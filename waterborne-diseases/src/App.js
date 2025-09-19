@@ -553,7 +553,7 @@ const App = () => {
     }
 
     return result !== undefined ? result : key;
-  }, [language]); // Dependency array includes 'language' so 't' updates when language changes.
+  }, [language, translations]); // Dependency array includes 'language' so 't' updates when language changes.
      
   useEffect(() => {
     setMessages([
