@@ -1,69 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { motion } from 'framer-motion';
-import { FaBars, FaTimes, FaHome, FaDatabase, FaChartBar, FaUsers, FaRobot, FaPhone, FaUpload, FaMoon, FaSun } from 'react-icons/fa';
+import { FaBars, FaTimes, FaRobot, FaHome, FaDatabase, FaUsers, FaInfoCircle, FaMoon, FaSun, FaComments, FaGlobe, FaPhone, FaHospital, FaStethoscope } from 'react-icons/fa';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import './App.css';
 
-// Mock data for disease outbreaks
-const diseaseOutbreaks = [
-  { id: 1, name: "Dibrugarh Outbreak", state: "Assam", position: [27.4728, 95.0167], cases: 1250, severity: "critical", healthContact: "1800-123-4567", rate: 42 },
-  { id: 2, name: "Guwahati Water Crisis", state: "Assam", position: [26.1445, 91.7362], cases: 890, severity: "high", healthContact: "1800-234-5678", rate: 35 },
-  { id: 3, name: "Imphal Contamination", state: "Manipur", position: [24.8170, 93.9368], cases: 620, severity: "high", healthContact: "1800-345-6789", rate: 28 },
-  { id: 4, name: "Shillong Health Alert", state: "Meghalaya", position: [25.5788, 91.8933], cases: 410, severity: "medium", healthContact: "1800-456-7890", rate: 22 },
-  { id: 5, name: "Agartala Water Issue", state: "Tripura", position: [23.8315, 91.2868], cases: 280, severity: "medium", healthContact: "1800-567-8901", rate: 18 },
-  { id: 6, name: "Aizawl Health Concern", state: "Mizoram", position: [23.7271, 92.7176], cases: 190, severity: "low", healthContact: "1800-678-9012", rate: 12 },
-  { id: 7, name: "Kohima Water Alert", state: "Nagaland", position: [25.6751, 94.1086], cases: 150, severity: "low", healthContact: "1800-789-0123", rate: 10 }
-];
-
-// Northeast India statistics data
-const northeastStats = [
-  { state: "Assam", diarrhea: 3200, cholera: 1800, typhoid: 1200, hepatitis: 800 },
-  { state: "Meghalaya", diarrhea: 1500, cholera: 900, typhoid: 600, hepatitis: 400 },
-  { state: "Manipur", diarrhea: 1800, cholera: 1100, typhoid: 750, hepatitis: 500 },
-  { state: "Nagaland", diarrhea: 900, cholera: 500, typhoid: 350, hepatitis: 250 },
-  { state: "Tripura", diarrhea: 1200, cholera: 700, typhoid: 450, hepatitis: 300 },
-  { state: "Mizoram", diarrhea: 800, cholera: 400, typhoid: 300, hepatitis: 200 },
-  { state: "Arunachal Pradesh", diarrhea: 600, cholera: 300, typhoid: 200, hepatitis: 150 }
-];
-
-// Disease trends data
-const diseaseTrends = [
-  { month: 'Jan', diarrhea: 200, cholera: 120, typhoid: 80, hepatitis: 60 },
-  { month: 'Feb', diarrhea: 250, cholera: 150, typhoid: 100, hepatitis: 70 },
-  { month: 'Mar', diarrhea: 300, cholera: 180, typhoid: 120, hepatitis: 90 },
-  { month: 'Apr', diarrhea: 400, cholera: 220, typhoid: 150, hepatitis: 110 },
-  { month: 'May', diarrhea: 550, cholera: 280, typhoid: 190, hepatitis: 140 },
-  { month: 'Jun', diarrhea: 700, cholera: 380, typhoid: 240, hepatitis: 180 },
-  { month: 'Jul', diarrhea: 650, cholera: 350, typhoid: 230, hepatitis: 170 },
-  { month: 'Aug', diarrhea: 480, cholera: 320, typhoid: 260, hepatitis: 210 },
-  { month: 'Sep', diarrhea: 400, cholera: 280, typhoid: 220, hepatitis: 180 },
-  { month: 'Oct', diarrhea: 320, cholera: 220, typhoid: 180, hepatitis: 150 },
-  { month: 'Nov', diarrhea: 200, cholera: 150, typhoid: 120, hepatitis: 90 },
-  { month: 'Dec', diarrhea: 150, cholera: 100, typhoid: 80, hepatitis: 60 }
-];
-
-// Team members data
-const teamMembers = [
-  { name: "Abhimanyu" },
-  { name: "Siddharth" },
-  { name: "Rudra" },
-  { name: "Karan" },
-  { name: "Ananya" },
-  { name: "Rohan" }
-];
-
-// Community events data
-const communityEvents = [
-  { id: 1, title: "Water Safety Workshop", date: "2023-11-15", attendees: 42, status: "upcoming" },
-  { id: 2, title: "Health Camp in Rural Areas", date: "2023-11-22", attendees: 68, status: "upcoming" },
-  { id: 3, title: "Awareness Drive in Schools", date: "2023-11-30", attendees: 35, status: "upcoming" }
-];
-
-// This new component will render our interactive map
 const OutbreakMap = ({ outbreaks, darkMode }) => {
-  const mapCenter = [26.2006, 92.9376]; // Centered on Assam
+  const mapCenter = [26.2006, 92.9376];
 
   const getMarkerOptions = (outbreak) => {
     let color;
@@ -76,7 +22,7 @@ const OutbreakMap = ({ outbreaks, darkMode }) => {
     }
 
     return {
-      radius: 5 + (outbreak.cases / 3000), // Dynamic radius based on cases
+      radius: 5 + (outbreak.cases / 3000),
       fillColor: color,
       color: color,
       weight: 1,
@@ -87,29 +33,48 @@ const OutbreakMap = ({ outbreaks, darkMode }) => {
 
   return (
     <div className={`card mb-4 ${darkMode ? 'bg-dark' : ''}`} style={{ borderRadius: '1rem', overflow: 'hidden' }}>
-      <MapContainer center={mapCenter} zoom={6} style={{ height: '450px', width: '100%' }} zoomControl={false}>
-        <TileLayer
-          url={darkMode ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {outbreaks.map(outbreak => (
-          <CircleMarker
-            key={outbreak.id}
-            center={outbreak.position}
-            pathOptions={getMarkerOptions(outbreak)}
-          >
-            <Popup>
-              <div className="fw-bold fs-6 mb-2">{outbreak.name} - {outbreak.state}</div>
-              <div className="mb-1"><strong>Cases:</strong> {outbreak.cases.toLocaleString()}</div>
-              <div className="mb-2"><strong className="text-capitalize">Severity:</strong> <span style={{ color: getMarkerOptions(outbreak).fillColor }}>{outbreak.severity}</span></div>
-              <hr className="my-2" />
-              <div className="small mb-1"><FaPhone className="me-2 text-primary" /><strong>Helpline:</strong> {outbreak.healthContact}</div>
-            </Popup>
-          </CircleMarker>
-        ))}
-      </MapContainer>
+        <MapContainer center={mapCenter} zoom={6} style={{ height: '450px', width: '100%' }} zoomControl={false}>
+            <TileLayer
+                url={darkMode ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"}
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {outbreaks.map(outbreak => (
+                <CircleMarker
+                    key={outbreak.id}
+                    center={outbreak.position}
+                    pathOptions={getMarkerOptions(outbreak)}
+                >
+                    <Popup>
+                        <div className="fw-bold fs-6 mb-2">{outbreak.name} - {outbreak.state}</div>
+                        <div className="mb-1"><strong>Cases:</strong> {outbreak.cases.toLocaleString()}</div>
+                        <div className="mb-2"><strong className="text-capitalize">Severity:</strong> <span style={{color: getMarkerOptions(outbreak).fillColor}}>{outbreak.severity}</span></div>
+                        <hr className="my-2"/>
+                        <div className="small mb-1"><FaPhone className="me-2 text-primary" /><strong>Helpline:</strong> {outbreak.healthContact}</div>
+                        <div className="small mb-2"><FaHospital className="me-2 text-success" /><strong>Health Centers:</strong> {outbreak.nearbyHospitals}+</div>
+                        <div className="small fst-italic"><strong>Latest Update:</strong> "{outbreak.latestNews}"</div>
+                    </Popup>
+                </CircleMarker>
+            ))}
+        </MapContainer>
     </div>
   );
+};
+
+const HealthTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="p-2 rounded bg-light shadow-sm" style={{ fontSize: '0.8rem' }}>
+        <strong>{label}</strong><br />
+        {payload.map((p, idx) => (
+          <div key={idx} style={{ color: p.color }}>
+            {p.name}: {p.value}
+          </div>
+        ))}
+        <em className="text-muted">💡 Did you know? Clean water prevents 80% of diarrheal diseases.</em>
+      </div>
+    );
+  }
+  return null;
 };
 
 const App = () => {
@@ -126,28 +91,33 @@ const App = () => {
     age: '',
     gender: '',
     location: '',
-    symptoms: []
+    symptoms: [],
   });
+ 
   const [waterFormData, setWaterFormData] = useState({
-    location: '',
-    water_source_type: 'well',
-    ph_level: '',
-    turbidity: '',
-    contaminantLevel: '',
-    temperature: '',
-    bacteria_count_cfu_ml: '',
-    nitrate_level_mg_l: '',
-    dissolved_oxygen_mg_l: ''
+    ph: '6.8',
+    turbidity: '12.3',
+    contaminantLevel: '150.5',
+    temperature: '25.4',
+    water_source_type: 'Groundwater',
+    bacteria_count_cfu_ml: '500',
+    nitrate_level_mg_l: '10.2',
+    dissolved_oxygen_mg_l: '4.5',
+    file: null
   });
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [language, setLanguage] = useState('en');
+ 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+
+  const [isWaterAnalyzing, setIsWaterAnalyzing] = useState(false);
   const [waterAnalysisResult, setWaterAnalysisResult] = useState(null);
   const [waterAnalysisError, setWaterAnalysisError] = useState(null);
+
   const mainChatRef = useRef(null);
   const widgetChatRef = useRef(null);
 
-  // FIX: Wrap the translations object in useMemo to prevent re-creation on every render.
   const translations = useMemo(() => ({
     en: {
       home: "Home",
@@ -162,9 +132,9 @@ const App = () => {
       assamese: "Assamese",
       bengali: "Bengali",
       heroTitle: "Northeast India Waterborne Disease Monitor",
-      heroSubtitle: "Real-time surveillance and response system for waterborne diseases",
-      outbreakTitle: "Diarrhea Outbreaks",
-      statisticsTitle: "Comparison of Northeast States",
+      heroSubtitle: "Real-time Surveillance and Response System for Water-Borne Diseases",
+      outbreakTitle: "Diarrhea Outbreak",
+      statisticsTitle: "Northeast States Comparison",
       trendsTitle: "Disease Trends (Monthly)",
       emergencyTitle: "Emergency Response Status",
       disease: "Disease",
@@ -173,13 +143,13 @@ const App = () => {
       responseTeam: "Response Team",
       lastUpdate: "Last Update",
       predictionTitle: "Submit Health Data for AI Disease Prediction",
-      predictionSubtitle: "Select symptoms and patient data, and our AI will provide an initial analysis of potential waterborne diseases.",
+      predictionSubtitle: "Select symptoms and patient data, and our AI will provide a preliminary analysis of potential waterborne illnesses.",
       patientInfo: "Patient Information",
       fullName: "Full Name",
       age: "Age",
       gender: "Gender",
       location: "Location",
-      symptoms: "Observed Symptoms",
+      symptoms: "Symptoms Observed",
       waterQuality: "Water Quality Parameters",
       waterSourceType: "Water Source Type",
       pH: "pH Level",
@@ -187,7 +157,7 @@ const App = () => {
       contaminantLevelPpm: "Contaminant Level (ppm)",
       waterTemperatureC: "Water Temperature (°C)",
       upload: "Upload File",
-      submitButton: "Submit Data and Get Analysis",
+      submitButton: "Submit Data & Get Analysis",
       analysisTitle: "AI Analysis Results",
       analysisPlaceholder: "Your analysis will appear here after submission.",
       analyzingPlaceholder: "Our AI is analyzing the data... Please wait.",
@@ -209,7 +179,7 @@ const App = () => {
       missionTitle: "Our Mission",
       missionText: "Healify is dedicated to revolutionizing public health monitoring through advanced AI and machine learning technologies. Our mission is to create a smart health surveillance system that detects, monitors, and prevents outbreaks of waterborne diseases in vulnerable communities across rural Northeast India.",
       visionTitle: "Our Vision",
-      visionText: "To establish a comprehensive early warning system that empowers communities, healthcare workers, and government officials with real-time insights and actionable intelligence to effectively combat waterborne diseases.",
+      visionText: "To establish a comprehensive early warning system that empowers communities, health workers, and government officials with real-time insights and actionable intelligence to combat waterborne diseases effectively.",
       techStack: "Technology Stack",
       teamTitle: "Our Team",
       critical: "Critical",
@@ -217,7 +187,7 @@ const App = () => {
       medium: "Medium",
       low: "Low",
       upcoming: "Upcoming",
-      registered: "Registered",
+      registered: "registered",
       registerNow: "Register Now",
       description: "Description",
       prevention: "Prevention Methods",
@@ -235,205 +205,48 @@ const App = () => {
       probability: "Match Score",
       noDiseaseDetectedTitle: "No Specific Disease Detected",
       noDiseaseDetectedDescription: "The combination of symptoms does not strongly match a single waterborne disease in our database. This does not rule out an illness.",
-      noDiseaseDetectedRemedy: "Please consult with a healthcare professional for an accurate diagnosis. Ensure you stay hydrated and monitor your symptoms.",
-      genderOptions: {
-        male: "Male",
-        female: "Female",
-        other: "Other"
-      },
-      symptomsList: [
-        "Fever", "Diarrhea", "Vomiting", "Stomach Cramps", "Dehydration", 
-        "Headache", "Fatigue", "Nausea", "Jaundice", "Dark Urine", 
-        "Pale Stools", "Bloating", "Weight Loss"
-      ],
+      noDiseaseDetectedRemedy: "Please consult a healthcare professional for an accurate diagnosis. Ensure you stay hydrated and monitor your symptoms.",
+      genderOptions: { male: "Male", female: "Female", other: "Other" },
+      symptomsList: [ "Fever", "Diarrhea", "Vomiting", "Abdominal Pain", "Dehydration", "Headache", "Fatigue", "Nausea", "Jaundice", "Dark colored urine", "Rose spots", "Bloating", "Weight loss" ],
       diseases: {
-        cholera: {
-          name: "Cholera",
-          description: "A bacterial infection that causes severe diarrhea and dehydration. It is often transmitted through contaminated water.",
-          remedies: [
-            "Oral rehydration solution (ORS) is the primary treatment.",
-            "Intravenous fluids for severe dehydration.",
-            "Antibiotics may be prescribed in severe cases."
-          ]
-        },
-        typhoid: {
-          name: "Typhoid Fever",
-          description: "A bacterial infection that can spread throughout the body, causing high fever, weakness, and gastrointestinal symptoms.",
-          remedies: [
-            "Antibiotics are the primary treatment.",
-            "Complete the full course of antibiotics even if feeling better.",
-            "Stay hydrated and get plenty of rest."
-          ]
-        },
-        hepatitisA: {
-          name: "Hepatitis A",
-          description: "A viral liver disease that can cause mild to severe illness. It is transmitted through contaminated food or water.",
-          remedies: [
-            "Rest is essential for recovery.",
-            "Avoid alcohol completely during recovery.",
-            "Maintain a healthy diet to support liver function."
-          ]
-        },
-        crypto: {
-          name: "Cryptosporidiosis",
-          description: "A diarrheal disease caused by the microscopic parasite Cryptosporidium. It can cause watery diarrhea and is a common cause of waterborne disease.",
-          remedies: [
-            "Most people recover without treatment.",
-            "Drink plenty of fluids to prevent dehydration.",
-            "Anti-diarrheal medications may help, but consult a doctor first."
-          ]
-        }
+          hepatitisA: { name: "Hepatitis A", description: "A liver infection caused by the Hepatitis A virus (HAV), highly contagious and spread through contaminated food or water.", remedies: ["Rest is crucial as there's no specific treatment.", "Stay hydrated by drinking plenty of fluids.", "Avoid alcohol and medications that can harm the liver."] },
+          cholera: { name: "Cholera", description: "An acute diarrheal illness caused by infection of the intestine with Vibrio cholerae bacteria, which can be severe.", remedies: ["Immediate rehydration with Oral Rehydration Solution (ORS) is key.", "Seek urgent medical attention for severe cases.", "Zinc supplements can help reduce the duration of diarrhea."] },
+          gastroenteritis: { name: "Gastroenteritis (Diarrhea)", description: "An intestinal infection marked by watery diarrhea, abdominal cramps, nausea or vomiting, and sometimes fever.", remedies: ["Drink plenty of liquids to prevent dehydration (ORS is best).", "Eat bland foods like bananas, rice, and toast (BRAT diet).", "Avoid dairy, fatty, or spicy foods."] },
+          typhoid: { name: "Typhoid Fever", description: "A serious bacterial infection caused by Salmonella Typhi, characterized by a sustained high fever.", remedies: ["Requires immediate medical attention and is treated with antibiotics.", "Drink plenty of fluids to prevent dehydration.", "Eat a high-calorie, nutritious diet."] },
+          giardiasis: { name: "Giardiasis", description: "An intestinal infection caused by a microscopic parasite called Giardia lamblia, often causing bloating and cramps without fever.", remedies: ["Medical treatment with prescription drugs is usually required.", "Stay well-hydrated.", "Avoid caffeine and dairy products, which can worsen diarrhea."] },
+          crypto: { name: "Cryptosporidiosis", description: "A diarrheal disease caused by the microscopic parasite Cryptosporidium. It can cause watery diarrhea and is a common cause of waterborne disease.", remedies: ["Most people recover without treatment.", "Drink plenty of fluids to prevent dehydration.", "Anti-diarrheal medicine may help, but consult a doctor first."] }
       },
       ai: {
-        initialGreeting: "Hello! I'm Healify AI. How can I assist you with waterborne diseases today? You can ask me 'What causes cholera?' or 'How to prevent typhoid?'",
-        fallback: "I'm sorry, I didn't understand that. Please ask about waterborne diseases, their symptoms, prevention methods, or cures."
+        initialGreeting: "Hello! I'm Healify AI. How can I assist you with waterborne diseases today? You can ask me things like 'What causes cholera?' or 'How to prevent typhoid?'",
+        fallback: "I'm sorry, I don't have information on that. I can answer questions about the causes, symptoms, treatment, and prevention of diseases like Cholera, Typhoid, Hepatitis A, Giardiasis, and Gastroenteritis. Please try asking your question differently.",
       }
     },
     hi: {
       home: "होम",
-      submitWaterData: "डेटा सबमिट करें",
+      submitWaterData: "डेटा जमा करें",
       diseasePrediction: "रोग पूर्वानुमान",
-      community: "सामुदायिक आउटरीच",
+      community: "सामुदायिक पहुंच",
       aiAssistant: "एआई सहायक",
       about: "हमारे बारे में",
       language: "भाषा",
-      english: "अंग्रेज़ी",
+      english: "अंग्रेजी",
       hindi: "हिंदी",
       assamese: "असमिया",
       bengali: "बंगाली",
-      heroTitle: "उत्तर-पूर्व भारत जलजनित रोग मॉनिटर",
-      heroSubtitle: "जलजनित रोगों के लिए वास्तविक समय पर निगरानी और प्रतिक्रिया प्रणाली",
-      outbreakTitle: "दस्त के प्रकोप",
-      statisticsTitle: "उत्तर-पूर्वी राज्यों की तुलना",
-      trendsTitle: "रोग प्रवृत्ति (मासिक)",
-      emergencyTitle: "आपातकालीन प्रतिक्रिया स्थिति",
-      disease: "रोग",
-      state: "राज्य",
-      severity: "गंभीरता स्तर",
-      responseTeam: "प्रतिक्रिया टीम",
-      lastUpdate: "अंतिम अद्यतन",
-      predictionTitle: "एआई रोग पूर्वानुमान के लिए स्वास्थ्य डेटा सबमिट करें",
-      predictionSubtitle: "लक्षण और रोगी डेटा चुनें, और हमारा एआई संभावित जलजनित बीमारियों का प्रारंभिक विश्लेषण प्रदान करेगा।",
-      patientInfo: "रोगी की जानकारी",
-      fullName: "पूरा नाम",
-      age: "आयु",
-      gender: "लिंग",
-      location: "स्थान",
-      symptoms: "देखे गए लक्षण",
-      waterQuality: "जल गुणवत्ता मापदंड",
-      waterSourceType: "जल स्रोत का प्रकार",
-      pH: "पीएच स्तर",
-      turbidity: "गंदलापन (NTU)",
-      contaminantLevelPpm: "संदूषक स्तर (ppm)",
-      waterTemperatureC: "पानी का तापमान (°C)",
-      upload: "फ़ाइल अपलोड करें",
-      submitButton: "डेटा सबमिट करें और विश्लेषण प्राप्त करें",
-      analysisTitle: "एआई विश्लेषण परिणाम",
-      analysisPlaceholder: "आपका विश्लेषण सबमिशन के बाद यहां दिखाई देगा।",
-      analyzingPlaceholder: "हमारा एआई डेटा का विश्लेषण कर रहा है... कृपया प्रतीक्षा करें।",
-      communityTitle: "सामुदायिक आउटरीच कार्यक्रम",
-      communitySubtitle: "जल सुरक्षा और रोग की रोकथाम के बारे में जानने के लिए पूर्वोत्तर भारत में हमारी स्वास्थ्य शिक्षा पहलों और सामुदायिक कार्यक्रमों में शामिल हों।",
-      eventsTitle: "आगामी कार्यक्रम",
-      programHighlights: "कार्यक्रम की मुख्य विशेषताएं",
-      onlinePrograms: "ऑनलाइन कार्यक्रम",
-      offlineEvents: "ऑफलाइन कार्यक्रम",
-      waterTesting: "जल परीक्षण",
-      chatTitle: "हीलिफाई एआई सहायक",
-      chatPlaceholder: "जलजनित रोगों के बारे में पूछें...",
-      chatFeatures: "एआई सहायक की विशेषताएं",
-      quickHelp: "त्वरित मदद",
-      diseaseSymptoms: "रोग के लक्षण",
-      preventionTips: "रोकथाम के उपाय",
-      waterTesting2: "जल परीक्षण",
-      aboutTitle: "हीलिफाई के बारे में",
-      missionTitle: "हमारा मिशन",
-      missionText: "हीलिफाई उन्नत एआई और मशीन लर्निंग तकनीकों के माध्यम से सार्वजनिक स्वास्थ्य निगरानी में क्रांति लाने के लिए समर्पित है। हमारा मिशन एक स्मार्ट स्वास्थ्य निगरानी प्रणाली बनाना है जो ग्रामीण पूर्वोत्तर भारत में कमजोर समुदायों में जलजनित बीमारियों के प्रकोप का पता लगाता है, निगरानी करता है और रोकता है।",
-      visionTitle: "हमारा दृष्टिकोण",
-      visionText: "एक व्यापक प्रारंभिक चेतावनी प्रणाली स्थापित करना जो समुदायों, स्वास्थ्य देखभाल कर्मचारियों और सरकारी अधिकारियों को वास्तविक समय की अंतर्दृष्टि और कार्रवाई योग्य बुद्धिमत्ता प्रदान करके जलजनित रोगों के प्रभावी रूप से मुकाबला करने में सक्षम बनाता है।",
-      techStack: "प्रौद्योगिकी स्टैक",
-      teamTitle: "हमारी टीम",
-      critical: "गंभीर",
-      high: "उच्च",
-      medium: "मध्यम",
-      low: "कम",
-      upcoming: "आगामी",
-      registered: "पंजीकृत",
-      registerNow: "अभी पंजीकरण करें",
-      description: "विवरण",
-      prevention: "रोकथाम के तरीके",
-      reportedCases: "रिपोर्ट किए गए मामले",
-      rate: "दर",
-      cases: "मामले",
-      location2: "स्थान",
-      send: "भेजें",
-      aboutAI: "हीलिफाई एआई के बारे में",
-      aboutAIText: "हमारा एआई सहायक कई भाषाओं में जलजनित रोगों, रोकथाम के तरीकों और स्वास्थ्य संसाधनों के बारे में आपके सवालों के तुरंत जवाब देता है।",
-      symptomsTitle: "लक्षण:",
-      preventionTitle: "रोकथाम के तरीके:",
-      remediesTitle: "इलाज और उपचार",
-      statistics: "प्रकोप के आँकड़े",
-      probability: "मिलान स्कोर",
-      noDiseaseDetectedTitle: "कोई विशेष रोग नहीं मिला",
-      noDiseaseDetectedDescription: "लक्षणों का संयोजन हमारे डेटाबेस में किसी एक जलजनित रोग से दृढ़ता से मेल नहीं खाता है। यह किसी बीमारी को खारिज नहीं करता है।",
-      noDiseaseDetectedRemedy: "सटीक निदान के लिए कृपया स्वास्थ्य देखभाल पेशेवर से परामर्श लें। सुनिश्चित करें कि आप पर्याप्त तरल पदार्थ लें और अपने लक्षणों पर नज़र रखें।",
-      genderOptions: {
-        male: "पुरुष",
-        female: "महिला",
-        other: "अन्य"
-      },
-      symptomsList: [
-        "बुखार", "दस्त", "उल्टी", "पेट दर्द", "निर्जलीकरण", 
-        "सिरदर्द", "थकान", "उबकारा", "पीलिया", "गहरे रंग का पेशाब", 
-        "हल्के रंग के मल", "पेट फूलना", "वजन घटना"
-      ],
-      diseases: {
-        cholera: {
-          name: "हैज़ा",
-          description: "एक बैक्टीरियोलॉजिकल संक्रमण जो गंभीर दस्त और निर्जलीकरण का कारण बनता है। यह अक्सर संदूषित पानी के माध्यम से संचारित होता है।",
-          remedies: [
-            "मौखिक पुनर्जलीकरण समाधान (ओआरएस) प्राथमिक उपचार है।",
-            "गंभीर निर्जलीकरण के लिए इंट्रावेनस तरल पदार्थ।",
-            "गंभीर मामलों में एंटीबायोटिक्स निर्धारित किया जा सकता है।"
-          ]
-        },
-        typhoid: {
-          name: "टाइफाइड बुखार",
-          description: "एक बैक्टीरियोलॉजिकल संक्रमण जो पूरे शरीर में फैल सकता है, जिससे उच्च बुखार, कमजोरी और पाचन संबंधी लक्षण होते हैं।",
-          remedies: [
-            "एंटीबायोटिक्स प्राथमिक उपचार हैं।",
-            "अच्छा महसूस करने पर भी एंटीबायोटिक्स का पूरा कोर्स पूरा करें।",
-            "पर्याप्त तरल पदार्थ लें और बहुत आराम करें।"
-          ]
-        },
-        hepatitisA: {
-          name: "हेपेटाइटिस ए",
-          description: "एक वायरल जिगर की बीमारी जो हल्की से गंभीर बीमारी का कारण बन सकती है। यह संदूषित भोजन या पानी के माध्यम से संचारित होती है।",
-          remedies: [
-            "रिकवरी के लिए आराम आवश्यक है।",
-            "रिकवरी के दौरान पूरी तरह से शराब से बचें।",
-            "जिगर के कार्य को समर्थित करने के लिए स्वस्थ आहार बनाए रखें।"
-          ]
-        },
-        crypto: {
-          name: "क्रिप्टोस्पोरिडियोसिस",
-          description: "सूक्ष्मजीवी क्रिप्टोस्पोरिडियम द्वारा उत्पन्न एक दस्त रोग। यह पानी के दस्त का कारण बन सकता है और जलजनित रोगों का एक सामान्य कारण है।",
-          remedies: [
-            "अधिकांश लोग उपचार के बिना ठीक हो जाते हैं।",
-            "निर्जलीकरण को रोकने के लिए पर्याप्त मात्रा में तरल पदार्थ पीएं।",
-            "एंटी-डायरियल दवाएं मदद कर सकती हैं, लेकिन पहले डॉक्टर से परामर्श करें।"
-          ]
-        }
-      },
+      heroTitle: "पूर्वोत्तर भारत जलजनित रोग मॉनिटर",
+      heroSubtitle: "जल-जनित रोगों के लिए रियल-टाइम निगरानी और प्रतिक्रिया प्रणाली",
+      outbreakTitle: "डायरिया का प्रकोप",
+      symptomsList: [ "बुखार", "दस्त", "उल्टी", "पेट दर्द", "निर्जलीकरण", "सिरदर्द", "थकान", "मतली", "पीलिया", "गहरे रंग का मूत्र", "गुलाबी धब्बे", "पेट फूलना", "वजन घटाना" ],
       ai: {
-        initialGreeting: "नमस्ते! मैं हीलिफाई एआई हूँ। मैं आज आपकी जलजनित बीमारियों के बारे में कैसे सहायता कर सकता हूँ? आप मुझसे 'हैज़ा का कारण क्या है?' या 'टाइफाइड कैसे रोकें?' पूछ सकते हैं।",
-        fallback: "क्षमा करें, मुझे वह समझ नहीं आया। कृपया जलजनित रोगों, उनके लक्षणों, रोकथाम के तरीकों या उपचार के बारे में पूछें।"
+        initialGreeting: "नमस्ते! मैं Healify AI हूं। आज मैं जल-जनित रोगों के बारे में आपकी कैसे सहायता कर सकता हूं?",
+        fallback: "मुझे खुशी है, मेरे पास इसकी जानकारी नहीं है। कृपया अपना प्रश्न अलग तरीके से पूछने की कोशिश करें।",
       }
     },
     as: {
       home: "ঘৰ",
       submitWaterData: "তথ্য জমা দিয়ক",
-      diseasePrediction: "ৰোগৰ পূৰ্বানুমান",
-      community: "সামাজিক প্ৰসাৰণ",
+      diseasePrediction: "ৰোগ পূৰ্বাভাস",
+      community: "সামুদায়িক সম্পৰ্ক",
       aiAssistant: "এআই সহায়ক",
       about: "আমাৰ বিষয়ে",
       language: "ভাষা",
@@ -441,140 +254,21 @@ const App = () => {
       hindi: "হিন্দী",
       assamese: "অসমীয়া",
       bengali: "বাংলা",
-      heroTitle: "উত্তৰ-পূৱ ভাৰত জলবাহিত ৰোগ মনিটৰ",
-      heroSubtitle: "জল-বাহিত ৰোগৰ বাবে ৰিয়েল-টাইম নজৰদাৰি আৰু প্ৰতিক্ৰিয়া ব্যৱস্থা",
-      outbreakTitle: "ডায়ৰিয়াৰ প্ৰাদুৰ্ভাৱ",
-      statisticsTitle: "উত্তৰ-পূৱ ৰাজ্যসমূহৰ তুলনা",
-      trendsTitle: "ৰোগৰ প্ৰৱণতা (মাহিক)",
-      emergencyTitle: "জৰুৰী প্ৰতিক্ৰিয়া স্থিতি",
-      disease: "ৰোগ",
-      state: "ৰাজ্য",
-      severity: "গুৰুত্বৰ স্তৰ",
-      responseTeam: "প্ৰতিক্ৰিয়া দল",
-      lastUpdate: "সৰ্বশেষ আপডেট",
-      predictionTitle: "এআই ৰোগ পূৰ্বাভাসৰ বাবে স্বাস্থ্য তথ্য জমা দিয়ক",
-      predictionSubtitle: "লক্ষণ আৰু ৰোগীৰ তথ্য বাছনি কৰক, আৰু আমাৰ এআইয়ে সম্ভাৱ্য জলবাহিত ৰোগৰ প্ৰাৰম্ভিক বিশ্লেষণ প্ৰদান কৰিব।",
-      patientInfo: "ৰোগীৰ তথ্য",
-      fullName: "সম্পূৰ্ণ নাম",
-      age: "বয়স",
-      gender: "লিংগ",
-      location: "অৱস্থান",
-      symptoms: "পৰ্যবেক্ষিত লক্ষণ",
-      waterQuality: "পানীৰ গুণ মাপদণ্ড",
-      waterSourceType: "পানীৰ উৎসৰ ধৰণ",
-      pH: "পিএইচ স্তৰ",
-      turbidity: "গন্ধলাপন (NTU)",
-      contaminantLevelPpm: "দূষকৰ স্তৰ (ppm)",
-      waterTemperatureC: "পানীৰ তাপমাত্ৰা (°C)",
-      upload: "ফাইল আপলোড কৰক",
-      submitButton: "তথ্য জমা দিয়ক আৰু বিশ্লেষণ প্ৰাপ্ত কৰক",
-      analysisTitle: "এআই বিশ্লেষণৰ ফলাফল",
-      analysisPlaceholder: "আপোনাৰ বিশ্লেষণ দাখিলৰ পিছত ইয়াত দেখা যাব।",
-      analyzingPlaceholder: "আমাৰ এআই-এ তথ্য বিশ্লেষণ কৰি আছে... অনুগ্ৰহ কৰি অপেক্ষা কৰক।",
-      communityTitle: "সামাজিক প্ৰসাৰণ কাৰ্যসূচী",
-      communitySubtitle: "পানীৰ সুৰক্ষা আৰু ৰোগ প্ৰতিৰোধৰ বিষয়ে জানিবলৈ উত্তৰ-পূব ভাৰতত আমাৰ স্বাস্থ্য শিক্ষাৰ পদক্ষেপ আৰু সামাজিক কাৰ্যসূচীত যোগদান কৰক।",
-      eventsTitle: "আগন্তুক কাৰ্যসূচী",
-      programHighlights: "কাৰ্যসূচীৰ মুখ্য অংশ",
-      onlinePrograms: "অনলাইন কাৰ্যসূচী",
-      offlineEvents: "অফলাইন কাৰ্যসূচী",
-      waterTesting: "পানী পৰীক্ষা",
-      chatTitle: "হিলিফাই এআই সহায়ক",
-      chatPlaceholder: "জলবাহিত ৰোগৰ বিষয়ে সোধক...",
-      chatFeatures: "এআই সহায়কৰ বৈশিষ্ট্য",
-      quickHelp: "দ্ৰুত সহায়",
-      diseaseSymptoms: "ৰোগৰ লক্ষণ",
-      preventionTips: "প্ৰতিৰোধৰ উপায়",
-      waterTesting2: "পানী পৰীক্ষা",
-      aboutTitle: "হিলিফাইৰ বিষয়ে",
-      missionTitle: "আমাৰ উদ্দেশ্য",
-      missionText: "হিলিফাই উন্নত এআই আৰু মেচিন লাৰ্নিং প্ৰযুক্তিৰ জৰিয়তে জনস্বাস্থ্য নিৰীক্ষণত বৈপ্লৱিক পৰিৱৰ্তন আনিবলৈ সমৰ্পিত। আমাৰ উদ্দেশ্য হৈছে গ্ৰাম্য উত্তৰ-পূব ভাৰতৰ দুৰ্বল সম্প্ৰদায়সমূহত জলবাহিত ৰোগৰ প্ৰাদুৰ্ভাৱ চিনাক্ত, নিৰীক্ষণ আৰু প্ৰতিৰোধ কৰা এক স্মাৰ্ট স্বাস্থ্য নিৰীক্ষণ প্ৰণালী সৃষ্টি কৰা।",
-      visionTitle: "আমাৰ দৃষ্টিভংগী",
-      visionText: "সম্প্ৰদায়, স্বাস্থ্যকৰ্মী আৰু চৰকাৰী কৰ্মচাৰীসকলক ৰিয়েল-টাইম অন্তৰ্দৃষ্টি আৰু কাৰ্যকৰ বুদ্ধিমত্তাৰ সৈতে জলবাহিত ৰোগৰ বিৰুদ্ধে কাৰ্যকৰভাৱে লড়াই কৰাৰ বাবে এক ব্যাপক প্ৰাথমিক সতৰ্কতা ব্যৱস্থা স্থাপন কৰা।",
-      techStack: "প্ৰযুক্তি স্ট্যাক",
-      teamTitle: "আমাৰ দল",
-      critical: "সংকটজনক",
-      high: "উচ্চ",
-      medium: "মাজাৰি",
-      low: "নিম্ন",
-      upcoming: "আহন্তুক",
-      registered: "পঞ্জীকৃত",
-      registerNow: "এতিয়া পঞ্জীকৰণ কৰক",
-      description: "বিৱৰণ",
-      prevention: "প্ৰতিৰোধৰ উপায়",
-      reportedCases: "প্ৰতিবেদন কৰা মামলাসমূহ",
-      rate: "হাৰ",
-      cases: "মামলাসমূহ",
-      location2: "অৱস্থান",
-      send: "পঠিয়াওক",
-      aboutAI: "হিলিফাই এআইৰ বিষয়ে",
-      aboutAIText: "আমাৰ এআই সহায়কে বহু ভাষাত জলবাহিত ৰোগ, প্ৰতিৰোধ পদ্ধতি আৰু স্বাস্থ্য সম্পদৰ বিষয়ে আপোনাৰ প্ৰশ্নৰ তৎকালীন উত্তৰ দিয়ে।",
-      symptomsTitle: "লক্ষণসমূহ:",
-      preventionTitle: "প্ৰতিৰোধ পদ্ধতি:",
-      remediesTitle: "নিৰাময় আৰু প্ৰতিকাৰ",
-      statistics: "প্ৰাদুৰ্ভাৱৰ পৰিসংখ্যা",
-      probability: "মিল স্কোৰ",
-      noDiseaseDetectedTitle: "কোনো নিৰ্দিষ্ট ৰোগ ধৰা পৰা নাই",
-      noDiseaseDetectedDescription: "লক্ষণসমূহৰ সংমিশ্ৰণে আমাৰ ডাটাবেছত কোনো এটা জলবাহিত ৰোগৰ সৈতে শক্তিশালীভাৱে মিল নাখায়। ই কোনো ৰোগ নুই নকৰে।",
-      noDiseaseDetectedRemedy: "সঠিক ৰোগ নিৰ্ণয়ৰ বাবে অনুগ্ৰহ কৰি এজন স্বাস্থ্যসেৱা পেছাদাৰীৰ সৈতে পৰামৰ্শ কৰক। আপুনি হাইড্ৰেটেড থকাটো নিশ্চিত কৰক আৰু আপোনাৰ লক্ষণসমূহ নিৰীক্ষণ কৰক।",
-      genderOptions: {
-        male: "পুৰুষ",
-        female: "মহিলা",
-        other: "অন্য"
-      },
-      symptomsList: [
-        "জ্বৰ", "ডায়েৰিয়া", "বমি", "পেটৰ বিষ", "ডিহাইড্ৰেচন", 
-        "মূৰৰ বিষ", "ভাগৰ", "বমি ভাব", "জণ্ডিচ", "গাঢ় ৰঙৰ প্ৰস্ৰাৱ", 
-        "গোলাপী দাগ", "পেট ফুলা", "ওজন হ্ৰাস"
-      ],
-      diseases: {
-        cholera: {
-          name: "হলেৰা",
-          description: "এক বেক্টেৰিয়াল সংক্ৰমণ যি গুৰুতৰ ডায়ৰিয়া আৰু ডিহাইড্ৰেচনৰ কাৰণ হয়। ই প্ৰায়ে দূষিত পানীৰ জৰিয়তে সংক্ৰমিত হয়।",
-          remedies: [
-            "মৌখিক পুনৰ্জলীকৰণ সমাধান (ওআৰএছ) হৈছে প্ৰাথমিক চিকিৎসা।",
-            "গুৰুতৰ ডিহাইড্ৰেচনৰ বাবে ইন্ট্ৰাভেনাছ তৰল।",
-            "গুৰুতৰ মামলাত এন্টিবায়টিক নিৰ্ধাৰিত কৰা হ'ব পাৰে।"
-          ]
-        },
-        typhoid: {
-          name: "টাইফয়েড জ্বৰ",
-          description: "এক বেক্টেৰিয়াল সংক্ৰমণ যি সমগ্ৰ শৰীৰত প্ৰসাৰিত হ'ব পাৰে, যাৰ ফলত উচ্চ জ্বৰ, দুৰ্বলতা আৰু পাচন সংক্ৰান্ত লক্ষণ হয়।",
-          remedies: [
-            "এন্টিবায়টিক হৈছে প্ৰাথমিক চিকিৎসা।",
-            "ভাল অনুভৱ কৰিলেও এন্টিবায়টিকৰ সম্পূৰ্ণ কোৰ্চ সম্পূৰ্ণ কৰক।",
-            "পৰ্যাপ্ত তৰল পদাৰ্থ গ্ৰহণ কৰক আৰু বেছি আৰাম কৰক।"
-          ]
-        },
-        hepatitisA: {
-          name: "হেপেটাইটিচ এ",
-          description: "এক ভাইৰাল যকৃত ৰোগ যি হালকৈ পৰা গুৰুতৰ অসুস্থতাৰ কাৰণ হ'ব পাৰে। ই দূষিত খাদ্য বা পানীৰ জৰিয়তে সংক্ৰমিত হয়।",
-          remedies: [
-            "ৰিকভাৰীৰ বাবে আৰাম অত্যন্ত প্ৰয়োজনীয়।",
-            "ৰিকভাৰীৰ সময়ত এলকহলৰ পৰা সম্পূৰ্ণভাৱে বিৰত থাকক।",
-            "যকৃতৰ কাৰ্য সমৰ্থন কৰিবলৈ এটা স্বাস্থ্যকৰ আহাৰ অনুসৰণ কৰক।"
-          ]
-        },
-        crypto: {
-          name: "ক্ৰিপ্টোস্প'ৰিডিওচিছ",
-          description: "অণুবীক্ষণিক পৰজীৱী ক্ৰিপ্টোস্প'ৰিডিয়ামৰ ফলত হোৱা এক ডায়েৰিয়া ৰোগ। ই পনীয়া ডায়েৰিয়াৰ সৃষ্টি কৰিব পাৰে আৰু ই জলবাহিত ৰোগৰ এক সাধাৰণ কাৰণ।",
-          remedies: [
-            "বেছিভাগ লোক চিকিৎসা অবিহনে আৰোগ্য হয়।",
-            "ডিহাইড্ৰেচন প্ৰতিৰোধ কৰিবলৈ যথেষ্ট তৰল পদাৰ্থ পান কৰক।",
-            "ডায়েৰিয়া-প্ৰতিৰোধী ঔষধে সহায় কৰিব পাৰে, কিন্তু প্ৰথমে চিকিৎসকৰ পৰামৰ্শ লওক।"
-          ]
-        }
-      },
+      heroTitle: "উত্তৰ-পূৰ্ব ভাৰত জলবাহিত ৰোগ মনিটৰ",
+      heroSubtitle: "জল-বাহিত ৰোগৰ বাবে ৰিয়েল-টাইম নিৰীক্ষণ আৰু প্ৰতিক্ৰিয়া ব্যৱস্থা",
+      outbreakTitle: "ডায়েৰিয়াৰ প্ৰাদুৰ্ভাৱ",
+      symptomsList: [ "জ্বৰ", "ডায়েৰিয়া", "বমি", "পেটৰ বিষ", "নিৰ্জলীকৰণ", "মূৰৰ বিষ", "ক্লান্তি", "বমি ভাব", "জণ্ডিছ", "গাঢ় ৰঙৰ প্ৰস্ৰাব", "গোলাপী দাগ", "পেট ফুলা", "ওজন কমা" ],
       ai: {
-        initialGreeting: "নমস্কাৰ! মই হিলিফাই এআই। মই আজি আপোনাক জলবাহিত ৰোগৰ বিষয়ে কেনেদৰে সহায় কৰিব পাৰোঁ? আপুনি মোক 'কলেৰাৰ কাৰণ কি?' বা 'টাইফয়েড কেনেকৈ প্ৰতিৰোধ কৰিব?' আদি প্ৰশ্ন সুধিব পাৰে।",
-        fallback: "ক্ষমা কৰিব, মই তেওঁৰ বুজি পোৱা নাই। জলবাহিত ৰোগ, সিহঁতৰ লক্ষণ, প্ৰতিৰোধৰ উপায় বা চিকিৎসাৰ বিষয়ে প্ৰশ্ন কৰক।"
+        initialGreeting: "নমস্কাৰ! মই Healify AI। আজি মই জল-বাহিত ৰোগৰ বিষয়ে আপোনাক কেনেকৈ সহায় কৰিব পাৰোঁ?",
+        fallback: "দুঃখিত, মোৰ ইয়াৰ তথ্য নাই। অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্ন বেলেগ ধৰণে সুধিবলৈ চেষ্টা কৰক।",
       }
     },
     bn: {
       home: "হোম",
       submitWaterData: "ডেটা জমা দিন",
-      diseasePrediction: "রোগ পূর্বাভাস",
-      community: "সম্প্রদায় আউটরিচ",
-      aiAssistant: "এআই সহকারী",
+      diseasePrediction: "রোগের পূর্বাভাস",
+      community: "কমিউনিটি আউটরিচ",
+      aiAssistant: "এআই সহায়ক",
       about: "আমাদের সম্পর্কে",
       language: "ভাষা",
       english: "ইংরেজি",
@@ -582,138 +276,19 @@ const App = () => {
       assamese: "অসমিয়া",
       bengali: "বাংলা",
       heroTitle: "উত্তর-পূর্ব ভারত জলবাহিত রোগ মনিটর",
-      heroSubtitle: "জল-বাহিত রোগের জন্য রিয়েল-টাইম নজরদারি এবং প্রতিক্রিয়া ব্যবস্থা",
+      heroSubtitle: "জল-বাহিত রোগের জন্য রিয়েল-টাইম নিরীক্ষণ এবং প্রতিক্রিয়া সিস্টেম",
       outbreakTitle: "ডায়রিয়ার প্রাদুর্ভাব",
-      statisticsTitle: "উত্তর-পূর্ব রাজ্যগুলির তুলনা",
-      trendsTitle: "রোগের প্রবণতা (মাসিক)",
-      emergencyTitle: "জরুরী প্রতিক্রিয়া স্থিতি",
-      disease: "রোগ",
-      state: "রাজ্য",
-      severity: "গুরুতরতার স্তর",
-      responseTeam: "প্রতিক্রিয়া দল",
-      lastUpdate: "শেষ আপডেট",
-      predictionTitle: "এআই রোগ পূর্বাভাসের জন্য স্বাস্থ্য ডেটা জমা দিন",
-      predictionSubtitle: "লক্ষণ এবং রোগীর ডেটা নির্বাচন করুন, এবং আমাদের এআই সম্ভাব্য জলবাহিত রোগের প্রাথমিক বিশ্লেষণ প্রদান করবে।",
-      patientInfo: "রোগীর তথ্য",
-      fullName: "পুরো নাম",
-      age: "বয়স",
-      gender: "লিঙ্গ",
-      location: "অবস্থান",
-      symptoms: "পর্যবেক্ষিত লক্ষণ",
-      waterQuality: "জল গুণমান পরামিতি",
-      waterSourceType: "জল উৎসের ধরন",
-      pH: "পিএইচ স্তর",
-      turbidity: "গন্ধলাপন (NTU)",
-      contaminantLevelPpm: "দূষকের স্তর (ppm)",
-      waterTemperatureC: "জলের তাপমাত্রা (°C)",
-      upload: "ফাইল আপলোড করুন",
-      submitButton: "ডেটা জমা দিন এবং বিশ্লেষণ পান",
-      analysisTitle: "এআই বিশ্লেষণ ফলাফল",
-      analysisPlaceholder: "আপনার বিশ্লেষণ জমা দেওয়ার পরে এখানে উপস্থিত হবে।",
-      analyzingPlaceholder: "আমাদের এআই ডেটা বিশ্লেষণ করছে... অনুগ্রহ করে অপেক্ষা করুন।",
-      communityTitle: "সম্প্রদায় আউটরিচ প্রোগ্রাম",
-      communitySubtitle: "জল নিরাপত্তা এবং রোগ প্রতিরোধ সম্পর্কে জানতে উত্তর-পূর্ব ভারত জুড়ে আমাদের স্বাস্থ্য শিক্ষা উদ্যোগ এবং সম্প্রদায় ইভেন্টগুলিতে যোগ দিন।",
-      eventsTitle: "আসন্ন ঘটনাবলী",
-      programHighlights: "প্রোগ্রামের হাইলাইটস",
-      onlinePrograms: "অনলাইন প্রোগ্রাম",
-      offlineEvents: "অফলাইন ইভেন্টস",
-      waterTesting: "জল পরীক্ষা",
-      chatTitle: "হিলিফাই এআই সহকারী",
-      chatPlaceholder: "জলবাহিত রোগের বিষয়ে জিজ্ঞাসা করুন...",
-      chatFeatures: "এআই সহকারীর বৈশিষ্ট্য",
-      quickHelp: "দ্রুত সাহায্য",
-      diseaseSymptoms: "রোগের লক্ষণ",
-      preventionTips: "প্রতিরোধ পদ্ধতি",
-      waterTesting2: "জল পরীক্ষা",
-      aboutTitle: "হিলিফাই সম্পর্কে",
-      missionTitle: "আমাদের মিশন",
-      missionText: "হিলিফাই উন্নত এআই এবং মেশিন লার্নিং প্রযুক্তির মাধ্যমে জনস্বাস্থ্য নিরীক্ষণে বিপ্লব আনতে নিবেদিত। আমাদের মিশন হল একটি স্মার্ট স্বাস্থ্য নিরীক্ষণ সিস্টেম তৈরি করা যা গ্রামীণ উত্তর-পূর্ব ভারতের দুর্বল সম্প্রদায়গুলিতে জলবাহিত রোগের প্রাদুর্ভাব সনাক্ত করবে, নিরীক্ষণ করবে এবং প্রতিরোধ করবে।",
-      visionTitle: "আমাদের দৃষ্টি",
-      visionText: "একটি ব্যাপক প্রারম্ভিক সতর্কতা ব্যবস্থা প্রতিষ্ঠা করা যা সম্প্রদায়, স্বাস্থ্যকর্মী এবং সরকারী কর্মকর্তাদেরকে জলবাহিত রোগের বিরুদ্ধে কার্যকরভাবে লড়াই করার জন্য রিয়েল-টাইম অন্তর্দৃষ্টি এবং কার্যকরী বুদ্ধিমত্তা দিয়ে শক্তিশালী করে।",
-      techStack: "প্রযুক্তি স্ট্যাক",
-      teamTitle: "আমাদের দল",
-      critical: "সংকটজনক",
-      high: "উচ্চ",
-      medium: "মাঝারি",
-      low: "নিম্ন",
-      upcoming: "আসন্ন",
-      registered: "নিবন্ধিত",
-      registerNow: "এখন নিবন্ধন করুন",
-      description: "বিবরণ",
-      prevention: "প্রতিরোধ পদ্ধতি",
-      reportedCases: "রিপোর্ট করা কেস",
-      rate: "হার",
-      cases: "কেস",
-      location2: "অবস্থান",
-      send: "প্রেরণ",
-      aboutAI: "হিলিফাই এআই সম্পর্কে",
-      aboutAIText: "আমাদের এআই সহকারী একাধিক ভাষায় জলবাহিত রোগ, প্রতিরোধ পদ্ধতি এবং স্বাস্থ্য সম্পদ সম্পর্কে আপনার প্রশ্নের তাত্ক্ষণিক উত্তর প্রদান করে।",
-      symptomsTitle: "লক্ষণ:",
-      preventionTitle: "প্রতিরোধ পদ্ধতি:",
-      remediesTitle: "নিরাময় ও প্রতিকার",
-      statistics: "প্রাদুর্ভাবের পরিসংখ্যান",
-      probability: "ম্যাচ স্কোর",
-      noDiseaseDetectedTitle: "কোনো নির্দিষ্ট রোগ সনাক্ত করা যায়নি",
-      noDiseaseDetectedDescription: "লক্ষণগুলির সংমিশ্রণ আমাদের ডাটাবেসের কোনো একক জলবাহিত রোগের সাথে দৃঢ়ভাবে মেলে না। এটি কোনো অসুস্থতা বাতিল করে না।",
-      noDiseaseDetectedRemedy: "সঠিক নির্ণয়ের জন্য অনুগ্রহ করে একজন স্বাস্থ্যসেবা পেশাদারের সাথে পরামর্শ করুন। আপনি হাইড্রেটেড আছেন তা নিশ্চিত করুন এবং আপনার লক্ষণগুলি পর্যবেক্ষণ করুন।",
-      genderOptions: {
-        male: "পুরুষ",
-        female: "মহিলা",
-        other: "অন্যান্য"
-      },
-      symptomsList: [
-        "জ্বর", "ডায়রিয়া", "বমি", "পেটে ব্যথা", "ডিহাইড্রেশন", 
-        "মাথাব্যথা", "ক্লান্তি", "বমি বমি ভাব", "জন্ডিস", "গাঢ় রঙের প্রস্রাব", 
-        "গোলাপী দাগ", "পেট ফাঁপা", "ওজন হ্রাস"
-      ],
-      diseases: {
-        cholera: {
-          name: "হলেরা",
-          description: "একটি ব্যাকটেরিয়াল সংক্রমণ যা গুরুতর ডায়রিয়া এবং ডিহাইড্রেশন সৃষ্টি করে। এটি প্রায়শই দূষিত জলের মাধ্যমে সংক্রমিত হয়।",
-          remedies: [
-            "মৌখিক পুনর্জলায়ন সমাধান (ওআরএস) হল প্রাথমিক চিকিত্সা।",
-            "গুরুতর ডিহাইড্রেশনের জন্য ইন্ট্রাভেনাস তরল।",
-            "গুরুতর ক্ষেত্রে অ্যান্টিবায়োটিক নির্ধারিত করা হতে পারে।"
-          ]
-        },
-        typhoid: {
-          name: "টাইফয়েড জ্বর",
-          description: "একটি ব্যাকটেরিয়াল সংক্রমণ যা সমগ্র শরীরে ছড়িয়ে পড়তে পারে, যা উচ্চ জ্বর, দুর্বলতা এবং পাচন সংক্রান্ত লক্ষণ সৃষ্টি করে।",
-          remedies: [
-            "অ্যান্টিবায়োটিক হল প্রাথমিক চিকিত্সা।",
-            "ভাল অনুভব করলেও অ্যান্টিবায়োটিকের সম্পূর্ণ কোর্স শেষ করুন।",
-            "পর্যাপ্ত তরল পান করুন এবং প্রচুর বিশ্রাম নিন।"
-          ]
-        },
-        hepatitisA: {
-          name: "হেপাটাইটিস এ",
-          description: "একটি ভাইরাল যকৃত রোগ যা হালকা থেকে গুরুতর অসুস্থতা সৃষ্টি করতে পারে। এটি দূষিত খাবার বা জলের মাধ্যমে সংক্রমিত হয়।",
-          remedies: [
-            "রিকভারির জন্য বিশ্রাম অপরিহার্য।",
-            "রিকভারির সময় সম্পূর্ণভাবে অ্যালকোহল থেকে বিরত থাকুন।",
-            "যকৃতের কাজকে সমর্থন করতে স্বাস্থ্যকর ডায়েট বজায় রাখুন।"
-          ]
-        },
-        crypto: {
-          name: "ক্রিপ্টোস্পোরিডিওসিস",
-          description: "অণুবীক্ষণিক পরজীবী ক্রিপ্টোস্পোরিডিয়াম দ্বারা সৃষ্ট একটি ডায়রিয়ার রোগ। এটি জলীয় ডায়রিয়ার কারণ হতে পারে এবং এটি জলবাহিত রোগের একটি সাধারণ কারণ।",
-          remedies: [
-            "বেশিরভাগ লোক চিকিৎসা ছাড়াই সুস্থ হয়ে ওঠে।",
-            "ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন।",
-            "অ্যান্টি-ডায়রিয়াল ওষুধ সাহায্য করতে পারে, তবে প্রথমে একজন ডাক্তারের সাথে পরামর্শ করুন।"
-          ]
-        }
-      },
+      symptomsList: [ "জ্বর", "ডায়রিয়া", "বমি", "পেটে ব্যথা", "পানিশূন্যতা", "মাথাব্যথা", "ক্লান্তি", "বমি বমি ভাব", "জন্ডিস", "গাঢ় রঙের প্রস্রাব", "গোলাপি দাগ", "পেট ফাঁপা", "ওজন কমা" ],
       ai: {
-        initialGreeting: "নমস্কার! আমি হিলিফাই এআই। আমি আজ আপনাকে জলবাহিত রোগ সম্পর্কে কীভাবে সহায়তা করতে পারি? আপনি আমাকে জিজ্ঞাসা করতে পারেন 'কলেরার কারণ কী?' বা 'টাইফয়েড কীভাবে প্রতিরোধ করবেন?'",
-        fallback: "দুঃখিত, আমি বুঝতে পারিনি। জলবাহিত রোগ, তাদের লক্ষণ, প্রতিরোধ পদ্ধতি বা চিকিত্সা সম্পর্কে জিজ্ঞাসা করুন।"
+        initialGreeting: "নমস্কার! আমি Healify AI। আজ জলবাহিত রোগ সম্পর্কে আমি আপনাকে কীভাবে সাহায্য করতে পারি?",
+        fallback: "দুঃখিত, আমার কাছে এই তথ্য নেই। দয়া করে আপনার প্রশ্নটি ভিন্নভাবে জিজ্ঞাসা করার চেষ্টা করুন।",
       }
     }
-  }), []); // Empty dependency array means it won't recompute unless needed
+  }), []);
 
-  // FIX: Wrap the 't' function in useCallback to prevent re-creation on every render.
   const t = useCallback((key) => {
     const keys = key.split('.');
+   
     const resolve = (languageObject, keyParts) => {
       let current = languageObject;
       for (const part of keyParts) {
@@ -726,274 +301,270 @@ const App = () => {
     };
 
     let result = resolve(translations[language], keys);
+
     if (result === undefined && language !== 'en') {
       result = resolve(translations['en'], keys);
     }
+
     return result !== undefined ? result : key;
-  }, [language, translations]); // Dependency array includes 'language' and 'translations' so 't' updates when they change.
-
+  }, [language, translations]);
+     
   useEffect(() => {
-    setMessages([{
-      id: 1,
-      text: t('ai.initialGreeting'),
-      sender: 'ai',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }]);
-  }, [language, t]); // Now 't' is stable and won't cause unnecessary re-renders.
+    setMessages([
+        { 
+            id: 1, 
+            text: t('ai.initialGreeting'), 
+            sender: 'ai', 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        }
+    ]);
+  }, [language, t]);
 
-  // ✨ NEW: Enhanced AI Knowledge Base
-  const diseaseInfoDatabase = {
+  const diseaseInfoDatabase = useMemo(() => ({
     hepatitisA: {
-      name: "Hepatitis A",
-      keywords: ["hepatitis", "jaundice", "hav"],
-      info: {
-        symptoms: "Fatigue, nausea, abdominal pain, loss of appetite, low-grade fever, dark urine, clay-colored bowel movements, joint pain, yellowing of the skin and eyes (jaundice).",
-        causes: "Hepatitis A is caused by the hepatitis A virus (HAV). It's spread when a person ingests fecal matter — even in microscopic amounts — from contact with objects, food or drinks contaminated by the feces of an infected person.",
-        treatment: "There is no specific antiviral treatment for hepatitis A. Treatment focuses on keeping comfortable and controlling signs and symptoms of the disease. This includes resting, eating small meals, avoiding alcohol, and managing nausea.",
-        prevention: "The best way to prevent hepatitis A is vaccination. Other preventive measures include good hygiene, safe food practices, and avoiding contaminated water."
-      }
+        name: "Hepatitis A",
+        keywords: ["hepatitis", "jaundice", "hav"],
+        info: {
+            causes: "Hepatitis A is caused by the Hepatitis A virus (HAV). It's typically transmitted through consuming food or water contaminated with fecal matter from an infected person.",
+            symptoms: "Key symptoms are fever, fatigue, loss of appetite, nausea, abdominal pain, dark urine, and jaundice (yellowing of the skin and eyes).",
+            treatment: "There is no specific treatment for Hepatitis A. The body usually clears the virus on its own. Doctors recommend rest, adequate nutrition, and plenty of fluids. It's vital to avoid alcohol.",
+            prevention: "The best prevention is the Hepatitis A vaccine. Also, always wash your hands with soap and water after using the bathroom and before preparing food. Drink only purified or boiled water."
+        }
     },
     cholera: {
-      name: "Cholera",
-      keywords: ["cholera", "vibrio", "rice-water stool"],
-      info: {
-        symptoms: "Cholera infection is often mild or without symptoms, but can sometimes be severe. Approximately 1 in 10 infected persons will have severe disease characterized by profuse watery diarrhea, vomiting, and leg cramps. Rapid loss of body fluids leads to dehydration and shock.",
-        causes: "Cholera is caused by the bacterium Vibrio cholerae. The infection is often mild or without symptoms, but can sometimes be severe. People contract cholera by drinking water or eating food contaminated with cholera bacteria.",
-        treatment: "Cholera can be simply and successfully treated by immediate replacement of the fluid and salts lost through diarrhea. Patients can be treated with oral rehydration solution (ORS), a prepackaged mixture of sugar and salts to be mixed with water. Severe cases also need intravenous fluid replacement.",
-        prevention: "Three oral cholera vaccines are prequalified by the World Health Organization. Preventive measures include access to safe water and sanitation, proper hygiene practices, and health education."
-      }
+        name: "Cholera",
+        keywords: ["cholera"],
+        info: {
+            causes: "Cholera is caused by the bacterium Vibrio cholerae, which is found in water or food sources contaminated by feces from an infected person.",
+            symptoms: "The hallmark symptom is profuse watery diarrhea, often described as 'rice-water stools'. Other symptoms include vomiting and leg cramps. It leads to rapid dehydration.",
+            treatment: "Immediate rehydration is critical. This is done using Oral Rehydration Solution (ORS). In severe cases, intravenous fluids and antibiotics are required. See a doctor immediately.",
+            prevention: "Prevention relies on ensuring access to clean, safe drinking water and proper sanitation. Boiling or treating water before use is essential in high-risk areas."
+        }
+    },
+    gastroenteritis: {
+        name: "Gastroenteritis",
+        keywords: ["gastroenteritis", "diarrhea", "stomach flu", "loose motion"],
+        info: {
+            causes: "Gastroenteritis, or infectious diarrhea, can be caused by various viruses (like rotavirus and norovirus), bacteria, or parasites. It spreads through contaminated food or water, or contact with an infected person.",
+            symptoms: "Common symptoms include watery diarrhea, abdominal cramps, nausea, vomiting, and sometimes fever. Dehydration is a major concern.",
+            treatment: "Treatment focuses on preventing dehydration by drinking plenty of fluids, especially ORS. Eat bland foods (like bananas, rice, toast). Most cases resolve on their own.",
+            prevention: "Frequent and thorough handwashing is the best way to prevent it. Also, ensure food is cooked properly and avoid consuming untreated water."
+        }
     },
     typhoid: {
-      name: "Typhoid Fever",
-      keywords: ["typhoid", "salmonella", "enteric fever"],
-      info: {
-        symptoms: "Typhoid fever is characterized by poor appetite, headache, generalized aches and pains, fever, and lethargy. Intestinal bleeding or perforation can occur in the third week of illness. Some patients develop a rash of flat, rose-colored spots.",
-        causes: "Typhoid fever is caused by the bacterium Salmonella typhi. People with acute illness can contaminate the water supply through their stool, which contains a lot of the bacteria. Contamination of the water supply can lead to outbreaks of typhoid fever.",
-        treatment: "Antibiotics such as ciprofloxacin, azithromycin, and ceftriaxone are used to treat typhoid fever. With appropriate antibiotic therapy, symptoms usually begin to improve within 2 to 3 days. Without treatment, typhoid fever can be fatal.",
-        prevention: "Vaccines are available to prevent typhoid fever. Preventive measures include access to safe water and sanitation, proper hygiene practices, and avoiding raw or undercooked foods."
-      }
+        name: "Typhoid Fever",
+        keywords: ["typhoid", "enteric fever"],
+        info: {
+            causes: "Typhoid fever is caused by the bacterium Salmonella Typhi. It is spread through contaminated food and water, and by close contact with an infected person.",
+            symptoms: "It is characterized by a sustained high fever that can reach 104°F (40°C). Other symptoms include headache, weakness, stomach pain, and sometimes a rash of flat, rose-colored spots.",
+            treatment: "Typhoid requires prompt treatment with antibiotics prescribed by a doctor. Without treatment, it can be fatal.",
+            prevention: "Vaccination is available and recommended for people in high-risk areas. Always drink safe water, avoid raw food from street vendors, and practice good hand hygiene."
+        }
+    },
+    giardiasis: {
+        name: "Giardiasis",
+        keywords: ["giardiasis", "giardia"],
+        info: {
+            causes: "This intestinal infection is caused by a microscopic parasite called Giardia lamblia. It is found in contaminated water, food, or soil and can be transmitted from person to person.",
+            symptoms: "Symptoms can include watery diarrhea, gas, greasy stools that tend to float, stomach cramps, and dehydration. Some people have no symptoms.",
+            treatment: "A doctor will prescribe specific anti-parasitic medications to treat Giardiasis.",
+            prevention: "Avoid swallowing water from pools, lakes, or streams. Practice good hygiene, especially handwashing. Peel or wash raw fruits and vegetables before eating."
+        }
     },
     crypto: {
-      name: "Cryptosporidiosis",
-      keywords: ["Diarrhea", "Dehydration", "Weight loss", "Abdominal Pain", "Fever", "Nausea", "Vomiting"],
-      info: {
-        symptoms: "The main symptom is watery diarrhea. Other symptoms may include stomach cramps or pain, dehydration, nausea, vomiting, fever, and weight loss. Symptoms usually begin 2 to 10 days after infection and can last 1 to 2 weeks.",
-        causes: "Cryptosporidiosis is caused by microscopic parasites called Cryptosporidium. These parasites live in the intestines of infected humans and animals and are passed through stool. People can become infected by swallowing contaminated water or food.",
-        treatment: "Most people with healthy immune systems recover without treatment. For people with compromised immune systems, treatment may include anti-parasitic drugs. Staying hydrated is important during recovery.",
-        prevention: "Preventive measures include washing hands frequently, avoiding swallowing water while swimming, drinking safe water, and avoiding contact with infected individuals or animals."
-      }
+        name: "Cryptosporidiosis",
+        keywords: ["cryptosporidiosis", "crypto"],
+        info: {
+            causes: "Cryptosporidiosis is caused by the microscopic parasite Cryptosporidium. It is a common cause of waterborne disease and can be found in water, food, soil, or on surfaces contaminated with the feces of an infected human or animal.",
+            symptoms: "The primary symptom is watery diarrhea. Other symptoms include stomach cramps, dehydration, nausea, vomiting, fever, and weight loss.",
+            treatment: "Most people with a healthy immune system recover without treatment. The focus is on drinking plenty of fluids to prevent dehydration. A doctor may prescribe anti-diarrheal medicine.",
+            prevention: "Good hygiene, including thorough handwashing, is key. Do not swallow water when swimming in public pools or natural bodies of water."
+        }
     }
-  };
+  }), []);
 
-  const symptomsKeywords = ["symptoms", "signs", "what are the symptoms", "what are the signs", "কোন লক্ষণ", "লক্ষণ", "লক্ষণসমূহ", "কি লক্ষণ", "কি চিহ্ন", "কোন লক্ষন", "লক্ষন", "লক্ষনসমূহ", "क्या लक्षण", "लक्षण", "लक्षणों", "लक्षण क्या हैं", "लक्षण क्या है", "symptom", "sign"];
-  const causesKeywords = ["cause", "causes", "reason", "reasons", "কাৰণ", "কাৰণসমূহ", "কিয়", "কিয় হয়", "কারণ", "কারণসমূহ", "কেন", "কেন হয়", "कारण", "कारणों", "क्यों", "क्यों होता है", "क्यों होती है", "why"];
-  const treatmentKeywords = ["treatment", "treatments", "cure", "therapy", "medication", "medicine", "চিকিৎসা", "চিকিৎসাসমূহ", "নিৰাময়", "নিৰাময়সমূহ", "উপচার", "উপচারসমূহ", "इलाज", "उपचार", "दवा", "दवाएं", "चिकित्सा", "चिकित्साएं"];
-  const preventionKeywords = ["prevention", "prevent", "avoid", "avoidance", "protection", "safety", "precaution", "precautions", "প্ৰতিৰোধ", "প্ৰতিৰোধসমূহ", "বিৰোধ", "বিৰোধসমূহ", "প্রতিরোধ", "প্রতিরোধসমূহ", "রক্ষা", "রক্ষাসমূহ", "रोकथाम", "रोकना", "बचाव", "सुरक्षा", "सावधानी"];
-
-  const getAIResponse = (message) => {
+  const getAIResponse = useCallback((message) => {
     const lowerCaseMessage = message.toLowerCase();
-    
-    // Handle greetings
-    if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi') || lowerCaseMessage.includes('hey') || 
-        lowerCaseMessage.includes('নমস্কাৰ') || lowerCaseMessage.includes('হেলো') || lowerCaseMessage.includes('হাই') || 
-        lowerCaseMessage.includes('নমস্কার') || lowerCaseMessage.includes('হ্যালো') || lowerCaseMessage.includes('হাই') || 
-        lowerCaseMessage.includes('नमस्ते') || lowerCaseMessage.includes('हैलो') || lowerCaseMessage.includes('हाय')) {
-      return t('ai.initialGreeting');
+
+    const greetingKeywords = ["hello", "hi", "hey", "namaste"];
+    const causesKeywords = ["cause", "from", "get", "origin", "reason", "why"];
+    const symptomsKeywords = ["symptom", "sign", "feel", "effect", "identify"];
+    const treatmentKeywords = ["treat", "cure", "remedy", "help", "solution", "manage"];
+    const preventionKeywords = ["prevent", "avoid", "safe", "stop", "protect"];
+
+    if (greetingKeywords.some(k => lowerCaseMessage.includes(k))) {
+        return "Hello there! How can I help you learn about waterborne diseases today?";
     }
-    
-    // Handle specific disease queries
+
     for (const diseaseKey in diseaseInfoDatabase) {
-      const disease = diseaseInfoDatabase[diseaseKey];
-      const diseaseName = disease.name.toLowerCase();
-      
-      if (lowerCaseMessage.includes(diseaseName) || disease.keywords.some(k => lowerCaseMessage.includes(k))) {
-        if (symptomsKeywords.some(k => lowerCaseMessage.includes(k))) {
-          return `Symptoms of ${disease.name}: ${disease.info.symptoms}`;
+        const disease = diseaseInfoDatabase[diseaseKey];
+        if (disease.keywords.some(k => lowerCaseMessage.includes(k))) {
+            if (symptomsKeywords.some(k => lowerCaseMessage.includes(k))) {
+                return `Symptoms of ${disease.name}: ${disease.info.symptoms}`;
+            }
+            if (causesKeywords.some(k => lowerCaseMessage.includes(k))) {
+                return `Causes of ${disease.name}: ${disease.info.causes}`;
+            }
+            if (treatmentKeywords.some(k => lowerCaseMessage.includes(k))) {
+                return `Treatment for ${disease.name}: ${disease.info.treatment}`;
+            }
+            if (preventionKeywords.some(k => lowerCaseMessage.includes(k))) {
+                return `Prevention of ${disease.name}: ${disease.info.prevention}`;
+            }
+            return `${disease.name}: ${t(`diseases.${diseaseKey}`).description} Would you like to know about its causes, symptoms, treatment, or prevention?`;
         }
-        if (causesKeywords.some(k => lowerCaseMessage.includes(k))) {
-          return `Causes of ${disease.name}: ${disease.info.causes}`;
-        }
-        if (treatmentKeywords.some(k => lowerCaseMessage.includes(k))) {
-          return `Treatment for ${disease.name}: ${disease.info.treatment}`;
-        }
-        if (preventionKeywords.some(k => lowerCaseMessage.includes(k))) {
-          return `Prevention of ${disease.name}: ${disease.info.prevention}`;
-        }
-        // If just the disease name is mentioned, give a summary
-        return `${disease.name}: ${disease.info.symptoms} ${disease.info.causes} ${disease.info.treatment} ${disease.info.prevention}`;
-      }
     }
-    
-    // Handle general symptom queries
+
+    if (preventionKeywords.some(k => lowerCaseMessage.includes(k))) {
+      return "To prevent most waterborne diseases, always drink boiled or purified water, wash your hands thoroughly with soap, cook food properly, and avoid swallowing water from pools or lakes.";
+    }
     if (symptomsKeywords.some(k => lowerCaseMessage.includes(k))) {
       return "Common symptoms for many waterborne diseases include diarrhea, vomiting, fever, and stomach cramps. For a more specific diagnosis, please use the 'Disease Prediction' tab or consult a doctor.";
     }
-    
-    // 4. Fallback response
-    return t('ai.fallback');
-  };
 
-  const handleSendMessage = () => {
+    return t('ai.fallback');
+  }, [diseaseInfoDatabase, t]);
+
+  const handleSendMessage = useCallback(() => {
     if (!userMessage.trim()) return;
-    
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const newUserMessage = { id: Date.now(), text: userMessage, sender: 'user', timestamp };
     setMessages(prev => [...prev, newUserMessage]);
-    
     const aiResponseText = getAIResponse(userMessage);
     setIsTyping(true);
-    
     setTimeout(() => {
-      const aiResponse = { 
-        id: Date.now() + 1, 
-        text: aiResponseText, 
-        sender: 'ai', 
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      };
+      const aiResponse = { id: Date.now() + 1, text: aiResponseText, sender: 'ai', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
       setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
     }, 1500);
-    
     setUserMessage('');
-  };
+  }, [userMessage, getAIResponse]);
 
   useEffect(() => {
-    if (mainChatRef.current) {
-      mainChatRef.current.scrollTop = mainChatRef.current.scrollHeight;
-    }
-    if (widgetChatRef.current) {
-      widgetChatRef.current.scrollTop = widgetChatRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const diseaseDatabase = {
-    cholera: {
-      keywords: ["fever", "diarrhea", "vomiting", "dehydration", "cramps", "cholera", "rice-water stool"],
-    },
-    typhoid: {
-      keywords: ["fever", "headache", "weakness", "stomach pain", "loss of appetite", "typhoid", "rose spots"],
-    },
-    hepatitisA: {
-      keywords: ["fatigue", "nausea", "abdominal pain", "appetite loss", "low-grade fever", "dark urine", "jaundice", "hepatitis"],
-    },
-    crypto: {
-      keywords: ["Diarrhea", "Dehydration", "Weight loss", "Abdominal Pain", "Fever", "Nausea", "Vomiting"],
-    }
-  };
-
-  const runAIAnalysis = (selectedSymptoms) => {
-    const translatedSymptomsList = t('symptomsList');
-    
-    // Important: Always compare against the English keywords in the database
-    const englishSelectedSymptoms = selectedSymptoms.map(symptom => {
-      const index = translatedSymptomsList.indexOf(symptom);
-      return translations['en'].symptomsList[index];
-    });
-    
-    let scores = [];
-    
-    for (const diseaseKey in diseaseDatabase) {
-      const disease = diseaseDatabase[diseaseKey];
-      const matchingSymptoms = disease.keywords.filter(keyword => 
-        englishSelectedSymptoms.includes(keyword)
-      );
-      
-      if (matchingSymptoms.length > 0) {
-        const score = Math.round((matchingSymptoms.length / disease.keywords.length) * 100);
-        if (score > 20) {
-          scores.push({
-            ...t(`diseases.${diseaseKey}`),
-            probability: score,
-          });
-        }
+      if (mainChatRef.current) {
+          mainChatRef.current.scrollTop = mainChatRef.current.scrollHeight;
       }
+      if (widgetChatRef.current) {
+          widgetChatRef.current.scrollTop = widgetChatRef.current.scrollHeight;
+      }
+  }, [messages]);
+ 
+  const diseaseDatabase = useMemo(() => ({
+    hepatitisA: { keywords: ["Fatigue", "Nausea", "Jaundice", "Dark colored urine", "Abdominal Pain", "Vomiting", "Fever"], },
+    cholera: { keywords: ["Diarrhea", "Vomiting", "Dehydration", "Nausea"], },
+    gastroenteritis: { keywords: ["Diarrhea", "Vomiting", "Nausea", "Abdominal Pain", "Fever", "Dehydration", "Headache"], },
+    typhoid: { keywords: ["Fever", "Headache", "Fatigue", "Abdominal Pain", "Rose spots", "Diarrhea"], },
+    giardiasis: { keywords: ["Diarrhea", "Fatigue", "Abdominal Pain", "Nausea", "Dehydration", "Bloating", "Weight loss"], },
+    crypto: { keywords: ["Diarrhea", "Dehydration", "Weight loss", "Abdominal Pain", "Fever", "Nausea", "Vomiting"], }
+  }), []);
+
+  const runAIAnalysis = useCallback((selectedSymptoms) => {
+    const translatedSymptomsList = t('symptomsList');
+    const englishSelectedSymptoms = selectedSymptoms.map(symptom => {
+        const index = translatedSymptomsList.indexOf(symptom);
+        return translations.en.symptomsList[index];
+    });
+    let scores = [];
+    for (const diseaseKey in diseaseDatabase) {
+        const disease = diseaseDatabase[diseaseKey];
+        const matchingSymptoms = disease.keywords.filter(keyword => englishSelectedSymptoms.includes(keyword));
+        if (matchingSymptoms.length > 0) {
+            const score = Math.round((matchingSymptoms.length / disease.keywords.length) * 100);
+            if (score > 20) {
+                scores.push({
+                    ...t(`diseases.${diseaseKey}`),
+                    probability: score,
+                });
+            }
+        }
     }
-    
     scores.sort((a, b) => b.probability - a.probability);
     return scores.length > 0 ? scores.slice(0, 3) : [];
-  };
+  }, [diseaseDatabase, t, translations.en.symptomsList]);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = useCallback((e) => {
     e.preventDefault();
     if (formData.symptoms.length === 0) {
       alert('Please select at least one symptom for analysis.');
       return;
     }
-    
     setIsAnalyzing(true);
-    
-    // Simulate API call delay
+    setAnalysisResult(null);
     setTimeout(() => {
       const results = runAIAnalysis(formData.symptoms);
       setAnalysisResult(results);
       setIsAnalyzing(false);
-    }, 2000);
-  };
-
-  const handleWaterFormSubmit = async (e) => {
+    }, 2500);
+  }, [formData.symptoms, runAIAnalysis]);
+ 
+  const handleWaterFormSubmit = useCallback(async (e) => {
     e.preventDefault();
+    setIsWaterAnalyzing(true);
+    setWaterAnalysisResult(null);
     setWaterAnalysisError(null);
-    
-    // Prepare data for submission
+
+    const API_URL = 'https://karan0301-sih.hf.space/predict';
+
     const submissionData = {
-      location: waterFormData.location,
-      water_source_type: waterFormData.water_source_type,
-      ph_level: parseFloat(waterFormData.ph_level),
-      turbidity: parseFloat(waterFormData.turbidity),
-      contaminant_level_ppm: parseFloat(waterFormData.contaminantLevel),
-      temperature_celsius: parseFloat(waterFormData.temperature),
-      bacteria_count_cfu_ml: parseFloat(waterFormData.bacteria_count_cfu_ml), // NEW
-      nitrate_level_mg_l: parseFloat(waterFormData.nitrate_level_mg_l), // NEW
-      dissolved_oxygen_mg_l: parseFloat(waterFormData.dissolved_oxygen_mg_l) // NEW
-    };
-    
+    ph_level: parseFloat(waterFormData.ph),
+    turbidity_ntu: parseFloat(waterFormData.turbidity),
+    contaminant_level_ppm: parseFloat(waterFormData.contaminantLevel),
+    temperature_celsius: parseFloat(waterFormData.temperature),
+    water_source_type: waterFormData.water_source_type,
+    bacteria_count_cfu_ml: parseFloat(waterFormData.bacteria_count_cfu_ml),
+    nitrate_level_mg_l: parseFloat(waterFormData.nitrate_level_mg_l),
+    dissolved_oxygen_mg_l: parseFloat(waterFormData.dissolved_oxygen_mg_l)
+};
     try {
-      // In a real app, you would send this to your backend API
-      // const response = await fetch('/api/water-analysis', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(submissionData)
-      // });
-      
-      // For demo purposes, we'll simulate a response
-      setTimeout(() => {
-        setWaterAnalysisResult({
-          quality: "Poor",
-          contaminants: ["E. Coli", "Lead"],
-          recommendations: [
-            "Do not drink this water without boiling",
-            "Install a water filtration system",
-            "Contact local health authorities"
-          ]
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(submissionData),
         });
-      }, 1500);
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        setWaterAnalysisResult(result);
+        console.log("API Response:", result);
+
     } catch (error) {
-      setWaterAnalysisError("Failed to analyze water quality. Please try again.");
+        console.error("API call failed:", error);
+        setWaterAnalysisError(`Failed to get analysis. ${error.message}`);
+    } finally {
+        setIsWaterAnalyzing(false);
     }
-  };
+  }, [waterFormData]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleWaterInputChange = (e) => {
+  const handleWaterInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setWaterFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleSymptomChange = (symptom) => {
+  const handleFileChange = useCallback((e) => {
+    setWaterFormData(prev => ({ ...prev, file: e.target.files[0] }));
+  }, []);
+
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleSymptomChange = useCallback((symptom) => {
     setFormData(prev => {
       const symptoms = prev.symptoms.includes(symptom)
         ? prev.symptoms.filter(s => s !== symptom)
         : [...prev.symptoms, symptom];
       return { ...prev, symptoms };
     });
-  };
+  }, []);
 
-  const toggleChat = () => setChatOpen(!chatOpen);
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleChat = useCallback(() => setChatOpen(!chatOpen), [chatOpen]);
+  const toggleDarkMode = useCallback(() => setDarkMode(!darkMode), [darkMode]);
+  const toggleSidebar = useCallback(() => setSidebarOpen(!sidebarOpen), [sidebarOpen]);
 
   useEffect(() => {
     if (darkMode) {
@@ -1003,189 +574,281 @@ const App = () => {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarOpen && !event.target.closest('.sidebar') && !event.target.closest('.hamburger-btn')) {
+        setSidebarOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [sidebarOpen]);
+
+  const diseaseOutbreaks = useMemo(() => [
+    { id: 1, name: t('outbreakTitle'), state: 'Assam', cases: 45000, rate: 18.5, severity: 'critical', position: [26.2006, 92.9376], healthContact: "104", nearbyHospitals: 15, latestNews: "Govt. launches new initiative for clean drinking water in rural Assam." },
+    { id: 2, name: 'Cholera Outbreak', state: 'Meghalaya', cases: 32000, rate: 16.2, severity: 'high', position: [25.4670, 91.3662], healthContact: "108", nearbyHospitals: 8, latestNews: "Health department issues high alert following flash floods in Garo Hills." },
+    { id: 3, name: 'Typhoid Outbreak', state: 'Manipur', cases: 28000, rate: 15.8, severity: 'medium', position: [24.6637, 93.9063], healthContact: "102", nearbyHospitals: 11, latestNews: "Vaccination drive for Typhoid begins in Imphal and surrounding areas." },
+    { id: 4, name: 'Hepatitis Outbreak', state: 'Nagaland', cases: 25000, rate: 14.7, severity: 'low', position: [26.1584, 94.5624], healthContact: "103", nearbyHospitals: 7, latestNews: "Awareness campaigns about contaminated water sources are underway." },
+    { id: 5, name: 'Gastroenteritis', state: 'Arunachal Pradesh', cases: 18000, rate: 12.3, severity: 'medium', position: [28.2180, 94.7278], healthContact: "108", nearbyHospitals: 5, latestNews: "Mobile medical units dispatched to remote eastern districts." }
+  ], [t]);
+
+  const stateData = useMemo(() => [
+    { state: 'Assam', cases: 45000, rate: 18.5 },
+    { state: 'Meghalaya', cases: 32000, rate: 16.2 },
+    { state: 'Manipur', cases: 28000, rate: 15.8 },
+    { state: 'Nagaland', cases: 25000, rate: 14.7 },
+    { state: 'Arunachal Pradesh', cases: 18000, rate: 12.3 },
+    { state: 'Tripura', cases: 15000, rate: 11.2 },
+    { state: 'Mizoram', cases: 12000, rate: 10.8 },
+    { state: 'Sikkim', cases: 8000, rate: 9.5 }
+  ], []);
+
+  const trendsData = useMemo(() => [
+    { month: 'Jan', cholera: 850, typhoid: 620, hepatitis: 430, gastro: 1200 },
+    { month: 'Feb', cholera: 920, typhoid: 680, hepatitis: 510, gastro: 1350 },
+    { month: 'Mar', cholera: 1100, typhoid: 750, hepatitis: 580, gastro: 1500 },
+    { month: 'Apr', cholera: 1250, typhoid: 820, hepatitis: 650, gastro: 1680 },
+    { month: 'May', cholera: 1450, typhoid: 920, hepatitis: 720, gastro: 1850 },
+    { month: 'Jun', cholera: 1680, typhoid: 1050, hepatitis: 800, gastro: 2100 },
+    { month: 'Jul', cholera: 1920, typhoid: 1200, hepatitis: 880, gastro: 2350 },
+    { month: 'Aug', cholera: 2100, typhoid: 1350, hepatitis: 950, gastro: 2600 },
+  ], []);
+
+  const eventsData = useMemo(() => [
+    {
+      id: 1,
+      title: "Water Safety Workshop - Guwahati",
+      date: "October 15, 2024",
+      location: "IIT Guwahati",
+      type: "offline",
+      registered: 120,
+      capacity: 200,
+      description: "Comprehensive training on water purification techniques and disease prevention methods for rural communities."
+    },
+    {
+      id: 2,
+      title: "AI-Powered Disease Monitoring Webinar",
+      date: "October 22, 2024",
+      location: "Online Platform",
+      type: "online",
+      registered: 450,
+      capacity: 500,
+      description: "Learn how artificial intelligence is revolutionizing disease surveillance and early warning systems in Northeast India."
+    },
+    {
+      id: 3,
+      title: "Community Health Fair - Shillong",
+      date: "November 5, 2024",
+      location: "Shillong Medical College",
+      type: "offline",
+      registered: 85,
+      capacity: 150,
+      description: "Free health screenings, water testing services, and educational programs for families in Meghalaya."
+    }
+  ], []);
+
+  const emergencyData = useMemo(() => [
+    { disease: "Cholera", state: "Meghalaya", severity: t('high'), team: "Team Alpha", lastUpdate: "2 hours ago" },
+    { disease: "Typhoid", state: "Manipur", severity: t('medium'), team: "Team Beta", lastUpdate: "4 hours ago" },
+    { disease: "Hepatitis A", state: "Nagaland", severity: t('low'), team: "Team Gamma", lastUpdate: "6 hours ago" },
+    { disease: "Gastroenteritis", state: "Assam", severity: t('critical'), team: "Team Delta", lastUpdate: "1 hour ago" }
+  ], [t]);
+
   return (
     <div className={`${darkMode ? 'bg-dark text-light' : 'bg-light'} min-vh-100`}>
-      <header className={`shadow sticky-top ${darkMode ? 'bg-dark' : 'bg-white'}`}>
+      <nav className={`navbar navbar-expand-lg ${darkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white'} shadow-sm position-fixed w-100`} style={{ zIndex: 1030 }}>
         <div className="container-fluid">
-          <div className="d-flex justify-content-between align-items-center py-3">
-            <div className="d-flex align-items-center">
-              <button
-                className="hamburger-btn btn me-3"
-                onClick={toggleSidebar}
-                aria-label={sidebarOpen ? "Close sidebar menu" : "Open sidebar menu"}
-                style={{ color: darkMode ? 'white' : 'black' }}
-              >
-                {sidebarOpen ? <FaTimes size={20} aria-hidden="true" /> : <FaBars size={20} aria-hidden="true" />}
-              </button>
-              <h1 className="h4 mb-0 fw-bold">Healify</h1>
-            </div>
-            
-            <div className="d-flex align-items-center">
-              <div className="dropdown me-3">
-                <button 
-                  className={`btn ${darkMode ? 'btn-outline-light' : 'btn-outline-dark'} dropdown-toggle`}
-                  type="button"
-                  id="languageDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {t('language')}
-                </button>
-                <ul className="dropdown-menu" aria-labelledby="languageDropdown">
-                  <li><button className="dropdown-item" onClick={() => setLanguage('en')}>{t('english')}</button></li>
-                  <li><button className="dropdown-item" onClick={() => setLanguage('hi')}>{t('hindi')}</button></li>
-                  <li><button className="dropdown-item" onClick={() => setLanguage('as')}>{t('assamese')}</button></li>
-                  <li><button className="dropdown-item" onClick={() => setLanguage('bn')}>{t('bengali')}</button></li>
-                </ul>
-              </div>
-              
-              <button 
-                className="btn me-3"
-                onClick={toggleDarkMode}
-                aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {darkMode ? <FaSun className="text-warning" /> : <FaMoon className="text-dark" />}
-              </button>
-              
-              <button 
-                className={`btn position-relative ${chatOpen ? 'btn-primary' : darkMode ? 'btn-outline-light' : 'btn-outline-dark'}`}
-                onClick={toggleChat}
-              >
-                <FaRobot />
-                {messages.filter(m => m.sender === 'ai' && !m.read).length > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {messages.filter(m => m.sender === 'ai' && !m.read).length}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+          <button className="btn btn-outline-primary hamburger-btn d-lg-none me-3" onClick={toggleSidebar}>
+            <FaBars />
+          </button>
+          
+          <a className="navbar-brand fw-bold text-primary" href="#">
+            <FaStethoscope className="me-2" />
+            Healify
+          </a>
 
-      <div className="container-fluid">
-        <div className="row">
-          {/* Sidebar */}
-          <div className={`col-lg-2 col-md-3 d-lg-block ${sidebarOpen ? 'd-block' : 'd-none'} sidebar ${darkMode ? 'bg-dark' : 'bg-light'} min-vh-100 shadow`}>
-            <div className="py-4">
-              <ul className="nav flex-column">
-                <li>
-                  <button
-                    onClick={() => { setActiveTab('home'); setSidebarOpen(false); }}
-                    aria-label="Go to Home tab"
-                    className={`w-100 text-start btn mb-2 ${activeTab === 'home' ? 'btn-primary' : darkMode ? 'btn-dark text-light' : 'btn-light'}`}
-                  >
-                    <FaHome className="me-2" aria-hidden="true" /> {t('home')}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setActiveTab('waterData'); setSidebarOpen(false); }}
-                    aria-label="Go to Submit Data tab"
-                    className={`w-100 text-start btn mb-2 ${activeTab === 'waterData' ? 'btn-primary' : darkMode ? 'btn-dark text-light' : 'btn-light'}`}
-                  >
-                    <FaDatabase className="me-2" aria-hidden="true" /> {t('submitWaterData')}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setActiveTab('prediction'); setSidebarOpen(false); }}
-                    aria-label="Go to Disease Prediction tab"
-                    className={`w-100 text-start btn mb-2 ${activeTab === 'prediction' ? 'btn-primary' : darkMode ? 'btn-dark text-light' : 'btn-light'}`}
-                  >
-                    <FaChartBar className="me-2" aria-hidden="true" /> {t('diseasePrediction')}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setActiveTab('community'); setSidebarOpen(false); }}
-                    aria-label="Go to Community Outreach tab"
-                    className={`w-100 text-start btn mb-2 ${activeTab === 'community' ? 'btn-primary' : darkMode ? 'btn-dark text-light' : 'btn-light'}`}
-                  >
-                    <FaUsers className="me-2" aria-hidden="true" /> {t('community')}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setActiveTab('about'); setSidebarOpen(false); }}
-                    aria-label="Go to About Us tab"
-                    className={`w-100 text-start btn mb-2 ${activeTab === 'about' ? 'btn-primary' : darkMode ? 'btn-dark text-light' : 'btn-light'}`}
-                  >
-                    <FaUsers className="me-2" aria-hidden="true" /> {t('about')}
-                  </button>
-                </li>
+          <div className="d-flex align-items-center">
+            <div className="dropdown me-3">
+              <button className={`btn btn-outline-secondary dropdown-toggle ${darkMode ? 'text-light' : ''}`} type="button" data-bs-toggle="dropdown">
+                <FaGlobe className="me-2" />
+                {t('language')}
+              </button>
+              <ul className="dropdown-menu">
+                <li><button className="dropdown-item" onClick={() => setLanguage('en')}>{t('english')}</button></li>
+                <li><button className="dropdown-item" onClick={() => setLanguage('hi')}>{t('hindi')}</button></li>
+                <li><button className="dropdown-item" onClick={() => setLanguage('as')}>{t('assamese')}</button></li>
+                <li><button className="dropdown-item" onClick={() => setLanguage('bn')}>{t('bengali')}</button></li>
               </ul>
             </div>
+            
+            <button className={`btn ${darkMode ? 'btn-outline-light' : 'btn-outline-dark'}`} onClick={toggleDarkMode}>
+              {darkMode ? <FaSun /> : <FaMoon />}
+            </button>
           </div>
+        </div>
+      </nav>
 
-          {/* Main Content */}
-          <main className={`col-lg-10 col-md-9 ${sidebarOpen ? 'd-none' : 'd-block'} py-4`}>
-            {/* Home Tab */}
+      <div className="d-flex" style={{ paddingTop: '70px' }}>
+        <motion.div 
+          className={`sidebar bg-white shadow-lg ${darkMode ? 'bg-dark border-end' : ''} ${sidebarOpen ? 'sidebar-open' : ''}`}
+          style={{ 
+            width: '250px',
+            minHeight: '100vh',
+            position: 'fixed',
+            left: sidebarOpen ? '0' : '-250px',
+            top: '70px',
+            zIndex: 1020,
+            transition: 'left 0.3s ease-in-out'
+          }}
+          initial={{ x: -250 }}
+          animate={{ x: sidebarOpen ? 0 : -250 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="p-3">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">Navigation</h5>
+              <button className="btn btn-sm btn-outline-secondary d-lg-none" onClick={toggleSidebar}>
+                <FaTimes />
+              </button>
+            </div>
+            
+            <ul className="nav flex-column">
+              <li className="nav-item mb-2">
+                <button 
+                  className={`nav-link btn w-100 text-start ${activeTab === 'home' ? 'btn-primary text-white' : `btn-outline-primary ${darkMode ? 'text-light' : ''}`}`}
+                  onClick={() => { setActiveTab('home'); setSidebarOpen(false); }}
+                >
+                  <FaHome className="me-2" />
+                  {t('home')}
+                </button>
+              </li>
+              <li className="nav-item mb-2">
+                <button 
+                  className={`nav-link btn w-100 text-start ${activeTab === 'submit' ? 'btn-primary text-white' : `btn-outline-primary ${darkMode ? 'text-light' : ''}`}`}
+                  onClick={() => { setActiveTab('submit'); setSidebarOpen(false); }}
+                >
+                  <FaDatabase className="me-2" />
+                  {t('submitWaterData')}
+                </button>
+              </li>
+              <li className="nav-item mb-2">
+                <button 
+                  className={`nav-link btn w-100 text-start ${activeTab === 'prediction' ? 'btn-primary text-white' : `btn-outline-primary ${darkMode ? 'text-light' : ''}`}`}
+                  onClick={() => { setActiveTab('prediction'); setSidebarOpen(false); }}
+                >
+                  <FaUsers className="me-2" />
+                  {t('diseasePrediction')}
+                </button>
+              </li>
+              <li className="nav-item mb-2">
+                <button 
+                  className={`nav-link btn w-100 text-start ${activeTab === 'community' ? 'btn-primary text-white' : `btn-outline-primary ${darkMode ? 'text-light' : ''}`}`}
+                  onClick={() => { setActiveTab('community'); setSidebarOpen(false); }}
+                >
+                  <FaUsers className="me-2" />
+                  {t('community')}
+                </button>
+              </li>
+              <li className="nav-item mb-2">
+                <button 
+                  className={`nav-link btn w-100 text-start ${activeTab === 'about' ? 'btn-primary text-white' : `btn-outline-primary ${darkMode ? 'text-light' : ''}`}`}
+                  onClick={() => { setActiveTab('about'); setSidebarOpen(false); }}
+                >
+                  <FaInfoCircle className="me-2" />
+                  {t('about')}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </motion.div>
+
+        <div className="flex-grow-1" style={{ marginLeft: sidebarOpen ? '250px' : '0', transition: 'margin-left 0.3s ease-in-out' }}>
+          <main className="container-fluid p-4">
             {activeTab === 'home' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="row mb-4">
+                <div className="row mb-5">
                   <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body p-5 text-center">
+                    <div className={`hero-section p-5 rounded-4 text-center ${darkMode ? 'bg-gradient text-light' : 'bg-primary text-white'}`} style={{ background: darkMode ? 'linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
                         <h1 className="display-4 fw-bold mb-3">{t('heroTitle')}</h1>
                         <p className="lead mb-4">{t('heroSubtitle')}</p>
-                        <div className="d-flex justify-content-center gap-3">
+                        <div className="d-flex justify-content-center gap-3 flex-wrap">
                           <button 
-                            className="btn btn-primary btn-lg"
+                            className="btn btn-light btn-lg px-4"
                             onClick={() => setActiveTab('prediction')}
                           >
+                            <FaRobot className="me-2" />
                             {t('diseasePrediction')}
                           </button>
                           <button 
-                            className="btn btn-outline-primary btn-lg"
-                            onClick={() => setActiveTab('waterData')}
+                            className="btn btn-outline-light btn-lg px-4"
+                            onClick={toggleChat}
                           >
-                            {t('submitWaterData')}
+                            <FaComments className="me-2" />
+                            {t('aiAssistant')}
                           </button>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
 
-                <div className="row mb-4">
+                <div className="row mb-5">
                   <div className="col-12">
-                    <h2 className="h4 fw-bold mb-3">{t('outbreakTitle')}</h2>
+                    <h2 className="mb-4 fw-bold text-center">{t('statistics')} - {t('statisticsTitle')}</h2>
                     <OutbreakMap outbreaks={diseaseOutbreaks} darkMode={darkMode} />
                   </div>
                 </div>
 
-                <div className="row mb-4">
-                  <div className="col-lg-6 mb-3">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
+                <div className="row mb-5">
+                  <div className="col-lg-6 mb-4">
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header border-0 bg-transparent">
+                        <h4 className="card-title fw-bold mb-0">{t('statisticsTitle')}</h4>
+                      </div>
                       <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('statisticsTitle')}</h3>
-                        <div style={{ width: "100%", minHeight: "400px" }}>
-                          {/* Chart would go here */}
-                          <div className="text-center py-5">
-                            <p>Chart visualization would appear here</p>
-                            <em className="text-muted">💡 Did you know? Clean water prevents 80% of diarrheal diseases.</em>
-                          </div>
-                        </div>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={stateData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#e0e0e0'} />
+                            <XAxis dataKey="state" tick={{ fontSize: 12 }} stroke={darkMode ? '#ccc' : '#666'} />
+                            <YAxis tick={{ fontSize: 12 }} stroke={darkMode ? '#ccc' : '#666'} />
+                            <Tooltip content={<HealthTooltip />} />
+                            <Legend />
+                            <Bar dataKey="cases" fill="#8884d8" name={t('reportedCases')} />
+                            <Bar dataKey="rate" fill="#82ca9d" name={t('rate')} />
+                          </BarChart>
+                        </ResponsiveContainer>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="col-lg-6 mb-3">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
+                  <div className="col-lg-6 mb-4">
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header border-0 bg-transparent">
+                        <h4 className="card-title fw-bold mb-0">{t('trendsTitle')}</h4>
+                      </div>
                       <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('trendsTitle')}</h3>
-                        <div style={{ width: "100%", minHeight: "400px" }}>
-                          {/* Chart would go here */}
-                          <div className="text-center py-5">
-                            <p>Chart visualization would appear here</p>
-                            <em className="text-muted">📊 Disease trends show seasonal patterns in waterborne illnesses.</em>
-                          </div>
-                        </div>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <LineChart data={trendsData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#e0e0e0'} />
+                            <XAxis dataKey="month" stroke={darkMode ? '#ccc' : '#666'} />
+                            <YAxis stroke={darkMode ? '#ccc' : '#666'} />
+                            <Tooltip content={<HealthTooltip />} />
+                            <Legend />
+                            <Line type="monotone" dataKey="cholera" stroke="#8884d8" strokeWidth={2} name="Cholera" />
+                            <Line type="monotone" dataKey="typhoid" stroke="#82ca9d" strokeWidth={2} name="Typhoid" />
+                            <Line type="monotone" dataKey="hepatitis" stroke="#ffc658" strokeWidth={2} name="Hepatitis" />
+                            <Line type="monotone" dataKey="gastro" stroke="#ff7c7c" strokeWidth={2} name="Gastroenteritis" />
+                          </LineChart>
+                        </ResponsiveContainer>
                       </div>
                     </div>
                   </div>
@@ -1193,11 +856,13 @@ const App = () => {
 
                 <div className="row">
                   <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
+                    <div className={`card ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header border-0 bg-transparent">
+                        <h4 className="card-title fw-bold mb-0">{t('emergencyTitle')}</h4>
+                      </div>
                       <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('emergencyTitle')}</h3>
                         <div className="table-responsive">
-                          <table className="table table-borderless mb-0">
+                          <table className={`table table-hover ${darkMode ? 'table-dark' : ''}`}>
                             <thead>
                               <tr>
                                 <th>{t('disease')}</th>
@@ -1208,29 +873,21 @@ const App = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {diseaseOutbreaks.slice(0, 3).map(outbreak => (
-                                <tr key={outbreak.id} className="align-middle">
-                                  <td>
-                                    <button 
-                                      className="btn btn-link p-0 text-decoration-none text-start"
-                                      onClick={() => setSelectedOutbreak(outbreak)}
-                                    >
-                                      {outbreak.name}
-                                    </button>
-                                  </td>
-                                  <td>{outbreak.state}</td>
+                              {emergencyData.map((emergency, idx) => (
+                                <tr key={idx}>
+                                  <td className="fw-semibold">{emergency.disease}</td>
+                                  <td>{emergency.state}</td>
                                   <td>
                                     <span className={`badge ${
-                                      outbreak.severity === 'critical' ? 'bg-danger' : 
-                                      outbreak.severity === 'high' ? 'bg-warning text-dark' : 
-                                      outbreak.severity === 'medium' ? 'bg-info text-dark' : 
-                                      'bg-secondary'
+                                      emergency.severity === t('critical') ? 'bg-danger' :
+                                      emergency.severity === t('high') ? 'bg-warning text-dark' :
+                                      emergency.severity === t('medium') ? 'bg-info' : 'bg-success'
                                     }`}>
-                                      {t(outbreak.severity)}
+                                      {emergency.severity}
                                     </span>
                                   </td>
-                                  <td>Team Alpha</td>
-                                  <td>2 hours ago</td>
+                                  <td>{emergency.team}</td>
+                                  <td className="text-muted">{emergency.lastUpdate}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -1243,180 +900,213 @@ const App = () => {
               </motion.div>
             )}
 
-            {/* Submit Water Data Tab */}
-            {activeTab === 'waterData' && (
+            {activeTab === 'submit' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="row">
-                  <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
+                <div className="row justify-content-center">
+                  <div className="col-lg-8">
+                    <div className={`card shadow-lg ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header text-center py-4 border-0" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '1rem 1rem 0 0' }}>
+                        <h3 className="text-white fw-bold mb-2">{t('submitWaterData')}</h3>
+                        <p className="text-white mb-0">Submit water quality data for AI-powered analysis</p>
+                      </div>
+                      
                       <div className="card-body p-4">
-                        <h2 className="card-title h3 fw-bold mb-4">{t('submitWaterData')}</h2>
-                        
                         <form onSubmit={handleWaterFormSubmit}>
-                          <div className="row">
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="location" className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('location')}</label>
-                              <input
-                                type="text"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="location"
-                                name="location"
-                                value={waterFormData.location}
-                                onChange={handleWaterInputChange}
-                                placeholder={t('location')}
-                              />
-                            </div>
+                          <div className="mb-4">
+                            <h5 className="fw-bold mb-3">{t('waterQuality')}</h5>
                             
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="water_source_type" className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('waterSourceType')}</label>
-                              <select
-                                className={`form-select ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="water_source_type"
-                                name="water_source_type"
-                                value={waterFormData.water_source_type}
-                                onChange={handleWaterInputChange}
-                              >
-                                <option value="well">Well</option>
-                                <option value="river">River</option>
-                                <option value="lake">Lake</option>
-                                <option value="tap">Tap Water</option>
-                                <option value="bottled">Bottled Water</option>
-                              </select>
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="ph_level" className="form-label">pH Level</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="ph_level"
-                                name="ph_level"
-                                value={waterFormData.ph_level}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="turbidity" className="form-label">{t('turbidity')}</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="turbidity"
-                                name="turbidity"
-                                value={waterFormData.turbidity}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="contaminantLevel" className="form-label">{t('contaminantLevelPpm')}</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="contaminantLevel"
-                                name="contaminantLevel"
-                                value={waterFormData.contaminantLevel}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="temperature" className="form-label">{t('waterTemperatureC')}</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="temperature"
-                                name="temperature"
-                                value={waterFormData.temperature}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            {/* NEW FIELDS */}
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="bacteria_count_cfu_ml" className="form-label">Bacteria Count (CFU/mL)</label>
-                              <input
-                                type="number"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="bacteria_count_cfu_ml"
-                                name="bacteria_count_cfu_ml"
-                                value={waterFormData.bacteria_count_cfu_ml}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="nitrate_level_mg_l" className="form-label">Nitrate Level (mg/L)</label>
-                              <input
-                                type="number"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="nitrate_level_mg_l"
-                                name="nitrate_level_mg_l"
-                                value={waterFormData.nitrate_level_mg_l}
-                                onChange={handleWaterInputChange}
-                              />
-                            </div>
-                            
-                            <div className="col-md-6 mb-3">
-                              <label htmlFor="dissolved_oxygen_mg_l" className="form-label">Dissolved Oxygen (mg/L)</label>
-                              <input
-                                type="number"
-                                className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                id="dissolved_oxygen_mg_l"
-                                name="dissolved_oxygen_mg_l"
-                                value={waterFormData.dissolved_oxygen_mg_l}
-                                onChange={handleWaterInputChange}
-                              />
+                            <div className="row g-3">
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('pH')}</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="ph"
+                                  value={waterFormData.ph}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('turbidity')}</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="turbidity"
+                                  value={waterFormData.turbidity}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('contaminantLevelPpm')}</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="contaminantLevel"
+                                  value={waterFormData.contaminantLevel}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('waterTemperatureC')}</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="temperature"
+                                  value={waterFormData.temperature}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('waterSourceType')}</label>
+                                <select
+                                  name="water_source_type"
+                                  value={waterFormData.water_source_type}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-select ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                >
+                                  <option value="Groundwater">Groundwater</option>
+                                  <option value="Surface_water">Surface Water</option>
+                                  <option value="Tap_water">Tap Water</option>
+                                </select>
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">Bacteria Count (CFU/ml)</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="bacteria_count_cfu_ml"
+                                  value={waterFormData.bacteria_count_cfu_ml}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">Nitrate Level (mg/L)</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="nitrate_level_mg_l"
+                                  value={waterFormData.nitrate_level_mg_l}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
+                              
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">Dissolved Oxygen (mg/L)</label>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  name="dissolved_oxygen_mg_l"
+                                  value={waterFormData.dissolved_oxygen_mg_l}
+                                  onChange={handleWaterInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
+                              </div>
                             </div>
                           </div>
                           
-                          <div className="mb-3">
-                            <label className="form-label">{t('upload')}</label>
-                            <input 
-                              type="file" 
-                              className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
+                          <div className="mb-4">
+                            <label className="form-label fw-semibold">{t('upload')}</label>
+                            <input
+                              type="file"
+                              onChange={handleFileChange}
+                              className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                              accept=".csv,.xlsx,.json"
                             />
+                            <div className="form-text text-muted">
+                              Optional: Upload additional data files (CSV, Excel, JSON)
+                            </div>
                           </div>
                           
-                          <button type="submit" className="btn btn-primary">
-                            {t('submitButton')}
-                          </button>
+                          <div className="d-grid">
+                            <button 
+                              type="submit" 
+                              className="btn btn-primary btn-lg fw-semibold"
+                              disabled={isWaterAnalyzing}
+                            >
+                              {isWaterAnalyzing ? (
+                                <>
+                                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                  Analyzing...
+                                </>
+                              ) : (
+                                <>{t('submitButton')}</>
+                              )}
+                            </button>
+                          </div>
                         </form>
                         
-                        {waterAnalysisError && (
-                          <div className="alert alert-danger mt-3 mb-0">{waterAnalysisError}</div>
-                        )}
-                        
-                        {waterAnalysisResult && (
-                          <div className={`card mt-4 ${darkMode ? 'bg-dark' : 'bg-light'}`}>
-                            <div className="card-body">
-                              <h3 className="card-title h5 fw-bold">{t('analysisTitle')}</h3>
-                              <div className="mb-3">
-                                <h4 className="h6">Water Quality: <span className="badge bg-danger">Poor</span></h4>
-                              </div>
-                              <div className="mb-3">
-                                <h4 className="h6">Detected Contaminants:</h4>
-                                <ul>
-                                  <li>E. Coli</li>
-                                  <li>Lead</li>
-                                </ul>
-                              </div>
-                              <div>
-                                <h4 className="h6">Recommendations:</h4>
-                                <ul>
-                                  <li>Do not drink this water without boiling</li>
-                                  <li>Install a water filtration system</li>
-                                  <li>Contact local health authorities</li>
-                                </ul>
-                              </div>
+                        {(waterAnalysisResult || waterAnalysisError || isWaterAnalyzing) && (
+                          <div className="mt-4">
+                            <h5 className="fw-bold mb-3">{t('analysisTitle')}</h5>
+                            <div className={`p-4 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              {isWaterAnalyzing && (
+                                <div className="text-center">
+                                  <div className="spinner-border text-primary mb-3" role="status"></div>
+                                  <p className="mb-0">{t('analyzingPlaceholder')}</p>
+                                </div>
+                              )}
+                              
+                              {waterAnalysisError && (
+                                <div className="alert alert-danger mb-0">
+                                  <strong>Error:</strong> {waterAnalysisError}
+                                </div>
+                              )}
+                              
+                              {waterAnalysisResult && !isWaterAnalyzing && (
+                                <div>
+                                  <h6 className="fw-bold text-success mb-3">Analysis Complete</h6>
+                                  <div className="row g-3">
+                                    <div className="col-md-6">
+                                      <div className={`p-3 rounded ${darkMode ? 'bg-dark' : 'bg-white'} border`}>
+                                        <h6 className="mb-2">Water Quality Status</h6>
+                                        <p className={`mb-0 fw-bold ${waterAnalysisResult.status === 'Safe' ? 'text-success' : 'text-danger'}`}>
+                                          {waterAnalysisResult.status || 'Analysis Complete'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                      <div className={`p-3 rounded ${darkMode ? 'bg-dark' : 'bg-white'} border`}>
+                                        <h6 className="mb-2">Risk Level</h6>
+                                        <p className={`mb-0 fw-bold ${waterAnalysisResult.risk_level === 'Low' ? 'text-success' : waterAnalysisResult.risk_level === 'Medium' ? 'text-warning' : 'text-danger'}`}>
+                                          {waterAnalysisResult.risk_level || 'Calculated'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    {waterAnalysisResult.recommendations && (
+                                      <div className="col-12">
+                                        <div className={`p-3 rounded ${darkMode ? 'bg-dark' : 'bg-white'} border`}>
+                                          <h6 className="mb-2">Recommendations</h6>
+                                          <p className="mb-0">{waterAnalysisResult.recommendations}</p>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -1427,160 +1117,171 @@ const App = () => {
               </motion.div>
             )}
 
-            {/* Disease Prediction Tab */}
             {activeTab === 'prediction' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="row">
-                  <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
+                <div className="row justify-content-center">
+                  <div className="col-lg-8">
+                    <div className={`card shadow-lg ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header text-center py-4 border-0" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '1rem 1rem 0 0' }}>
+                        <h3 className="text-white fw-bold mb-2">{t('predictionTitle')}</h3>
+                        <p className="text-white mb-0">{t('predictionSubtitle')}</p>
+                      </div>
+                      
                       <div className="card-body p-4">
-                        <h2 className="card-title h3 fw-bold mb-4">{t('predictionTitle')}</h2>
-                        <p className={`mb-4 ${darkMode ? 'text-light' : ''}`}>{t('predictionSubtitle')}</p>
-                        
-                        <div className="row">
-                          <div className="col-lg-6">
-                            <h3 className="h5 fw-bold mb-3">{t('patientInfo')}</h3>
-                            <form onSubmit={handleFormSubmit}>
-                              <div className="mb-3">
-                                <label className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('fullName')}</label>
+                        <form onSubmit={handleFormSubmit}>
+                          <div className="mb-4">
+                            <h5 className="fw-bold mb-3">{t('patientInfo')}</h5>
+                            
+                            <div className="row g-3">
+                              <div className="col-md-6">
+                                <label className="form-label fw-semibold">{t('fullName')}</label>
                                 <input
                                   type="text"
-                                  className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
                                   name="name"
                                   value={formData.name}
                                   onChange={handleInputChange}
-                                  placeholder={t('fullName')}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
                                 />
                               </div>
                               
-                              <div className="row">
-                                <div className="col-md-6 mb-3">
-                                  <label className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('age')}</label>
-                                  <input
-                                    type="number"
-                                    className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                                    name="age"
-                                    value={formData.age}
-                                    onChange={handleInputChange}
-                                    placeholder={t('age')}
-                                  />
-                                </div>
-                                
-                                <div className="col-md-6 mb-3">
-                                  <label className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('gender')}</label>
-                                  <select
-                                    className={`form-select ${darkMode ? 'bg-dark text-light' : ''}`}
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleInputChange}
-                                  >
-                                    <option value="">{t('gender')}</option>
-                                    <option value="male">{t('genderOptions.male')}</option>
-                                    <option value="female">{t('genderOptions.female')}</option>
-                                    <option value="other">{t('genderOptions.other')}</option>
-                                  </select>
-                                </div>
+                              <div className="col-md-3">
+                                <label className="form-label fw-semibold">{t('age')}</label>
+                                <input
+                                  type="number"
+                                  name="age"
+                                  value={formData.age}
+                                  onChange={handleInputChange}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                />
                               </div>
                               
-                              <div className="mb-3">
-                                <label className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('location')}</label>
+                              <div className="col-md-3">
+                                <label className="form-label fw-semibold">{t('gender')}</label>
+                                <select
+                                  name="gender"
+                                  value={formData.gender}
+                                  onChange={handleInputChange}
+                                  className={`form-select ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  required
+                                >
+                                  <option value="">Select...</option>
+                                  <option value="male">{t('genderOptions.male')}</option>
+                                  <option value="female">{t('genderOptions.female')}</option>
+                                  <option value="other">{t('genderOptions.other')}</option>
+                                </select>
+                              </div>
+                              
+                              <div className="col-12">
+                                <label className="form-label fw-semibold">{t('location')}</label>
                                 <input
                                   type="text"
-                                  className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
                                   name="location"
                                   value={formData.location}
                                   onChange={handleInputChange}
-                                  placeholder={t('location')}
+                                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                  placeholder="City, State"
+                                  required
                                 />
                               </div>
-                              
-                              <div className="mb-4">
-                                <label className={`form-label ${darkMode ? 'text-light' : ''}`}>{t('symptoms')}</label>
-                                <div className="row">
-                                  {t('symptomsList').map((symptom, index) => (
-                                    <div className="col-md-6 mb-2" key={index}>
-                                      <div className="form-check">
-                                        <input
-                                          className="form-check-input"
-                                          type="checkbox"
-                                          id={`symptom-${index}`}
-                                          checked={formData.symptoms.includes(symptom)}
-                                          onChange={() => handleSymptomChange(symptom)}
-                                        />
-                                        <label className={`form-check-label ${darkMode ? 'text-light' : ''}`} htmlFor={`symptom-${index}`}>
-                                          {symptom}
-                                        </label>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              
-                              <button type="submit" className="btn btn-primary" disabled={isAnalyzing}>
-                                {isAnalyzing ? (
-                                  <>
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Analyzing...
-                                  </>
-                                ) : (
-                                  t('submitButton')
-                                )}
-                              </button>
-                            </form>
+                            </div>
                           </div>
                           
-                          <div className="col-lg-6">
-                            <h3 className="h5 fw-bold mb-3">{t('analysisTitle')}</h3>
-                            <div className={`card ${darkMode ? 'bg-dark' : ''}`} style={{ minHeight: '400px' }}>
-                              <div className="card-body">
-                                {isAnalyzing ? (
-                                  <div className="text-center py-5">
-                                    <div className="spinner-border text-primary" role="status">
-                                      <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p className="mt-3">{t('analyzingPlaceholder')}</p>
+                          <div className="mb-4">
+                            <h5 className="fw-bold mb-3">{t('symptoms')}</h5>
+                            <div className="row g-2">
+                              {t('symptomsList').map((symptom, index) => (
+                                <div key={index} className="col-md-4 col-6">
+                                  <div className="form-check">
+                                    <input
+                                      className="form-check-input"
+                                      type="checkbox"
+                                      id={`symptom-${index}`}
+                                      checked={formData.symptoms.includes(symptom)}
+                                      onChange={() => handleSymptomChange(symptom)}
+                                    />
+                                    <label className="form-check-label" htmlFor={`symptom-${index}`}>
+                                      {symptom}
+                                    </label>
                                   </div>
-                                ) : analysisResult ? (
-                                  <div>
-                                    <h4 className="h6 mb-3">Top Predictions:</h4>
-                                    {analysisResult.map((disease, index) => (
-                                      <div key={index} className="mb-3 pb-3 border-bottom">
-                                        <div className="d-flex justify-content-between">
-                                          <h5 className="h6 mb-1">{disease.name}</h5>
-                                          <span className="badge bg-primary">{disease.probability}% {t('probability')}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="d-grid">
+                            <button 
+                              type="submit" 
+                              className="btn btn-primary btn-lg fw-semibold"
+                              disabled={isAnalyzing}
+                            >
+                              {isAnalyzing ? (
+                                <>
+                                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                  Analyzing...
+                                </>
+                              ) : (
+                                <>{t('submitButton')}</>
+                              )}
+                            </button>
+                          </div>
+                        </form>
+                        
+                        {(analysisResult || isAnalyzing) && (
+                          <div className="mt-4">
+                            <h5 className="fw-bold mb-3">{t('analysisTitle')}</h5>
+                            <div className={`p-4 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              {isAnalyzing ? (
+                                <div className="text-center">
+                                  <div className="spinner-border text-primary mb-3" role="status"></div>
+                                  <p className="mb-0">{t('analyzingPlaceholder')}</p>
+                                </div>
+                              ) : analysisResult && analysisResult.length > 0 ? (
+                                <div>
+                                  <h6 className="fw-bold text-success mb-3">Analysis Complete</h6>
+                                  {analysisResult.map((disease, index) => (
+                                    <div key={index} className={`card mb-3 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`}>
+                                      <div className="card-body">
+                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                          <h6 className="card-title fw-bold text-primary mb-1">{disease.name}</h6>
+                                          <span className={`badge fs-6 ${
+                                            disease.probability >= 70 ? 'bg-danger' :
+                                            disease.probability >= 50 ? 'bg-warning text-dark' : 'bg-info'
+                                          }`}>
+                                            {disease.probability}% {t('probability')}
+                                          </span>
                                         </div>
-                                        <p className="small mb-2">{disease.description}</p>
-                                        <div>
-                                          <h6 className="h6 mb-1">{t('remediesTitle')}:</h6>
-                                          <ul className="small mb-0">
-                                            {disease.remedies.map((remedy, i) => (
-                                              <li key={i}>{remedy}</li>
+                                        <p className="card-text mb-3">{disease.description}</p>
+                                        
+                                        <div className="mb-3">
+                                          <h6 className="fw-semibold text-success">{t('remediesTitle')}</h6>
+                                          <ul className="mb-0">
+                                            {disease.remedies.map((remedy, idx) => (
+                                              <li key={idx} className="mb-1">{remedy}</li>
                                             ))}
                                           </ul>
                                         </div>
                                       </div>
-                                    ))}
-                                    {analysisResult.length === 0 && (
-                                      <div className="text-center py-5">
-                                        <h5 className="h6 mb-3">{t('noDiseaseDetectedTitle')}</h5>
-                                        <p className="small">{t('noDiseaseDetectedDescription')}</p>
-                                        <p className="small text-muted">{t('noDiseaseDetectedRemedy')}</p>
-                                      </div>
-                                    )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div>
+                                  <h6 className="fw-bold text-warning mb-3">{t('noDiseaseDetectedTitle')}</h6>
+                                  <p className="mb-3">{t('noDiseaseDetectedDescription')}</p>
+                                  <div className={`alert ${darkMode ? 'alert-dark' : 'alert-light'} mb-0`}>
+                                    <strong>Recommendation:</strong> {t('noDiseaseDetectedRemedy')}
                                   </div>
-                                ) : (
-                                  <div className="text-center py-5">
-                                    <p className="mb-0">{t('analysisPlaceholder')}</p>
-                                  </div>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1588,85 +1289,122 @@ const App = () => {
               </motion.div>
             )}
 
-            {/* Community Outreach Tab */}
             {activeTab === 'community' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="row mb-4">
+                <div className="row mb-5">
+                  <div className="col-12 text-center">
+                    <h2 className="fw-bold mb-3">{t('communityTitle')}</h2>
+                    <p className="lead text-muted">{t('communitySubtitle')}</p>
+                  </div>
+                </div>
+
+                <div className="row mb-5">
                   <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body p-5 text-center">
-                        <h1 className="display-5 fw-bold mb-3">{t('communityTitle')}</h1>
-                        <p className="lead mb-4">{t('communitySubtitle')}</p>
-                      </div>
+                    <h3 className="fw-bold mb-4">{t('eventsTitle')}</h3>
+                    <div className="row g-4">
+                      {eventsData.map(event => (
+                        <div key={event.id} className="col-lg-4 col-md-6">
+                          <motion.div 
+                            className={`card h-100 shadow-sm ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`}
+                            style={{ borderRadius: '1rem' }}
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className={`card-header border-0 ${event.type === 'online' ? 'bg-primary' : 'bg-success'} text-white`}>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <span className="badge bg-light text-dark">{event.type === 'online' ? t('onlinePrograms') : t('offlineEvents')}</span>
+                                <small>{event.date}</small>
+                              </div>
+                            </div>
+                            <div className="card-body">
+                              <h5 className="card-title fw-bold mb-3">{event.title}</h5>
+                              <p className="text-muted mb-2">
+                                <strong>{t('location2')}:</strong> {event.location}
+                              </p>
+                              <p className="card-text mb-3">{event.description}</p>
+                              
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                <span className="text-success fw-semibold">
+                                  {event.registered}/{event.capacity} {t('registered')}
+                                </span>
+                                <div className="progress" style={{ width: '40%', height: '8px' }}>
+                                  <div 
+                                    className="progress-bar bg-success" 
+                                    style={{ width: `${(event.registered / event.capacity) * 100}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                              
+                              <button className={`btn ${event.registered >= event.capacity ? 'btn-secondary' : 'btn-primary'} w-100`} disabled={event.registered >= event.capacity}>
+                                {event.registered >= event.capacity ? 'Full' : t('registerNow')}
+                              </button>
+                            </div>
+                          </motion.div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
                 <div className="row">
-                  <div className="col-lg-8 mb-4">
-                    <h3 className="h5 fw-bold mb-3">{t('eventsTitle')}</h3>
-                    <div className="row g-4">
-                      {communityEvents.map(event => (
-                        <div className="col-md-6 col-lg-4" key={event.id}>
-                          <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : ''}`}>
-                            <div className="card-body d-flex flex-column">
-                              <h4 className="card-title h6 fw-bold">{event.title}</h4>
-                              <p className="small text-muted mb-3">{event.date}</p>
-                              <div className="mt-auto">
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                  <span className={`badge ${
-                                    event.status === 'upcoming' ? 'bg-success' : 'bg-secondary'
-                                  }`}>
-                                    {t('upcoming')}
-                                  </span>
-                                </div>
-                                <div className="d-flex justify-content-between align-items-center">
-                                  <span className={darkMode ? 'text-light' : 'text-muted'}>
-                                    {event.attendees} {t('registered')}
-                                  </span>
-                                  <button className={`btn ${darkMode ? 'btn-outline-light' : 'btn-outline-primary'} btn-sm`}>
-                                    {t('registerNow')}
-                                  </button>
-                                </div>
-                              </div>
+                  <div className="col-lg-6 mb-4">
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header border-0 bg-transparent">
+                        <h4 className="fw-bold">{t('programHighlights')}</h4>
+                      </div>
+                      <div className="card-body">
+                        <ul className="list-unstyled">
+                          <li className="mb-3 d-flex align-items-start">
+                            <FaStethoscope className="text-primary me-3 mt-1" />
+                            <div>
+                              <strong>Health Screenings</strong><br />
+                              <small className="text-muted">Free health checkups and consultations</small>
                             </div>
-                          </div>
-                        </div>
-                      ))}
+                          </li>
+                          <li className="mb-3 d-flex align-items-start">
+                            <FaPhone className="text-success me-3 mt-1" />
+                            <div>
+                              <strong>24/7 Helpline</strong><br />
+                              <small className="text-muted">Emergency medical assistance</small>
+                            </div>
+                          </li>
+                          <li className="mb-3 d-flex align-items-start">
+                            <FaHospital className="text-info me-3 mt-1" />
+                            <div>
+                              <strong>{t('waterTesting')}</strong><br />
+                              <small className="text-muted">Community water quality analysis</small>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="col-lg-4">
-                    <h3 className="h5 fw-bold mb-3">{t('programHighlights')}</h3>
-                    <div className="row g-3">
-                      <div className="col-12">
-                        <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-light'}`}>
-                          <div className="card-body">
-                            <h4 className="card-title h6 fw-bold">{t('onlinePrograms')}</h4>
-                            <p className="small mb-0">Join our virtual workshops and webinars to learn about water safety and disease prevention.</p>
-                          </div>
-                        </div>
+                  <div className="col-lg-6 mb-4">
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-header border-0 bg-transparent">
+                        <h4 className="fw-bold">Contact Information</h4>
                       </div>
-                      
-                      <div className="col-12">
-                        <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-light'}`}>
-                          <div className="card-body">
-                            <h4 className="card-title h6 fw-bold">{t('offlineEvents')}</h4>
-                            <p className="small mb-0">Participate in community health camps and awareness drives in your locality.</p>
-                          </div>
+                      <div className="card-body">
+                        <div className="mb-3">
+                          <strong>Emergency Helpline:</strong><br />
+                          <span className="fs-4 fw-bold text-primary">108</span>
                         </div>
-                      </div>
-                      
-                      <div className="col-12">
-                        <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-light'}`}>
-                          <div className="card-body">
-                            <h4 className="card-title h6 fw-bold">{t('waterTesting')}</h4>
-                            <p className="small mb-0">Get your water sources tested by our team of experts for quality and safety.</p>
-                          </div>
+                        <div className="mb-3">
+                          <strong>Program Coordination:</strong><br />
+                          <span className="text-muted">+91-9876543210</span>
+                        </div>
+                        <div className="mb-3">
+                          <strong>Email:</strong><br />
+                          <span className="text-muted">outreach@healify.org</span>
+                        </div>
+                        <div>
+                          <strong>Regional Offices:</strong><br />
+                          <small className="text-muted">Guwahati, Shillong, Imphal, Aizawl, Agartala, Gangtok, Kohima, Itanagar</small>
                         </div>
                       </div>
                     </div>
@@ -1675,56 +1413,72 @@ const App = () => {
               </motion.div>
             )}
 
-            {/* About Us Tab */}
             {activeTab === 'about' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="row mb-4">
-                  <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body p-5 text-center">
-                        <h1 className="display-5 fw-bold mb-3">{t('aboutTitle')}</h1>
-                        <p className="lead">{t('missionText')}</p>
-                      </div>
-                    </div>
+                <div className="row mb-5">
+                  <div className="col-12 text-center">
+                    <h2 className="fw-bold mb-4">{t('aboutTitle')}</h2>
                   </div>
                 </div>
 
-                <div className="row mb-4">
+                <div className="row mb-5">
                   <div className="col-lg-6 mb-4">
-                    <div className={`card ${darkMode ? 'bg-dark' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('missionTitle')}</h3>
-                        <p>{t('missionText')}</p>
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-body p-4">
+                        <h4 className="fw-bold text-primary mb-3">{t('missionTitle')}</h4>
+                        <p className="text-muted">{t('missionText')}</p>
                       </div>
                     </div>
                   </div>
                   
                   <div className="col-lg-6 mb-4">
-                    <div className={`card ${darkMode ? 'bg-dark' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('visionTitle')}</h3>
-                        <p>{t('visionText')}</p>
+                    <div className={`card h-100 ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-body p-4">
+                        <h4 className="fw-bold text-success mb-3">{t('visionTitle')}</h4>
+                        <p className="text-muted">{t('visionText')}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="row mb-4">
+                <div className="row mb-5">
                   <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-3">{t('techStack')}</h3>
-                        <div className="d-flex flex-wrap gap-3">
-                          <span className="badge bg-primary">React</span>
-                          <span className="badge bg-success">Node.js</span>
-                          <span className="badge bg-info">MongoDB</span>
-                          <span className="badge bg-warning text-dark">Python</span>
-                          <span className="badge bg-danger">TensorFlow</span>
-                          <span className="badge bg-secondary">Docker</span>
+                    <div className={`card ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-body p-4">
+                        <h4 className="fw-bold mb-4">{t('techStack')}</h4>
+                        <div className="row g-4">
+                          <div className="col-md-3 col-6 text-center">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <FaRobot className="fs-1 text-primary mb-2" />
+                              <h6 className="fw-semibold">AI & ML</h6>
+                              <small className="text-muted">TensorFlow, PyTorch</small>
+                            </div>
+                          </div>
+                          <div className="col-md-3 col-6 text-center">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <FaDatabase className="fs-1 text-success mb-2" />
+                              <h6 className="fw-semibold">Data Analytics</h6>
+                              <small className="text-muted">Python, R, MongoDB</small>
+                            </div>
+                          </div>
+                          <div className="col-md-3 col-6 text-center">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <FaGlobe className="fs-1 text-info mb-2" />
+                              <h6 className="fw-semibold">Web Platform</h6>
+                              <small className="text-muted">React, Node.js</small>
+                            </div>
+                          </div>
+                          <div className="col-md-3 col-6 text-center">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <FaPhone className="fs-1 text-warning mb-2" />
+                              <h6 className="fw-semibold">Mobile App</h6>
+                              <small className="text-muted">Flutter, React Native</small>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1733,21 +1487,37 @@ const App = () => {
 
                 <div className="row">
                   <div className="col-12">
-                    <div className={`card ${darkMode ? 'bg-dark' : ''}`} style={{ borderRadius: '1rem' }}>
-                      <div className="card-body">
-                        <h3 className="card-title h5 fw-bold mb-4">{t('teamTitle')}</h3>
+                    <div className={`card ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} style={{ borderRadius: '1rem' }}>
+                      <div className="card-body p-4 text-center">
+                        <h4 className="fw-bold mb-4">{t('teamTitle')}</h4>
+                        <p className="lead text-muted mb-4">
+                          Our multidisciplinary team combines expertise in public health, artificial intelligence, data science, and community development.
+                        </p>
                         <div className="row g-4">
-                          {teamMembers.map((member, index) => (
-                            <div className="col-md-2 col-6 text-center" key={index}>
-                              <img 
-                                src={`https://placehold.co/80x80/${['4ade80', '60a5fa', 'f59e0b', 'ef4444', '8b5cf6', '10b981'][index]}/ffffff?text=${member.name.charAt(0)}`}
-                                alt={member.name}
-                                className="rounded-circle mb-2"
-                                style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                              />
-                              <div className={`fw-bold small ${darkMode ? 'text-light' : ''}`}>{member.name}</div>
+                          <div className="col-lg-3 col-md-6">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <h6 className="fw-semibold">Public Health Experts</h6>
+                              <small className="text-muted">Epidemiologists & Medical Professionals</small>
                             </div>
-                          ))}
+                          </div>
+                          <div className="col-lg-3 col-md-6">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <h6 className="fw-semibold">AI Researchers</h6>
+                              <small className="text-muted">Machine Learning & Deep Learning</small>
+                            </div>
+                          </div>
+                          <div className="col-lg-3 col-md-6">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <h6 className="fw-semibold">Software Engineers</h6>
+                              <small className="text-muted">Full-Stack Development</small>
+                            </div>
+                          </div>
+                          <div className="col-lg-3 col-md-6">
+                            <div className={`p-3 rounded ${darkMode ? 'bg-secondary bg-opacity-25' : 'bg-light'}`}>
+                              <h6 className="fw-semibold">Community Liaisons</h6>
+                              <small className="text-muted">Regional Coordinators</small>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1759,122 +1529,90 @@ const App = () => {
         </div>
       </div>
 
-      {/* Chat Widget */}
       {chatOpen && (
-        <div className="position-fixed bottom-0 end-0 m-4" style={{ width: '400px', zIndex: 1000 }}>
-          <div className={`card ${darkMode ? 'bg-dark text-light' : 'bg-white'} shadow`} style={{ borderRadius: '1rem', height: '500px', display: 'flex', flexDirection: 'column' }}>
-            <div className="card-header d-flex justify-content-between align-items-center" style={{ borderRadius: '1rem 1rem 0 0' }}>
-              <h5 className="mb-0">{t('chatTitle')}</h5>
-              <button className="btn p-0" onClick={toggleChat} aria-label="Close chat">
+        <motion.div 
+          className={`position-fixed ${darkMode ? 'bg-dark border-secondary' : 'bg-white'} shadow-lg`}
+          style={{
+            bottom: '20px',
+            right: '20px',
+            width: '350px',
+            height: '500px',
+            zIndex: 1040,
+            borderRadius: '1rem',
+            border: '1px solid #dee2e6'
+          }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="d-flex flex-column h-100">
+            <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center" style={{ borderRadius: '1rem 1rem 0 0' }}>
+              <h6 className="mb-0 fw-bold">
+                <FaRobot className="me-2" />
+                {t('chatTitle')}
+              </h6>
+              <button className="btn btn-sm btn-outline-light" onClick={toggleChat}>
                 <FaTimes />
               </button>
             </div>
             
-            <div className="card-body p-0" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <div ref={widgetChatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-                {messages.map((msg) => (
-                  <div key={msg.id} className={`d-flex mb-3 ${msg.sender === 'user' ? 'justify-content-end' : 'justify-content-start'}`}>
-                    {msg.sender === 'ai' && <FaRobot className={`me-2 flex-shrink-0 align-self-end text-primary ${darkMode ? 'bg-light' : ''} p-1 rounded-circle`} size={25} />}
-                    <div style={{ maxWidth: '75%' }}>
-                      <div className={`p-2 rounded ${msg.sender === 'user' ? 'bg-primary text-white' : darkMode ? 'bg-secondary text-light' : 'bg-light text-dark'}`}>
-                        <p className="mb-0 small">{msg.text}</p>
-                      </div>
-                      <div className={`text-muted small mt-1 ${msg.sender === 'user' ? 'text-end' : 'text-start'}`}>
-                        {msg.timestamp}
-                      </div>
+            <div className="flex-grow-1 p-3 overflow-auto" ref={widgetChatRef} style={{ maxHeight: '350px' }}>
+              {messages.map(message => (
+                <div key={message.id} className={`mb-3 ${message.sender === 'user' ? 'text-end' : 'text-start'}`}>
+                  <div className={`d-inline-block p-2 rounded ${
+                    message.sender === 'user' 
+                      ? 'bg-primary text-white' 
+                      : darkMode 
+                        ? 'bg-secondary text-light' 
+                        : 'bg-light text-dark'
+                  }`} style={{ maxWidth: '80%' }}>
+                    <small>{message.text}</small>
+                    <div className={`text-${message.sender === 'user' ? 'light' : 'muted'} mt-1`} style={{ fontSize: '0.7rem' }}>
+                      {message.timestamp}
                     </div>
                   </div>
-                ))}
-                
-                {isTyping && (
-                  <div className="d-flex justify-content-start mb-3">
-                    <FaRobot className={`me-2 flex-shrink-0 align-self-end text-primary ${darkMode ? 'bg-light' : ''} p-1 rounded-circle`} size={25} />
-                    <div className={`p-2 rounded ${darkMode ? 'bg-secondary' : 'bg-light'}`}>
-                      <div className="d-flex">
-                        <div className="bg-secondary rounded-circle me-1" style={{ width: '8px', height: '8px', animation: 'bounce 1s infinite' }}></div>
-                        <div className="bg-secondary rounded-circle me-1" style={{ width: '8px', height: '8px', animation: 'bounce 1s infinite 0.15s' }}></div>
-                        <div className="bg-secondary rounded-circle" style={{ width: '8px', height: '8px', animation: 'bounce 1s infinite 0.3s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
+              ))}
               
-              <div className="card-footer p-3">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    value={userMessage}
-                    onChange={(e) => setUserMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder={t('chatPlaceholder')}
-                    className={`form-control ${darkMode ? 'bg-dark text-light' : ''}`}
-                  />
-                  <button 
-                    className="btn btn-primary" 
-                    type="button" 
-                    onClick={handleSendMessage}
-                    disabled={!userMessage.trim()}
-                  >
-                    {t('send')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Outbreak Detail Modal */}
-      {selectedOutbreak && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setSelectedOutbreak(null)}>
-          <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
-            <div className={`modal-content ${darkMode ? 'bg-dark text-light' : ''}`}>
-              <div className="modal-header">
-                <h5 className="modal-title">{selectedOutbreak.name}</h5>
-                <button type="button" className="btn-close" onClick={() => setSelectedOutbreak(null)} aria-label="Close"></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-8">
-                    <p><strong>{t('state')}:</strong> {selectedOutbreak.state}</p>
-                    <p><strong>{t('severity')}:</strong> 
-                      <span className={`badge ms-2 ${
-                        selectedOutbreak.severity === 'critical' ? 'bg-danger' : 
-                        selectedOutbreak.severity === 'high' ? 'bg-warning text-dark' : 
-                        selectedOutbreak.severity === 'medium' ? 'bg-info text-dark' : 
-                        'bg-secondary'
-                      }`}>
-                        {t(selectedOutbreak.severity)}
+              {isTyping && (
+                <div className="mb-3 text-start">
+                  <div className={`d-inline-block p-2 rounded ${darkMode ? 'bg-secondary text-light' : 'bg-light text-dark'}`}>
+                    <small>
+                      <span className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                       </span>
-                    </p>
-                    <p><strong>{t('cases')}:</strong> {selectedOutbreak.cases.toLocaleString()}</p>
-                    <p><strong>{t('rate')}:</strong> {selectedOutbreak.rate}/1000</p>
-                    <p><strong>{t('description')}:</strong> {t(`diseases.${selectedOutbreak.name.split(' ')[0].toLowerCase()}`).description}</p>
-                  </div>
-                  <div className="col-md-4">
-                    <div className={`p-3 rounded ${darkMode ? 'bg-secondary' : 'bg-light'}`}>
-                      <h6>{t('statistics')}</h6>
-                      <div className="text-center my-3">
-                        <div className="display-6 fw-bold text-danger">{selectedOutbreak.cases.toLocaleString()}</div>
-                        <div className={`small ${darkMode ? 'text-light' : 'text-muted'}`}>{t('reportedCases')}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="fw-bold text-warning">{selectedOutbreak.rate}/1000</div>
-                        <div className={`small ${darkMode ? 'text-light' : 'text-muted'}`}>{t('rate')}</div>
-                      </div>
-                    </div>
+                    </small>
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setSelectedOutbreak(null)}>
-                  Close
+              )}
+            </div>
+            
+            <div className="card-footer border-0" style={{ borderRadius: '0 0 1rem 1rem' }}>
+              <div className="input-group">
+                <input
+                  type="text"
+                  className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                  placeholder={t('chatPlaceholder')}
+                  value={userMessage}
+                  onChange={(e) => setUserMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleSendMessage}
+                  disabled={!userMessage.trim()}
+                >
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                  </svg>
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
