@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback} from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { motion } from 'framer-motion';
 import { FaBars, FaTimes, FaRobot, FaHome, FaDatabase, FaUsers, FaInfoCircle, FaMoon, FaSun, FaComments, FaGlobe, FaPhone, FaHospital, FaStethoscope } from 'react-icons/fa';
@@ -531,7 +531,7 @@ const App = () => {
     }
   };
 
-  const t = (key) => {
+  const t = useCallback((key) => {
     const keys = key.split('.');
     
     const resolve = (languageObject, keyParts) => {
@@ -552,7 +552,7 @@ const App = () => {
     }
 
     return result !== undefined ? result : key;
-  };
+  }, [language]);
     
   useEffect(() => {
     setMessages([
