@@ -85,7 +85,7 @@ const App = () => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [selectedOutbreak, setSelectedOutbreak] = useState(null);
+  // Removed unused selectedOutbreak
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -505,21 +505,23 @@ const App = () => {
 
     const API_URL = 'https://karan0301-sih.hf.space/predict';
 
-    const submissionData = {
-    ph_level: parseFloat(waterFormData.ph),
-    turbidity_ntu: parseFloat(waterFormData.turbidity),
-    contaminant_level_ppm: parseFloat(waterFormData.contaminantLevel),
-    temperature_celsius: parseFloat(waterFormData.temperature),
-    water_source_type: waterFormData.water_source_type,
-    bacteria_count_cfu_ml: parseFloat(waterFormData.bacteria_count_cfu_ml),
-    nitrate_level_mg_l: parseFloat(waterFormData.nitrate_level_mg_l),
-    dissolved_oxygen_mg_l: parseFloat(waterFormData.dissolved_oxygen_mg_l)
-};
+    // Create the data object for API submission
+    const apiData = {
+      ph_level: parseFloat(waterFormData.ph),
+      turbidity_ntu: parseFloat(waterFormData.turbidity),
+      contaminant_level_ppm: parseFloat(waterFormData.contaminantLevel),
+      temperature_celsius: parseFloat(waterFormData.temperature),
+      water_source_type: waterFormData.water_source_type,
+      bacteria_count_cfu_ml: parseFloat(waterFormData.bacteria_count_cfu_ml),
+      nitrate_level_mg_l: parseFloat(waterFormData.nitrate_level_mg_l),
+      dissolved_oxygen_mg_l: parseFloat(waterFormData.dissolved_oxygen_mg_l)
+    };
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(submissionData),
+            body: JSON.stringify(apiData),
         });
 
         if (!response.ok) {
