@@ -95,7 +95,7 @@ const App = () => {
     location: '',
     symptoms: [],
   });
-  
+ 
   const [waterFormData, setWaterFormData] = useState({
   ph: '6.8',
   turbidity: '12.3',
@@ -109,7 +109,7 @@ const App = () => {
 });
 
   const [language, setLanguage] = useState('en');
-  
+ 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
 
@@ -424,7 +424,7 @@ const App = () => {
         },
         ai: {
             initialGreeting: "নমস্কাৰ! মই হিলিফাই এআই। মই আজি আপোনাক জলবাহিত ৰোগৰ বিষয়ে কেনেদৰে সহায় কৰিব পাৰোঁ? আপুনি মোক 'কলেৰাৰ কাৰণ কি?' বা 'টাইফয়েড কেনেকৈ প্ৰতিৰোধ কৰিব?' আদি প্ৰশ্ন সুধিব পাৰে।",
-            fallback: "মই দুঃখিত, মোৰ ওচৰত সেই বিষয়ে তথ্য নাই। মই কলেৰা, টাইফয়েড, হেপাটাইটিছ এ, গিয়াৰ্ডিয়াচিছ, আৰু গেষ্ট্ৰ'এণ্টেৰাইটিছৰ দৰে ৰোগৰ কাৰণ, লক্ষণ, চিকিৎসা, আৰু প্ৰতিৰোধৰ বিষয়ে প্ৰশ্নৰ উত্তৰ দিব পাৰোঁ। অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো বেলেগ ধৰণে সুধিবলৈ চেষ্টা কৰক।",
+            fallback: "মই দুঃখিত, মোৰ ওচৰত সেই বিষয়ে তথ্য নাই। মই কলেৰা, টাইফয়েড, হেপাটাইটিছ এ, গিয়াৰ্ডিয়াচিছ, আৰু গেষ্ট্ৰ'এণ্টেৰাইটিছৰ দৰে ৰোগৰ কাৰণ, লক্ষণ, চিকিৎসা, আৰু প্ৰতিৰোধৰ বিষয়ে প্ৰশ্নৰ উত্তৰ দিব পাৰোঁ। অনুগ্ৰহ কৰি আপোনাৰ প্ৰש্নটো বেলেগ ধৰণে সুধিবলৈ চেষ্টা কৰক।",
         }
     },
     bn: {
@@ -531,9 +531,10 @@ const App = () => {
     }
   };
 
+  // FIX: Wrap the 't' function in useCallback to prevent re-creation on every render.
   const t = useCallback((key) => {
     const keys = key.split('.');
-    
+   
     const resolve = (languageObject, keyParts) => {
       let current = languageObject;
       for (const part of keyParts) {
@@ -552,18 +553,18 @@ const App = () => {
     }
 
     return result !== undefined ? result : key;
-  }, [language]);
-    
+  }, [language]); // Dependency array includes 'language' so 't' updates when language changes.
+     
   useEffect(() => {
     setMessages([
-        {  
-            id: 1,  
-            text: t('ai.initialGreeting'),  
-            sender: 'ai',  
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })  
+        { 
+            id: 1, 
+            text: t('ai.initialGreeting'), 
+            sender: 'ai', 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
         }
     ]);
-  }, [language, t]);
+  }, [language, t]); // Now 't' is stable and won't cause unnecessary re-renders.
 
   // ✨ NEW: Enhanced AI Knowledge Base
   const diseaseInfoDatabase = {
@@ -704,7 +705,7 @@ const App = () => {
           widgetChatRef.current.scrollTop = widgetChatRef.current.scrollHeight;
       }
   }, [messages]);
-  
+ 
   const diseaseDatabase = {
     hepatitisA: { keywords: ["Fatigue", "Nausea", "Jaundice", "Dark colored urine", "Abdominal Pain", "Vomiting", "Fever"], },
     cholera: { keywords: ["Diarrhea", "Vomiting", "Dehydration", "Nausea"], },
@@ -753,7 +754,7 @@ const App = () => {
       setIsAnalyzing(false);
     }, 2500);
   };
-  
+ 
   const handleWaterFormSubmit = async (e) => {
     e.preventDefault();
     setIsWaterAnalyzing(true);
@@ -918,7 +919,7 @@ const App = () => {
           </div>
         </div>
       </header>
-      
+     
       <div className="d-flex">
         <aside 
           className="sidebar shadow position-fixed"
@@ -1229,7 +1230,7 @@ const App = () => {
               </div>
             </motion.div>
           )}
-          
+         
           {activeTab === 'prediction' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
@@ -1321,7 +1322,7 @@ const App = () => {
                              <span className="visually-hidden">Loading...</span>
                            </div>
                            <p className="mt-3">{t('analyzingPlaceholder')}</p>
-                         </div>
+                          </div>
                       ) : analysisResult && analysisResult.length > 0 ? (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                             {analysisResult.map((result, index) => (
@@ -1339,9 +1340,9 @@ const App = () => {
                                     </ul>
                                 </div>
                             ))}
-                             <div className="alert alert-warning mt-4 small">
-                                 <strong>Disclaimer:</strong> This is an AI-generated preliminary analysis and not a substitute for professional medical advice. Please consult a qualified doctor for an accurate diagnosis.
-                             </div>
+                           <div className="alert alert-warning mt-4 small">
+                               <strong>Disclaimer:</strong> This is an AI-generated preliminary analysis and not a substitute for professional medical advice. Please consult a qualified doctor for an accurate diagnosis.
+                           </div>
                         </motion.div>
                       ) : analysisResult && analysisResult.length === 0 ? (
                          <div className="text-center d-flex flex-column justify-content-center h-100">
@@ -1351,11 +1352,11 @@ const App = () => {
                          </div>
                       ) : (
                         <div className="text-center d-flex flex-column justify-content-center h-100">
-                            <svg className="text-primary mb-3 mx-auto" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                            <p className={darkMode ? 'text-light' : 'text-muted'}>{t('analysisPlaceholder')}</p>
-                            <p className={`small ${darkMode ? 'text-light' : 'text-muted'}`}>Select symptoms and submit to see results.</p>
+                          <svg className="text-primary mb-3 mx-auto" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          <p className={darkMode ? 'text-light' : 'text-muted'}>{t('analysisPlaceholder')}</p>
+                          <p className={`small ${darkMode ? 'text-light' : 'text-muted'}`}>Select symptoms and submit to see results.</p>
                         </div>
                       )}
                     </div>
@@ -1365,7 +1366,7 @@ const App = () => {
             </div>
             </motion.div>
           )}
-          
+         
           {activeTab === 'community' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
@@ -1429,7 +1430,7 @@ const App = () => {
               </div>
             </motion.div>
           )}
-          
+         
           {activeTab === 'chat' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
@@ -1503,7 +1504,7 @@ const App = () => {
             </div>
             </motion.div>
           )}
-          
+         
           {activeTab === 'about' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className={`card ${darkMode ? 'bg-dark text-light' : ''}`} style={{ borderRadius: '1rem' }}>
