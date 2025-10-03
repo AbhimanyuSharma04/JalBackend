@@ -1,0 +1,201 @@
+/* General Layout & App Styles */
+.sidebar {
+  padding-top: 70px;
+  overflow-y: auto;
+}
+
+.hamburger-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 400px;
+}
+
+/* ========================================= */
+/* CHATBOT STYLES                            */
+/* ========================================= */
+
+.chat-bubble-ai, .chat-bubble-user {
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 80%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    word-wrap: break-word;
+    /* --- NEW: Added for better readability --- */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+}
+
+.chat-bubble-ai {
+    border-bottom-left-radius: 4px;
+}
+
+.chat-bubble-ai.bg-light {
+    background-color: #f0f0f0 !important;
+    color: #000 !important;
+}
+
+.chat-bubble-user {
+    border-bottom-right-radius: 4px;
+}
+
+/* --- NEW: De-emphasize timestamps --- */
+.text-muted.small.mt-1 {
+    font-size: 0.75rem;
+    color: #999 !important;
+    margin-top: 8px !important;
+    padding: 0 5px;
+}
+
+/* ========================================= */
+/* STYLES FOR REACT-MARKDOWN                 */
+/* ========================================= */
+
+.markdown-container-small {
+  font-size: 0.875rem;
+}
+
+.chat-bubble-ai p {
+  margin-bottom: 0.75rem;
+}
+
+.chat-bubble-ai p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- NEW: Style bold text --- */
+.chat-bubble-ai strong {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.chat-bubble-ai ul {
+  margin-bottom: 0.75rem;
+  /* --- NEW: Use custom bullets --- */
+  list-style: none;
+  padding-left: 0;
+}
+
+.chat-bubble-ai li {
+  margin-bottom: 0.25rem;
+  /* --- NEW: Indent list items for custom bullets --- */
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+/* --- NEW: Add the custom bullet point --- */
+.chat-bubble-ai li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #0d6efd;
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+/* ========================================= */
+/* OTHER STYLES (Your existing code)         */
+/* ========================================= */
+
+.ripple-bg {
+  background: radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.1), transparent 40%),
+              radial-gradient(circle at 80% 40%, rgba(25, 135, 84, 0.1), transparent 50%);
+  background-size: cover;
+  animation: rippleAnim 10s infinite linear;
+}
+
+.pulse-critical {
+  animation: pulseCritical 2s infinite;
+  border-left: 5px solid #dc3545 !important;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  margin: 0 1px;
+  background-color: #9E9EA1;
+  display: inline-block;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-of-type(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation-delay: -0.16s;
+}
+
+.leaflet-control-container {
+  z-index: 1001 !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: white !important;
+  color: #333 !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+  text-decoration: none !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f4f4f4 !important;
+}
+
+.chat-input-group {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #dee2e6;
+}
+
+.chat-input-group .form-control {
+  border-radius: 20px !important;
+  border-color: #ced4da;
+  box-shadow: none !important;
+  margin-right: 10px;
+}
+
+.chat-input-group .btn {
+  border-radius: 50% !important;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-watery-background {
+  background: linear-gradient(135deg, #146f7b, #b2ebf2, #80deea, #4dd0e1);
+  background-size: 400% 400%;
+  animation: wateryAnimation 15s ease infinite;
+}
+
+@keyframes rippleAnim {
+  0% { background-position: 0 0, 0 0; }
+  50% { background-position: 50px 50px, -50px -50px; }
+  100% { background-position: 0 0, 0 0; }
+}
+
+@keyframes pulseCritical {
+  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}
+
+@keyframes wateryAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
