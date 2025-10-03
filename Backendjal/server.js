@@ -84,7 +84,7 @@ app.post('/api/handle-social-login', verifyToken, async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         // Now that the route is protected, we know who is making the request
-        console.log(`Received request for /api/chat from user: ${req.user.uid}`);
+        console.log("Received request for public /api/chat route");
         const { message } = req.body;
 
         const systemPrompt = `

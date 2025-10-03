@@ -10,7 +10,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import ReactMarkdown from 'react-markdown';
 import './Dashboard.css';
-import { auth, sensorDB } from './firebase/config'
 
 const OutbreakMap = ({ outbreaks, darkMode }) => {
     const mapCenter = [22.351114, 78.667742];
