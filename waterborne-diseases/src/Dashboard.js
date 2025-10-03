@@ -10,6 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import ReactMarkdown from 'react-markdown';
 import './Dashboard.css';
+import { auth, sensorDB } from './firebase/config'
 
 const OutbreakMap = ({ outbreaks, darkMode }) => {
     const mapCenter = [22.351114, 78.667742];
@@ -637,7 +638,7 @@ const App = () => {
 
     try {
         // Call your backend's /api/chat endpoint
-        const response = await fetch('http://localhost:4000/api/chat', {
+        const response = await fetch('https://jalbackend.onrender.com/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

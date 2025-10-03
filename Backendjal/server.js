@@ -12,7 +12,10 @@ const app = express();
 const PORT = 4000;
 
 // 3. APPLY MIDDLEWARE
-app.use(cors());
+// In section 3
+app.use(cors({
+  origin: 'https://statuesque-pavlova-67cd37.netlify.app/' // IMPORTANT: Use your actual Netlify URL here
+}));
 app.use(express.json());
 
 // 4. INITIALIZE FIREBASE ADMIN SDK
@@ -28,7 +31,7 @@ const openAI = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
     apiKey: process.env.OPENROUTER_API_KEY,
     defaultHeaders: {
-        "HTTP-Referer": "http://localhost:3000",
+        "HTTP-Referer": process.env.SITE_URL || "http://localhost:3000",
         "X-Title": "Jal-Rakshak",
     },
 });
@@ -78,7 +81,7 @@ app.post('/api/handle-social-login', verifyToken, async (req, res) => {
 });
 
 // 7. DEFINE PROTECTED API ENDPOINT FOR THE CHATBOT
-app.post('/api/chat', verifyToken, async (req, res) => {
+app.post('/api/chat', async (req, res) => {
     try {
         // Now that the route is protected, we know who is making the request
         console.log(`Received request for /api/chat from user: ${req.user.uid}`);
