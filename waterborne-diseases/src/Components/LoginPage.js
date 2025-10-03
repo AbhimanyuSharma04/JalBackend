@@ -14,7 +14,7 @@ const LoginPage = ({ darkMode }) => {
     // Function to handle registration by calling your backend
     const handleRegister = async () => {
         try {
-            const response = await fetch('https://jalbackend.onrender.com/api/chat', {
+            const response = await fetch('https://jalbackend.onrender.com', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password, name }),
@@ -60,7 +60,7 @@ const LoginPage = ({ darkMode }) => {
             localStorage.setItem('authToken', token);
 
             // Notify our backend about the new user
-            await fetch('http://localhost:4000/api/handle-social-login', {
+            await fetch('https://jalbackend.onrender.com', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
