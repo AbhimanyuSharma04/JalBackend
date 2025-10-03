@@ -14,7 +14,7 @@ const PORT = 4000;
 // 3. APPLY MIDDLEWARE
 // In section 3
 app.use(cors({
-  origin:['https://statuesque-pavlova-67cd37.netlify.app/',
+  origin:['https://statuesque-pavlova-67cd37.netlify.app',
   'http://localhost:3000'] // IMPORTANT: Use your actual Netlify URL here
 }));
 app.use(express.json());
