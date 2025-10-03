@@ -637,7 +637,7 @@ const App = () => {
 
     try {
         // Call your backend's /api/chat endpoint
-        const response = await fetch('https://jalbackend.onrender.com', {
+        const response = await fetch('https://jalbackend.onrender.com/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
