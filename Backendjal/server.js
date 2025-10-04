@@ -94,7 +94,7 @@ You are 'Jal-Rakshak AI', a compassionate, reliable, and knowledgeable public he
 `;
 
         const completion = await openAI.chat.completions.create({
-            model: "mistralai/mistral-7b-instruct:free",
+            model: "alibaba/tongyi-deepresearch-30b-a3b:free",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: message },
