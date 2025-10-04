@@ -93,8 +93,8 @@ You are 'Jal-Rakshak AI', a compassionate, reliable, and knowledgeable public he
 // The rest of your detailed system prompt goes here
 `;
 
-        const completion = await openAI.chat.com.pletions.create({
-            model: "x-ai/grok-4-fast:free",
+        const completion = await openAI.chat.completions.create({
+            model: "mistralai/mistral-7b-instruct:free",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: message },
