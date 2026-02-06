@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
+    "@supabase/supabase-js": "^2.95.3",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.0",
     "firebase": "^12.3.0",

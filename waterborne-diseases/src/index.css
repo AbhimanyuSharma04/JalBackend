@@ -1,13 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CRITICAL: Dark theme must be in index.css as it loads first */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(circle at 50% 0%, #023859 0%, #011C40 100%) !important;
+  color: #ffffff !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html {
+  background: radial-gradient(circle at 50% 0%, #023859 0%, #011C40 100%) !important;
+  min-height: 100vh;
+}
+
+#root {
+  background: transparent !important;
+  min-height: 100vh;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Force all elements to inherit white text by default */
+* {
+  color: inherit;
 }
