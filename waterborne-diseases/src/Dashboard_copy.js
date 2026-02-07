@@ -244,6 +244,7 @@ const App = () => {
     const [showAddDeviceModal, setShowAddDeviceModal] = useState(false);
     const [newDeviceData, setNewDeviceData] = useState({ id: '', name: '' });
     const [deviceLoading, setDeviceLoading] = useState(false);
+    const [showContactModal, setShowContactModal] = useState(false);
 
     useEffect(() => {
         const fetchUserNameAndDevices = async () => {
@@ -2144,7 +2145,7 @@ const App = () => {
                                             <div className="mt-5 p-4 rounded bg-dark bg-opacity-50 border border-secondary">
                                                 <h5 className="h6 fw-bold text-white mb-2">{t('joinCause')}</h5>
                                                 <p className="small text-white-50 mb-3">{t('joinCauseText')}</p>
-                                                <button className="jr-btn-fetch w-100">{t('contactUs')}</button>
+                                                <button className="jr-btn-fetch w-100" onClick={() => setShowContactModal(true)}>{t('contactUs')}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -2310,6 +2311,51 @@ const App = () => {
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Contact Us Modal */}
+            {showContactModal && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }} onClick={() => setShowContactModal(false)}>
+                    <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
+                        <div className="modal-content text-white" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="modal-header border-secondary">
+                                <h5 className="modal-title">{t('contactUs')}</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowContactModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="d-flex flex-column gap-3">
+                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                        <div className="d-flex align-items-center mb-1">
+                                            <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                <span className="fw-bold text-white">A</span>
+                                            </div>
+                                            <h6 className="fw-bold mb-0 text-white">Abhimanyu</h6>
+                                        </div>
+                                        <a href="mailto:abhimanyusharma.xi@gmail.com" className="text-decoration-none ms-5 d-block text-info small">abhimanyusharma.xi@gmail.com</a>
+                                    </div>
+                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                        <div className="d-flex align-items-center mb-1">
+                                            <div className="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                <span className="fw-bold text-white">R</span>
+                                            </div>
+                                            <h6 className="fw-bold mb-0 text-white">Rudra</h6>
+                                        </div>
+                                        <a href="mailto:rudrarana02006@gmail.com" className="text-decoration-none ms-5 d-block text-info small">rudrarana02006@gmail.com</a>
+                                    </div>
+                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                        <div className="d-flex align-items-center mb-1">
+                                            <div className="bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                <span className="fw-bold text-white">S</span>
+                                            </div>
+                                            <h6 className="fw-bold mb-0 text-white">Siddharth</h6>
+                                        </div>
+                                        <a href="mailto:siddharthjaspal@gmail.com" className="text-decoration-none ms-5 d-block text-info small">siddharthjaspal@gmail.com</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
