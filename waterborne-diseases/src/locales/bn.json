@@ -1,0 +1,336 @@
+{
+    "home": " হোম ",
+    "submitWaterData": " ডেটা জমা দিন ",
+    "diseasePrediction": " রোগের পূর্বাভাস ",
+    "community": " সম্প্রদায় আউটরিচ ",
+    "aiAssistant": " এআই সহকারী ",
+    "about": " আমাদের সম্পর্কে ",
+    "language": " ভাষা ",
+    "english": " ইংরেজি ",
+    "hindi": " হিন্দি ",
+    "assamese": " অসমিয়া ",
+    "bengali": " বাংলা ",
+    "heroTitle": " সর্ব-ভারত জলবাহিত রোগ মনিটর ",
+    "heroSubtitle": " জল-বাহিত রোগের জন্য রিয়েল-টাইম নজরদারি এবং প্রতিক্রিয়া ব্যবস্থা ",
+    "outbreakTitle": " ডায়রিয়ার প্রাদুর্ভাব ",
+    "statisticsTitle": " সর্ব-ভারত রাজ্যগুলির তুলনা ",
+    "trendsTitle": " রোগের প্রবণতা (মাসিক )",
+    "emergencyTitle": " জরুরী প্রতিক্রিয়া স্থিতি ",
+    "disease": " রোগ ",
+    "state": " রাজ্য ",
+    "severityLabel": " গুরুতরতার স্তর ",
+    "responseTeam": " প্রতিক্রিয়া দল ",
+    "lastUpdate": " শেষ আপডেট ",
+    "predictionTitle": " এআই রোগ পূর্বাভাসের জন্য স্বাস্থ্য ডেটা জমা দিন ",
+    "predictionSubtitle": " লক্ষণ এবং রোগীর ডেটা নির্বাচন করুন, এবং আমাদের এআই সম্ভাব্য জলবাহিত অসুস্থতার একটি প্রাথমিক বিশ্লেষণ প্রদান করবে। ",
+    "patientInfo": " রোগীর তথ্য ",
+    "fullName": " পুরো নাম ",
+    "age": " বয়স ",
+    "gender": " লিঙ্গ ",
+    "location": " অবস্থান ",
+    "symptoms": " পর্যবেক্ষণ করা লক্ষণ ",
+    "waterQuality": " জলের গুণমান পরামিতি ",
+    "waterSourceType": " জলের উৎসের প্রকার ",
+    "pH": " পিএইচ স্তর ",
+    "turbidity": " ঘোলাত্ব (NTU)",
+    "contaminantLevelPpm": " দূষক স্তর (ppm)",
+    "waterTemperatureC": " জলের তাপমাত্রা (°C)",
+    "upload": " ফাইল আপলোড করুন ",
+    "submitButton": " ডেটা জমা দিন এবং বিশ্লেষণ পান ",
+    "analysisTitle": " এআই বিশ্লেষণ ফলাফল ",
+    "analysisPlaceholder": " লক্ষণ নির্বাচন করুন এবং এআই রোগের পূর্বাভাস পেতে জমা দিন এ ক্লিক করুন। ",
+    "analyzingPlaceholder": " আমাদের এআই ডেটা বিশ্লেষণ করছে... অনুগ্রহ করে অপেক্ষা করুন। ",
+    "communityTitle": " সম্প্রদায় আউটরিচ প্রোগ্রাম ",
+    "communitySubtitle": " জল নিরাপত্তা এবং রোগ প্রতিরোধ সম্পর্কে জানতে সর্ব-ভারত জুড়ে আমাদের স্বাস্থ্য শিক্ষা উদ্যোগ এবং সম্প্রদায় ইভেন্টগুলিতে যোগ দিন। ",
+    "eventsTitle": " আসন্ন ঘটনাবলী ",
+    "programHighlights": " প্রোগ্রামের হাইলাইটস ",
+    "onlinePrograms": " অনলাইন প্রোগ্রাম ",
+    "offlineEvents": " অফলাইন ইভেন্টস ",
+    "waterTesting": " জল পরীক্ষা ",
+    "chatTitle": " জল-রक्षक এআই সহকারী ",
+    "chatPlaceholder": " জলবাহিত রোগ সম্পর্কে জিজ্ঞাসা করুন ...",
+    "chatFeatures": " এআই সহকারীর বৈশিষ্ট্য ",
+    "quickHelp": " দ্রুত সাহায্য ",
+    "diseaseSymptoms": " রোগের লক্ষণ ",
+    "preventionTips": " প্রতিরোধ টিপস ",
+    "waterTesting2": " জল পরীক্ষা ",
+    "aboutTitle": " জল-রक्षक সম্পর্কে ",
+    "missionTitle": " আমাদের লক্ষ্য ",
+    "missionText": " জল-রक्षक উন্নত এআই এবং মেশিন লার্নিং প্রযুক্তির মাধ্যমে জনস্বাস্থ্য পর্যবেক্ষণে বিপ্লব ঘটাতে নিবেদিত। আমাদের লক্ষ্য হল একটি স্মার্ট স্বাস্থ্য নজরদারি ব্যবস্থা তৈরি করা যা গ্রামীণ সর্ব-ভারতে দুর্বল সম্প্রদায়গুলিতে জলবাহিত রোগের প্রাদুর্ভাব সনাক্ত, পর্যবেক্ষণ এবং প্রতিরোধ করে। ",
+    "visionTitle": " আমাদের দৃষ্টি ",
+    "visionText": " একটি ব্যাপক প্রারম্ভিক সতর্কতা ব্যবস্থা প্রতিষ্ঠা করা যা সম্প্রদায়, স্বাস্থ্যকর্মী এবং সরকারী কর্মকর্তাদেরকে জলবাহিত রোগের বিরুদ্ধে কার্যকরভাবে লড়াই করার জন্য রিয়েল-টাইম অন্তর্দৃষ্টি এবং কার্যকরী বুদ্ধিমত্তা দিয়ে শক্তিশালী করে। ",
+    "techStack": " প্রযুক্তি স্ট্যাক ",
+    "teamTitle": " আমাদের দল ",
+    "critical": " সংকটজনক ",
+    "high": " উচ্চ ",
+    "medium": " মাঝারি ",
+    "low": " নিম্ন ",
+    "upcoming": " আসন্ন ",
+    "registered": " নিবন্ধিত ",
+    "registerNow": " এখন নিবন্ধন করুন ",
+    "description": " বিবরণ ",
+    "prevention": " প্রতিরোধ পদ্ধতি ",
+    "reportedCases": " রিপোর্ট করা কেস ",
+    "rate": " হার ",
+    "cases": " কেস ",
+    "location2": " অবস্থান ",
+    "send": " প্রেরণ ",
+    "aboutAI": " জল-রक्षक এআই সম্পর্কে ",
+    "aboutAIText": " আমাদের এআই সহকারী একাধিক ভাষায় জলবাহিত রোগ, প্রতিরোধ পদ্ধতি এবং স্বাস্থ্য সম্পদ সম্পর্কে আপনার প্রশ্নের তাত্ক্ষণিক উত্তর প্রদান করে। ",
+    "symptomsTitle": " লক্ষণ :",
+    "preventionTitle": " প্রতিরোধ পদ্ধতি :",
+    "remediesTitle": " নিরাময় ও প্রতিকার ",
+    "statistics": " প্রাদুর্ভাবের পরিসংখ্যান ",
+    "probability": " ম্যাচ স্কোর ",
+    "noDiseaseDetectedTitle": " কোনো নির্দিষ্ট রোগ সনাক্ত করা যায়নি ",
+    "noDiseaseDetectedDescription": " লক্ষণগুলির সংমিশ্রণ আমাদের ডাটাবেসের কোনো একক জলবাহিত রোগের সাথে দৃঢ়ভাবে মেলে না। এটি কোনো অসুস্থতা বাতিল করে না। ",
+    "noDiseaseDetectedRemedy": " সঠিক নির্ণয়ের জন্য অনুগ্রহ করে একজন স্বাস্থ্যসেবা পেশাদারের সাথে পরামর্শ করুন। আপনি হাইড্রেটেড আছেন তা নিশ্চিত করুন এবং আপনার লক্ষণগুলি পর্যবেক্ষণ করুন। ",
+    "genderOptions": {
+        "male": " পুরুষ ",
+        "female": " মহিলা ",
+        "other": " অন্যান্য "
+    },
+    "symptomsList": [
+        " জ্বর ",
+        " ডায়রিয়া ",
+        " বমি ",
+        " পেটে ব্যথা ",
+        " ডিহাইড্রেশন ",
+        " মাথাব্যথা ",
+        " ক্লান্তি ",
+        " বমি বমি ভাব ",
+        " জন্ডিস ",
+        " গাঢ় রঙের প্রস্রাব ",
+        " গোলাপী দাগ ",
+        " পেট ফাঁপা ",
+        " ওজন হ্রাস "
+    ],
+    "diseases": {
+        "hepatitisA": {
+            "name": " হেপাটাইটিস এ ",
+            "description": " হেপাটাইটিস এ ভাইরাস (HAV) দ্বারা সৃষ্ট একটি লিভারের সংক্রমণ, যা অত্যন্ত সংক্রাকক এবং দূষিত খাবার বা জলের মাধ্যমে ছড়ায়। ",
+            "remedies": [
+                " বিশ্রাম অপরিহার্য কারণ কোনো নির্দিষ্ট চিকিৎসা নেই। ",
+                " প্রচুর পরিমাণে তরল পান করে হাইড্রেটেড থাকুন। ",
+                " অ্যালকোহল এবং লিভারের ক্ষতি করতে পারে এমন ওষুধ এড়িয়ে চলুন। "
+            ]
+        },
+        "cholera": {
+            "name": " কলেরা ",
+            "description": " ভিব্রিও কলেরি ব্যাকটেরিয়া দ্বারা অন্ত্রের সংক্রমণের কারণে সৃষ্ট একটি তীব্র ডায়রিয়ার অসুস্থতা, যা গুরুতর হতে পারে। ",
+            "remedies": [
+                " ওরাল রিহাইড্রেশন সলিউশন (ORS) দিয়ে অবিলম্বে পুনরুদ দরকার। ",
+                " গুরুতর ক্ষেত্রে জরুরি চিকিৎসার সহায়তা নিন। ",
+                " জিঙ্ক সাপ্লিমেন্ট ডায়রিয়ার সময়কাল কমাতে সাহায্য করতে পারে। "
+            ]
+        },
+        "gastroenteritis": {
+            "name": " গ্যাস্ট্রোএন্টারাইটিস (ডায়রিয়া )",
+            "description": " একটি অন্ত্রের সংক্রমণ যা জলীয় ডায়রিয়া, পেটে ব্যথা, বমি বমি ভাব বা বমি এবং কখনও কখনও জ্বর দ্বারা চিহ্নিত করা হয়। ",
+            "remedies": [
+                " ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন (ORS সেরা ) । ",
+                " কলা, ভাত এবং টোস্টের মতো নরম খাবার খান (BRAT ডায়েট ) । ",
+                " দুগ্ধজাত, চর্বিযুক্ত বা মশলাদার খাবার এড়িয়ে চলুন। "
+            ]
+        },
+        "typhoid": {
+            "name": " টাইফয়েড জ্বর ",
+            "description": " সালমোনেला টাইফি দ্বারা সৃষ্ট একটি গুরুতর ব্যাকটেরিয়া সংক্রমণ, যা একটি স্থায়ী উচ্চ জ্বর দ্বারা চিহ্নিত করা হয়। ",
+            "remedies": [
+                " অবিলম্বে চিকিৎসার প্রয়োজন এবং এটি অ্যান্টিবায়োটিক দিয়ে চিকিৎসা করা হয়। ",
+                " ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন। ",
+                " একটি উচ্চ-ক্যালোরি, পুষ্টিকর খাদ্য গ্রহণ করুন। "
+            ]
+        },
+        "giardiasis": {
+            "name": " জিয়ার্ডিয়াসিস ",
+            "description": " জিয়ার্ডিয়া ল্যাম্বলিয়া নামক একটি আণুবীক্ষণিক পরজীবী দ্বারা সৃষ্ট একটি অন্ত্রের সংক্রমণ, যা প্রায়শই জ্বর ছাড়াই পেট ফাঁপা এবং ব্যথার কারণ হয়। ",
+            "remedies": [
+                " সাধারণত প্রেসক্রিপশন ওষুধের সাথে চিকিৎসা প্রয়োজন। ",
+                " ভালভাবে হাইড্রেটেড থাকুন। ",
+                " ক্যাফিন এবং দুগ্ধজাত পণ্য এড়িয়ে চলুন, যা ডায়রিয়াকে আরও খারাপ করতে পারে। "
+            ]
+        },
+        "crypto": {
+            "name": " ক্রিপ্টোস্পোরিডিওসিস ",
+            "description": " আণুবীক্ষণিক পরজীবী ক্রিপ্টোস্পোরিডিয়াম দ্বারা সৃষ্ট একটি ডায়রিয়ার রোগ। এটি জলীয় ডায়রিয়ার কারণ হতে পারে এবং এটি জলবাহিত রোগের একটি সাধারণ কারণ। ",
+            "remedies": [
+                " বেশিরভাগ লোক চিকিৎসা ছাড়াই সুস্থ হয়ে ওঠে। ",
+                " ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন। ",
+                " অ্যান্টি-ডায়রিয়াল ওষুধ সাহায্য করতে পারে, তবে প্রথমে একজন ডাক্তারের সাথে পরামর্শ করুন। "
+            ]
+        }
+    },
+    "ai": {
+        "initialGreeting": " নমস্কার ! আমি জল-রक्षक এআই। আমি আজ আপনাকে জলবাহিত রোগ সম্পর্কে কীভাবে সহায়তা করতে পারি ? আপনি আমাকে জিজ্ঞাসা করতে পারেন ' কলেরার কারণ কী ?' বা ' টাইফয়েড কীভাবে প্রতিরোধ করা যায় ?'",
+        "fallback": " আমি দুঃখিত, আমার কাছে সেই বিষয়ে তথ্য নেই। আমি কলেরা, টাইফয়েড, হেপাটাইটিস এ, জিয়ার্ডিয়াসিস এবং গ্যাস্ট্রোএন্টারাইটিসের মতো রোগের কারণ, লক্ষণ, চিকিৎসা এবং প্রতিরোধ সম্পর্কে প্রশ্নের উত্তর দিতে পারি। অনুগ্রহ করে আপনার প্রশ্নটি ভিন্নভাবে জিজ্ঞাসা করার চেষ্টা করুন। "
+    },
+    "welcome": "স্বাগতম",
+    "devices": "ডিভাইস",
+    "addDevice": "+ ডিভাইস যোগ করুন",
+    "heroTitleBadge": "সর্ব-ভারত",
+    "heroTitleMain": "জলবাহিত রোগ মনিটর",
+    "allIndiaMapTitle": "সর্বভারতীয় রোগ প্রাদুর্ভাব মনিটর",
+    "nearbyMapTitle": "কাছাকাছি রোগ প্রাদুর্ভাব",
+    "heroPill1": "এআই-চালিত সনাক্তকরণ",
+    "heroPill2": "রিয়েল-টাইম সতর্কতা",
+    "heroPill3": "সর্ব-ভারত ফোকাস",
+    "statisticsInfo": "ইউপি এবং বিহারে সর্বোচ্চ রিপোর্ট করা ঘটনা",
+    "trendsInfo": "জুলাই-আগস্টে সর্বোচ্চ সংক্রমণ পরিলক্ষিত হয়েছে",
+    "waterFormTitle": "জলের গুণমান পরিমাপ",
+    "waterFormSubtitle": "আপনার জলের উৎসের বিস্তারিত বিশ্লেষণের জন্য নিম্নলিখিত পরিমাপগুলি জমা দিন।",
+    "basicWaterInfo": "জলের মৌলিক তথ্য",
+    "physicalParams": "ভৌত পরামিতি",
+    "chemicalParams": "রাসায়নিক পরামিতি",
+    "sensorReadings": "সেন্সর রিডিং",
+    "rgbSensor": "আরজিবি সেন্সর",
+    "uvSensor": "ইউভি সেন্সর",
+    "initialPrediction": "প্রাথমিক পূর্বাভাস",
+    "fetchFromDevice": "ডিভাইস থেকে আনুন",
+    "fetching": "আনা হচ্ছে...",
+    "joinCause": "আমাদের উদ্দেশ্যে যোগ দিন",
+    "joinCauseText": "জল-রক্ষকে অবদান রাখতে আগ্রহী? আমরা সর্বদা স্বেচ্ছাসেবক এবং অংশীদারদের খুঁজছি।",
+    "contactUs": "যোগাযোগ করুন",
+    "deviceName": "ডিভাইসের নাম",
+    "deviceId": "ডিভাইস আইডি",
+    "addNewDevice": "নতুন ডিভাইস যোগ করুন",
+    "adding": "যোগ করা হচ্ছে...",
+    "alertDeviceAdded": "ডিভাইস সফলভাবে যোগ করা হয়েছে!",
+    "alertDeviceError": "ডিভাইস যোগ করতে ত্রুটি: ",
+    "selectSource": "উৎস নির্বাচন করুন",
+    "selectColor": "রঙ নির্বাচন করুন",
+    "selectGender": "লিঙ্গ নির্বাচন করুন",
+    "outbreaks": {
+        "diarrhea": {
+            "name": "Diarrhea Outbreak",
+            "news": "Govt. launches new initiative for clean drinking water in rural UP."
+        },
+        "cholera": {
+            "name": "Cholera Outbreak",
+            "news": "Health department issues high alert following monsoon flooding in Kolkata."
+        },
+        "typhoid": {
+            "name": "Typhoid Outbreak",
+            "news": "Vaccination drive for Typhoid begins in Mumbai and surrounding areas."
+        },
+        "hepatitis": {
+            "name": "Hepatitis Outbreak",
+            "news": "Awareness campaigns about contaminated water sources are underway."
+        },
+        "gastroenteritis": {
+            "name": "Gastroenteritis",
+            "news": "Mobile medical units dispatched to rural districts of Gujarat."
+        },
+        "typhoidFever": {
+            "name": "Typhoid Fever",
+            "news": "Community health camps are being organized in key villages."
+        },
+        "contamination": {
+            "name": "Potential Contamination",
+            "news": "High coliform levels detected"
+        },
+        "safeZone": {
+            "name": "Safe Zone",
+            "news": "Water quality normal"
+        }
+    },
+    "states": {
+        "UP": "Uttar Pradesh",
+        "WB": "West Bengal",
+        "MH": "Maharashtra",
+        "BR": "Bihar",
+        "GJ": "Gujarat",
+        "PB": "Punjab",
+        "sector4": "Sector 4, Rohini",
+        "connaughtPlace": "Connaught Place"
+    },
+    "deviceTypes": {
+        "sensorBuoy": "Sensor Buoy",
+        "pipelineMonitor": "Pipeline Monitor"
+    },
+    "status": {
+        "active": "Active",
+        "alert": "Alert"
+    },
+    "events": {
+        "webinar": {
+            "title": "Online Health Webinar",
+            "desc": "Join our health education initiatives and community events across India to learn about water safety and disease prevention."
+        },
+        "camp": {
+            "title": "Rural Health Camp",
+            "desc": "Free health checkups and water quality testing."
+        },
+        "workshop": {
+            "title": "Water Quality Workshop",
+            "desc": "Virtual training session on water purification."
+        },
+        "screening": {
+            "title": "Village Health Screening",
+            "desc": "Special health camp focusing on pediatric waterborne diseases."
+        },
+        "training": {
+            "title": "Water Safety Training",
+            "desc": "Hands-on training for community leaders on water safety."
+        },
+        "seminar": {
+            "title": "AI for Public Health Seminar",
+            "desc": "Discussing the future of AI in public health."
+        }
+    },
+    "highlights": {
+        "online": "Webinars and virtual workshops",
+        "offline": "Health camps and field visits",
+        "testing": "Quality assessment and purification"
+    },
+    "footerSlogan": "Empowering communities with real-time water safety intelligence.",
+    "techStackItems": {
+        "aiModels": "AI/ML Models",
+        "iotSensors": "IoT Sensors",
+        "alertSystem": "Real-time Alert System"
+    },
+    "coreMember": "Core Member",
+    "onlineAI": "Online • Jal-Rakshak AI",
+    "onlineAssistant": "Online • AI Assistant",
+    "match": "Match",
+    "remedies": "প্রতিকার:",
+    "clickToInteract": "মানচিত্রের সাথে ইন্টারঅ্যাক্ট করতে ক্লিক করুন",
+    "welcomeUser": "স্বাগতম,",
+    "fetchSuccess": "সফলভাবে সর্বশেষ সেন্সর ডেটা আনা হয়েছে!",
+    "fetchEmpty": "ডাটাবেসে কোনো সেন্সর ডেটা পাওয়া যায়নি।",
+    "fetchError": "ডেটা আনার সময় একটি ত্রুটি ঘটেছে।",
+    "alertSelectSymptom": "অনুগ্রহ করে বিশ্লেষণের জন্য অন্তত একটি লক্ষণ নির্বাচন করুন।",
+    "chatConnectionError": "সংযোগ করতে সমস্যা হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।",
+    "severity": {
+        "critical": "গুরুতর",
+        "high": "উচ্চ",
+        "medium": "মাঝারি",
+        "low": "নিম্ন"
+    },
+    "statusLabel": "স্থিতি",
+    "battery": "ব্যাটারি",
+    "chatFeaturesList": {
+        "aiSupport": "২৪/৭ এআই স্বাস্থ্য সহায়তা",
+        "multiLang": "বহু-ভাষা সমর্থন",
+        "symptomAnalysis": "লক্ষণ বিশ্লেষণ"
+    },
+    "team": {
+        "abhimanyu": "অভিমন্যু",
+        "rudra": "রুদ্র",
+        "siddharth": "সিদ্ধার্থ"
+    },
+    "waterSources": {
+        "river": "নদী",
+        "well": "কূয়া",
+        "lake": "হ্রদ",
+        "pond": "পুকুর",
+        "tap": "কলের জল",
+        "borewell": "বোরওয়েল",
+        "rainwater": "বৃষ্টির জল"
+    },
+    "colors": {
+        "blue": "নীল",
+        "green": "সবুজ",
+        "red": "লাল"
+    }
+}

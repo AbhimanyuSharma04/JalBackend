@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { sensorDB } from './firebase/config'; // Make sure this path is correct
 import { supabase } from './supabaseClient';
-import { ref, query, orderByChild, limitToLast, get } from "firebase/database";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import { ref, get } from "firebase/database";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaRobot, FaHome, FaDatabase, FaUsers, FaInfoCircle, FaMoon, FaSun, FaComments, FaGlobe, FaPhone, FaHospital, FaStethoscope, FaMapMarkerAlt, FaVideo, FaFlask, FaShieldAlt, FaMicrochip, FaBolt, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaRobot, FaHome, FaDatabase, FaUsers, FaInfoCircle, FaComments, FaStethoscope, FaMapMarkerAlt, FaVideo, FaFlask, FaShieldAlt, FaMicrochip, FaBolt, FaChevronDown, FaSignOutAlt, FaExchangeAlt, FaClipboardList, FaTrash, FaEye, FaTint, FaFaucet } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -64,6 +66,7 @@ const MapInteractionController = ({ isInteractive }) => {
     return null;
 };
 const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
+    const { t } = useTranslation();
     // Default center for India map
     let mapCenter = [22.351114, 78.667742];
     const [isInteractive, setIsInteractive] = useState(false);
@@ -96,7 +99,7 @@ const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
 
     const getDeviceMarkerOptions = (device) => {
         let color = '#06b6d4'; // Cyan for devices
-        if (device.status === 'Alert') color = '#ef4444';
+        if (device.status === 'alert') color = '#ef4444';
 
         return {
             radius: 8,
@@ -117,7 +120,7 @@ const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
         >
             <div className="p-3 border-bottom border-light border-opacity-10 bg-dark bg-opacity-25 d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 fs-6 fw-bold text-white"><FaMapMarkerAlt className="me-2 text-primary" />{title}</h5>
-                {!isInteractive && <small className="text-white-50" style={{ fontSize: '0.7em' }}>Click map to interact</small>}
+                {!isInteractive && <small className="text-white-50" style={{ fontSize: '0.7em' }}>{t('clickToInteract')}</small>}
             </div>
             <MapContainer
                 key={mapId}
@@ -151,8 +154,8 @@ const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
                             <div style={{ color: 'black' }}>
                                 <div className="fw-bold fs-6 mb-2">{outbreak.name}</div>
                                 <div className="small mb-1"><FaMapMarkerAlt className="me-1" />{outbreak.state}</div>
-                                <div className="mb-1"><strong>Cases:</strong> {outbreak.cases.toLocaleString()}</div>
-                                <div className="mb-2"><strong className="text-capitalize">Severity:</strong> <span style={{ color: getMarkerOptions(outbreak).fillColor }}>{outbreak.severity}</span></div>
+                                <div className="mb-1"><strong>{t('cases')}:</strong> {outbreak.cases.toLocaleString()}</div>
+                                <div className="mb-2"><strong className="text-capitalize">{t('severityLabel')}:</strong> <span style={{ color: getMarkerOptions(outbreak).fillColor }}>{t(`severity.${outbreak.severity}`)}</span></div>
                             </div>
                         </Popup>
                     </CircleMarker>
@@ -168,11 +171,11 @@ const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
                             <div style={{ color: 'black' }}>
                                 <div className="fw-bold fs-6 mb-1">{device.name}</div>
                                 <div className="badge bg-primary mb-2">{device.type}</div>
-                                <div className="small mb-1"><strong>Status:</strong> <span className={device.status === 'Alert' ? 'text-danger fw-bold' : 'text-success'}>{device.status}</span></div>
+                                <div className="small mb-1"><strong>{t('statusLabel')}:</strong> <span className={device.status === 'alert' ? 'text-danger fw-bold' : 'text-success'}>{t(`status.${device.status}`)}</span></div>
                                 <div className="p-2 bg-light rounded border mt-2">
-                                    <div className="d-flex justify-content-between small mb-1"><span>pH Level:</span> <strong>{device.readings.ph}</strong></div>
-                                    <div className="d-flex justify-content-between small mb-1"><span>Turbidity:</span> <strong>{device.readings.turbidity} NTU</strong></div>
-                                    <div className="d-flex justify-content-between small"><span>Battery:</span> <strong>{device.battery}</strong></div>
+                                    <div className="d-flex justify-content-between small mb-1"><span>{t('pH')}:</span> <strong>{device.readings.ph}</strong></div>
+                                    <div className="d-flex justify-content-between small mb-1"><span>{t('turbidity')}:</span> <strong>{device.readings.turbidity} NTU</strong></div>
+                                    <div className="d-flex justify-content-between small"><span>{t('battery')}:</span> <strong>{device.battery}</strong></div>
                                 </div>
                             </div>
                         </Popup>
@@ -187,14 +190,17 @@ const OutbreakMap = ({ outbreaks, devices = [], title, mapId }) => {
 
 
 const App = () => {
+    const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState('home');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [chatOpen, setChatOpen] = useState(false);
     const [userMessage, setUserMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
-    const [darkMode, setDarkMode] = useState(true);
+    const [darkMode] = useState(true);
     const [selectedOutbreak, setSelectedOutbreak] = useState(null);
+
+
     const [formData, setFormData] = useState({
         name: '',
         age: '',
@@ -204,14 +210,15 @@ const App = () => {
     });
 
     // Mock Data for Nearby Map
+    // Mock Data for Nearby Map
     const nearbyOutbreaks = [
-        { id: 'n1', name: 'Potential Contamination', state: 'Sector 4, Rohini', cases: 12, severity: 'high', position: [28.6139, 77.2090], healthContact: '108', nearbyHospitals: 2, latestNews: 'High coliform levels detected' },
-        { id: 'n2', name: 'Safe Zone', state: 'Connaught Place', cases: 0, severity: 'low', position: [28.6270, 77.2180], healthContact: '108', nearbyHospitals: 5, latestNews: 'Water quality normal' }
+        { id: 'n1', name: t('outbreaks.contamination.name'), state: t('states.sector4'), cases: 12, severity: 'high', position: [28.6139, 77.2090], healthContact: '108', nearbyHospitals: 2, latestNews: t('outbreaks.contamination.news') },
+        { id: 'n2', name: t('outbreaks.safeZone.name'), state: t('states.connaughtPlace'), cases: 0, severity: 'low', position: [28.6270, 77.2180], healthContact: '108', nearbyHospitals: 5, latestNews: t('outbreaks.safeZone.news') }
     ];
 
     const nearbyDevices = [
-        { id: 'd1', name: 'Jal-Rakshak Unit #102', type: 'Sensor Buoy', status: 'Active', position: [28.6100, 77.2000], readings: { ph: 7.2, turbidity: 4.5 }, battery: '85%' },
-        { id: 'd2', name: 'Jal-Rakshak Unit #105', type: 'Pipeline Monitor', status: 'Alert', position: [28.6150, 77.2150], readings: { ph: 8.9, turbidity: 12.0 }, battery: '12%' }
+        { id: 'd1', name: 'Jal-Rakshak Unit #102', type: t('deviceTypes.sensorBuoy'), status: 'active', position: [28.6100, 77.2000], readings: { ph: 7.2, turbidity: 4.5 }, battery: '85%' },
+        { id: 'd2', name: 'Jal-Rakshak Unit #105', type: t('deviceTypes.pipelineMonitor'), status: 'alert', position: [28.6150, 77.2150], readings: { ph: 8.9, turbidity: 12.0 }, battery: '12%' }
     ];
 
     const [waterFormData, setWaterFormData] = useState({
@@ -224,7 +231,7 @@ const App = () => {
         guva_sensor: '',
         conductivity: ''
     });
-    const [language, setLanguage] = useState('en');
+
 
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
@@ -237,6 +244,11 @@ const App = () => {
     const [fetchMessage, setFetchMessage] = useState('');
     const [userName, setUserName] = useState('');
 
+    // Refs for click outside to close
+    const profileDropdownRef = useRef(null);
+    const chatbotRef = useRef(null);
+    const chatbotToggleRef = useRef(null);
+
     // Device Management State
     const [devices, setDevices] = useState([]);
     const [selectedDevice, setSelectedDevice] = useState(null);
@@ -245,6 +257,73 @@ const App = () => {
     const [newDeviceData, setNewDeviceData] = useState({ id: '', name: '' });
     const [deviceLoading, setDeviceLoading] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [savedReadings, setSavedReadings] = useState([]);
+    const [selectedReading, setSelectedReading] = useState(null);
+    const navigate = useNavigate();
+
+    const fetchReadings = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase
+            .from('user_readings')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('timestamp', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching readings:', error);
+        } else {
+            setSavedReadings(data || []);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'readings') {
+            fetchReadings();
+        }
+    }, [activeTab]);
+
+    const handleSaveReading = async () => {
+        if (!waterAnalysisResult) return;
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert("Please login to save readings.");
+            return;
+        }
+
+        const readingData = {
+            user_id: user.id,
+            device_name: selectedDevice?.device_name || 'Manual Entry',
+            device_id: selectedDevice?.device_id || null,
+            ph: waterFormData.ph || null,
+            turbidity: waterFormData.turbidity || null,
+            contaminant_level: waterFormData.contaminantLevel || null,
+            temperature: waterFormData.temperature || null,
+            conductivity: waterFormData.conductivity || null,
+            water_source: waterFormData.water_source_type || 'River',
+            risk_level: waterAnalysisResult.risk_level,
+            confidence: waterAnalysisResult.confidence,
+            analysis_result: waterAnalysisResult
+        };
+
+        const { error } = await supabase.from('user_readings').insert([readingData]);
+
+        if (error) {
+            console.error('Error saving reading:', error);
+            alert('Failed to save reading.');
+        } else {
+            alert('Reading saved successfully!');
+            setActiveTab('readings'); // Switch to readings tab
+        }
+    };
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        navigate('/login');
+    };
 
     useEffect(() => {
         const fetchUserNameAndDevices = async () => {
@@ -266,7 +345,7 @@ const App = () => {
                 }
 
                 // Fetch Devices
-                const { data: userDevices, error } = await supabase
+                const { data: userDevices } = await supabase
                     .from('devices')
                     .select('*')
                     .eq('user_id', user.id);
@@ -309,587 +388,15 @@ const App = () => {
                 setSelectedDevice(newDevice); // Auto select new device
                 setShowAddDeviceModal(false);
                 setNewDeviceData({ id: '', name: '' });
-                alert('Device added successfully!');
+                alert(t('alertDeviceAdded'));
             }
         } catch (error) {
-            alert('Error adding device: ' + error.message);
+            alert(t('alertDeviceError') + error.message);
         } finally {
             setDeviceLoading(false);
         }
     };
 
-    const translations = {
-        en: {
-            home: "Home",
-            submitWaterData: "Submit Data",
-            diseasePrediction: "Disease Prediction",
-            community: "Community Outreach",
-            aiAssistant: "AI Assistant",
-            about: "About Us",
-            language: "Language",
-            english: "English",
-            hindi: "Hindi",
-            assamese: "Assamese",
-            bengali: "Bengali",
-            heroTitle: "All-India Waterborne Disease Monitor",
-            heroSubtitle: "Real-time Surveillance and Response System for Water-Borne Diseases",
-            outbreakTitle: "Diarrhea Outbreak",
-            statisticsTitle: "All-India State Comparison",
-            trendsTitle: "Disease Trends (Monthly)",
-            emergencyTitle: "Emergency Response Status",
-            disease: "Disease",
-            state: "State",
-            severity: "Severity Level",
-            responseTeam: "Response Team",
-            lastUpdate: "Last Update",
-            predictionTitle: "Submit Health Data for AI Disease Prediction",
-            predictionSubtitle: "Select symptoms and patient data, and our AI will provide a preliminary analysis of potential waterborne illnesses.",
-            patientInfo: "Patient Information",
-            fullName: "Full Name",
-            age: "Age",
-            gender: "Gender",
-            location: "Location",
-            symptoms: "Symptoms Observed",
-            waterQuality: "Water Quality Parameters",
-            waterSourceType: "Water Source Type",
-            pH: "pH Level",
-            turbidity: "Turbidity (NTU)",
-            contaminantLevelPpm: "Contaminant Level (ppm)",
-            waterTemperatureC: "Water Temperature (°C)",
-            conductivity: "Conductivity (µS/cm)",
-            upload: "Upload File",
-            submitButton: "Submit Data & Get Analysis",
-            analysisTitle: "AI Analysis Results",
-            analysisPlaceholder: "Your analysis will appear here after submission.",
-            analyzingPlaceholder: "Our AI is analyzing the data... Please wait.",
-            communityTitle: "Community Outreach Programs",
-            communitySubtitle: "Join our health education initiatives and community events across India to learn about water safety and disease prevention.",
-            eventsTitle: "Upcoming Events",
-            programHighlights: "Program Highlights",
-            onlinePrograms: "Online Programs",
-            offlineEvents: "Offline Events",
-            waterTesting: "Water Testing",
-            chatTitle: "Jal-Rakshak AI Assistant",
-            chatPlaceholder: "Ask about waterborne diseases...",
-            chatFeatures: "AI Assistant Features",
-            quickHelp: "Quick Help",
-            diseaseSymptoms: "Disease symptoms",
-            preventionTips: "Prevention tips",
-            waterTesting2: "Water testing",
-            aboutTitle: "About Jal-Rakshak",
-            missionTitle: "Our Mission",
-            missionText: "Jal-Rakshak is dedicated to revolutionizing public health monitoring through advanced AI and machine learning technologies. Our mission is to create a smart health surveillance system that detects, monitors, and prevents outbreaks of waterborne diseases in vulnerable communities across rural India.",
-            visionTitle: "Our Vision",
-            visionText: "To establish a comprehensive early warning system that empowers communities, health workers, and government officials with real-time insights and actionable intelligence to combat waterborne diseases effectively.",
-            techStack: "Technology Stack",
-            teamTitle: "Our Team",
-            critical: "Critical",
-            high: "High",
-            medium: "Medium",
-            low: "Low",
-            upcoming: "Upcoming",
-            registered: "registered",
-            registerNow: "Register Now",
-            description: "Description",
-            prevention: "Prevention Methods",
-            reportedCases: "Reported Cases",
-            rate: "Rate",
-            cases: "Cases",
-            location2: "Location",
-            send: "Send",
-            aboutAI: "About Jal-Rakshak AI",
-            aboutAIText: "Our AI assistant provides instant answers to your questions about waterborne diseases, prevention methods, and health resources in multiple languages.",
-            symptomsTitle: "Symptoms:",
-            preventionTitle: "Prevention Methods:",
-            remediesTitle: "Cure and Remedies",
-            statistics: "Outbreak Statistics",
-            probability: "Match Score",
-            noDiseaseDetectedTitle: "No Specific Disease Detected",
-            noDiseaseDetectedDescription: "The combination of symptoms does not strongly match a single waterborne disease in our database. This does not rule out an illness.",
-            noDiseaseDetectedRemedy: "Please consult a healthcare professional for an accurate diagnosis. Ensure you stay hydrated and monitor your symptoms.",
-            genderOptions: { male: "Male", female: "Female", other: "Other" },
-            symptomsList: ["Fever", "Diarrhea", "Vomiting", "Abdominal Pain", "Dehydration", "Headache", "Fatigue", "Nausea", "Jaundice", "Dark colored urine", "Rose spots", "Bloating", "Weight loss"],
-            diseases: {
-                hepatitisA: { name: "Hepatitis A", description: "A liver infection caused by the Hepatitis A virus (HAV), highly contagious and spread through contaminated food or water.", remedies: ["Rest is crucial as there's no specific treatment.", "Stay hydrated by drinking plenty of fluids.", "Avoid alcohol and medications that can harm the liver."] },
-                cholera: { name: "Cholera", description: "An acute diarrheal illness caused by infection of the intestine with Vibrio cholerae bacteria, which can be severe.", remedies: ["Immediate rehydration with Oral Rehydration Solution (ORS) is key.", "Seek urgent medical attention for severe cases.", "Zinc supplements can help reduce the duration of diarrhea."] },
-                gastroenteritis: { name: "Gastroenteritis (Diarrhea)", description: "An intestinal infection marked by watery diarrhea, abdominal cramps, nausea or vomiting, and sometimes fever.", remedies: ["Drink plenty of liquids to prevent dehydration (ORS is best).", "Eat bland foods like bananas, rice, and toast (BRAT diet).", "Avoid dairy, fatty, or spicy foods."] },
-                typhoid: { name: "Typhoid Fever", description: "A serious bacterial infection caused by Salmonella Typhi, characterized by a sustained high fever.", remedies: ["Requires immediate medical attention and is treated with antibiotics.", "Drink plenty of fluids to prevent dehydration.", "Eat a high-calorie, nutritious diet."] },
-                giardiasis: { name: "Giardiasis", description: "An intestinal infection caused by a microscopic parasite called Giardia lamblia, often causing bloating and cramps without fever.", remedies: ["Medical treatment with prescription drugs is usually required.", "Stay well-hydrated.", "Avoid caffeine and dairy products, which can worsen diarrhea."] },
-                crypto: { name: "Cryptosporidiosis", description: "A diarrheal disease caused by the microscopic parasite Cryptosporidium. It can cause watery diarrhea and is a common cause of waterborne disease.", remedies: ["Most people with a healthy immune system recover without treatment.", "Drink plenty of fluids to prevent dehydration.", "Anti-diarrheal medicine may help, but consult a doctor first."] }
-            },
-            ai: {
-                initialGreeting: "Hello! I'm Jal-Rakshak AI. How can I assist you with waterborne diseases today? You can ask me things like 'What causes cholera?' or 'How to prevent typhoid?'",
-                fallback: "I'm sorry, I don't have information on that. I can answer questions about the causes, symptoms, treatment, and prevention of diseases like Cholera, Typhoid, Hepatitis A, Giardiasis, and Gastroenteritis. Please try asking your question differently.",
-            },
-            // Newly added keys
-            welcome: "Welcome",
-            devices: "Devices",
-            addDevice: "+ Add Device",
-            heroTitleBadge: "ALL-INDIA",
-            heroTitleMain: "Waterborne Disease Monitor",
-            allIndiaMapTitle: "All India Disease Outbreak Monitor",
-            nearbyMapTitle: "Nearby Disease Outbreak",
-            heroPill1: "AI-Powered Detection",
-            heroPill2: "Real-Time Alerts",
-            heroPill3: "All-India Focus",
-            statisticsInfo: "Highest reported cases in UP & Bihar",
-            trendsInfo: "Peak transmission observed in July-Aug",
-            waterFormTitle: "Water Quality Parameters",
-            waterFormSubtitle: "Submit the following parameters for a detailed analysis of your water source.",
-            basicWaterInfo: "Basic Water Info",
-            physicalParams: "Physical Parameters",
-            chemicalParams: "Chemical Parameters",
-            sensorReadings: "Sensor Readings",
-            rgbSensor: "RGB Sensor",
-            uvSensor: "UV Sensor",
-            initialPrediction: "Initial Prediction",
-            fetchFromDevice: "Fetch From Device",
-            fetching: "Fetching...",
-            joinCause: "Join Our Cause",
-            joinCauseText: "Interested in contributing to Jal-Rakshak? We are always looking for volunteers and partners.",
-            contactUs: "Contact Us",
-            deviceName: "Device Name",
-            deviceId: "Device ID",
-            addNewDevice: "Add New Device",
-            adding: "Adding...",
-            deviceAdded: "Device added successfully!",
-            deviceAddError: "Error adding device: ",
-            selectSource: "Select Source",
-            selectColor: "Select Color",
-            selectGender: "Select Gender",
-        },
-        hi: {
-            home: " होम ",
-            submitWaterData: " डेटा सबमिट करें ",
-            diseasePrediction: " रोग की भविष्यवाणी ",
-            community: " सामुदायिक आउटरीच ",
-            aiAssistant: " एआई सहायक ",
-            about: " हमारे बारे में ",
-            language: " भाषा ",
-            english: " अंग्रेज़ी ",
-            hindi: " हिंदी ",
-            assamese: " অসমিয়া ",
-            bengali: " बंगाली ",
-            heroTitle: " अखिल-भारतीय जलजनित रोग मॉनिटर ",
-            heroSubtitle: " जल-जनित रोगों के लिए वास्तविक समय की निगरानी और प्रतिक्रिया प्रणाली ",
-            outbreakTitle: " डायरिया का प्रकोप ",
-            statisticsTitle: " अखिल-भारतीय राज्य तुलना ",
-            trendsTitle: " रोग के रुझान (मासिक )",
-            emergencyTitle: " आपातकालीन प्रतिक्रिया स्थिति ",
-            disease: " रोग ",
-            state: " राज्य ",
-            severity: " गंभीरता स्तर ",
-            responseTeam: " प्रतिक्रिया दल ",
-            lastUpdate: " अंतिम अपडेट ",
-            predictionTitle: " एआई रोग भविष्यवाणी के लिए स्वास्थ्य डेटा सबमिट करें ",
-            predictionSubtitle: " लक्षण और रोगी डेटा चुनें, और हमारा एआई संभावित जलजनित बीमारियों का प्रारंभिक विश्लेषण प्रदान करेगा। ",
-            patientInfo: " रोगी की जानकारी ",
-            fullName: " पूरा नाम ",
-            age: " आयु ",
-            gender: " लिंग ",
-            location: " स्थान ",
-            symptoms: " देखे गए लक्षण ",
-            waterQuality: " जल गुणवत्ता मापदंड ",
-            waterSourceType: " जल स्रोत का प्रकार ",
-            pH: " पीएच स्तर ",
-            turbidity: " गंदलापन (NTU)",
-            contaminantLevelPpm: " संदूषक स्तर (ppm)",
-            waterTemperatureC: " पानी का तापमान (°C)",
-            conductivity: " चालकता (µS/cm)",
-            upload: " फ़ाइल अपलोड करें ",
-            submitButton: " डेटा सबमिट करें और विश्लेषण प्राप्त करें ",
-            analysisTitle: " एआई विश्लेषण परिणाम ",
-            analysisPlaceholder: " आपका विश्लेषण सबमिशन के बाद यहां दिखाई देगा। ",
-            analyzingPlaceholder: " हमारा एआई डेटा का विश्लेषण कर रहा है... कृपया प्रतीक्षा करें। ",
-            communityTitle: " सामुदायिक आउटरीच कार्यक्रम ",
-            communitySubtitle: " जल सुरक्षा और रोग की रोकथाम के बारे में जानने के लिए अखिल-भारत में हमारी स्वास्थ्य शिक्षा पहलों और सामुदायिक कार्यक्रमों में शामिल हों। ",
-            eventsTitle: " आगामी कार्यक्रम ",
-            programHighlights: " कार्यक्रम की मुख्य विशेषताएं ",
-            onlinePrograms: " ऑनलाइन कार्यक्रम ",
-            offlineEvents: " ऑफलाइन कार्यक्रम ",
-            waterTesting: " जल परीक्षण ",
-            chatTitle: " जल-रक्षक एआई सहायक ",
-            chatPlaceholder: " जलजनित रोगों के बारे में पूछें ...",
-            chatFeatures: " एआई सहायक की विशेषताएं ",
-            quickHelp: " त्वरित मदद ",
-            diseaseSymptoms: " रोग के लक्षण ",
-            preventionTips: " रोकथाम के उपाय ",
-            waterTesting2: " जल परीक्षण ",
-            aboutTitle: " जल-रक्षक के बारे में ",
-            missionTitle: " हमारा मिशन ",
-            missionText: " जल-रक्षक उन्नत एआई और मशीन लर्निंग तकनीकों के माध्यम से सार्वजनिक स्वास्थ्य निगरानी में क्रांति लाने के लिए समर्पित है। हमारा मिशन एक स्मार्ट स्वास्थ्य निगरानी प्रणाली बनाना है जो ग्रामीण अखिल-भारत में कमजोर समुदायों में जलजनित बीमारियों के प्रकोप का पता लगाता है, निगरानी करता है और रोकता है। ",
-            visionTitle: " हमारी दृष्टि ",
-            visionText: " एक व्यापक प्रारंभिक चेतावनी प्रणाली स्थापित करना जो समुदायों, स्वास्थ्य कार्यकर्ताओं और सरकारी अधिकारियों को जलजनित बीमारियों से प्रभावी ढंग से निपटने के लिए वास्तविक समय की अंतर्दृष्टि और कार्रवाई योग्य बुद्धिमत्ता के साथ सशक्त बनाती है। ",
-            techStack: " प्रौद्योगिकी स्टैक ",
-            teamTitle: " हमारी टीम ",
-            critical: " गंभीर ",
-            high: " उच्च ",
-            medium: " मध्यम ",
-            low: " कम ",
-            upcoming: " आगामी ",
-            registered: " पंजीकृत ",
-            registerNow: " अभी पंजीकरण करें ",
-            description: " विवरण ",
-            prevention: " रोकथाम के तरीके ",
-            reportedCases: " दर्ज मामले ",
-            rate: " दर ",
-            cases: " मामले ",
-            location2: " स्थान ",
-            send: " भेजें ",
-            aboutAI: " जल-रक्षक एआई के बारे में ",
-            aboutAIText: " हमारा एआई सहायक कई भाषाओं में जलजनित रोगों, रोकथाम के तरीकों और स्वास्थ्य संसाधनों के बारे में आपके सवालों के तुरंत जवाब देता है। ",
-            symptomsTitle: " लक्षण :",
-            preventionTitle: " रोकथाम के तरीके :",
-            remediesTitle: " इलाज और उपचार ",
-            statistics: " प्रकोप के आँकड़े ",
-            probability: " मिलान स्कोर ",
-            noDiseaseDetectedTitle: " कोई विशेष रोग नहीं मिला ",
-            noDiseaseDetectedDescription: " लक्षणों का संयोजन हमारे डेटाबेस में किसी एक जलजनित रोग से दृढ़ता से मेल नहीं खाता है। यह किसी बीमारी को खारिज नहीं करता है। ",
-            noDiseaseDetectedRemedy: " कृपया सटीक निदान के लिए एक स्वास्थ्य पेशेवर से परामर्श करें। सुनिश्चित करें कि आप हाइड्रेटेड रहें और अपने लक्षणों की निगरानी करें। ",
-            genderOptions: { male: " पुरुष ", female: " महिला ", other: " अन्य " },
-            symptomsList: [" बुखार ", " दस्त ", " उल्टी ", " पेट दर्द ", " निर्जलीकरण ", " सिरदर्द ", " थकान ", " जी मिचलाना ", " पीलिया ", " गहरे रंग का मूत्र ", " गुलाबी धब्बे ", " पेट फूलना ", " वजन कम होना "],
-            diseases: {
-                hepatitisA: { name: " हेपेटाइटिस ए ", description: " हेपेटाइटिस ए वायरस (HAV) के कारण होने वाला एक यकृत संक्रमण, जो अत्यधिक संक्रामक है और दूषित भोजन या पानी से फैलता है। ", remedies: [" आराम महत्वपूर्ण है क्योंकि कोई विशिष्ट उपचार नहीं है। ", " खूब सारे तरल पदार्थ पीकर हाइड्रेटेड रहें। ", " शराब और यकृत को नुकसान पहुँचाने वाली दवाओं से बचें। "] },
-                cholera: { name: " हैजा ", description: " विब्रियो कोलेरी बैक्टीरिया से आंत के संक्रमण के कारण होने वाली एक गंभीर दस्त की बीमारी, जो गंभीर हो सकती है। ", remedies: [" ओरल रिहाइड्रेशन सॉल्यूशन (ORS) से तत्काल पुनर्जलीकरण महत्वपूर्ण है। ", " गंभीर मामलों के लिए तत्काल चिकित्सा सहायता लें। ", " जिंक सप्लीमेंट दस्त की अवधि को कम करने में मदद कर सकते हैं। "] },
-                gastroenteritis: { name: " गैस्ट्रोएंटेराइटिस (दस्त )", description: " एक आंतों का संक्रमण जिसमें पानी वाले दस्त, पेट में ऐंठन, मतली या उल्टी और कभी-कभी बुखार होता है। ", remedies: [" निर्जलीकरण को रोकने के लिए खूब सारे तरल पदार्थ पिएं (ORS सबसे अच्छा है ) । ", " केला, चावल और टोस्ट (BRAT आहार ) जैसे नरम खाद्य पदार्थ खाएं। ", " डेयरी, वसायुक्त या मसालेदार भोजन से बचें। "] },
-                typhoid: { name: " टाइफाइड बुखार ", description: " साल्मोनेला टाइफी के कारण होने वाला एक गंभीर जीवाणु संक्रमण, जिसकी विशेषता लगातार तेज बुखार है। ", remedies: [" तत्काल चिकित्सा ध्यान देने की आवश्यकता है और इसका इलाज एंटीबायोटिक दवाओं से किया जाता है। ", " निर्जलीकरण को रोकने के लिए खूब सारे तरल पदार्थ पिएं। ", " उच्च-कैलोरी, पौष्टिक आहार खाएं। "] },
-                giardiasis: { name: " गिआर्डियासिस ", description: " जिआर्डिया लैम्ब्लिया नामक एक सूक्ष्म परजीवी के कारण होने वाला एक आंतों का संक्रमण, जो अक्सर बिना बुखार के पेट फूलना और ऐंठन का कारण बनता है। ", remedies: [" आमतौर पर पर्चे वाली दवाओं से चिकित्सा उपचार की आवश्यकता होती है। ", " अच्छी तरह से हाइड्रेटेड रहें। ", " कैफीन और डेयरी उत्पादों से बचें, जो दस्त को बढ़ा सकते हैं। "] },
-                crypto: { name: " क्रिप्टोस्पोरिडिओसिस ", description: " सूक्ष्म परजीवी क्रिप्टोस्पोरिडियम के कारण होने वाली एक दस्त की बीमारी। यह पानी वाले दस्त का कारण बन सकती है और जलजनित बीमारी का एक आम कारण है। ", remedies: [" ज्यादातर लोग बिना इलाज के ठीक हो जाते हैं। ", " निर्जलीकरण को रोकने के लिए खूब सारे तरल पदार्थ पिएं। ", " दस्त-रोधी दवा मदद कर सकती है, लेकिन पहले डॉक्टर से सलाह लें। "] }
-            },
-            ai: {
-                initialGreeting: " नमस्ते ! मैं जल-रक्षक एआई हूँ। आज मैं जलजनित रोगों के बारे में आपकी कैसे सहायता कर सकता हूँ ? आप मुझसे ' हैजा का कारण क्या है ?' या ' टाइफाइड से कैसे बचें ?' जैसे सवाल पूछ सकते हैं। ",
-                fallback: " मुझे खेद है, मेरे पास उस पर जानकारी नहीं है। मैं हैजा, टाइफाइड, हेपेटाइटिस ए, जिआर्डियासिस और गैस्ट्रोएंटेराइटिस जैसे रोगों के कारण, लक्षण, उपचार और रोकथाम के बारे में सवालों के जवाब दे सकता हूँ। कृपया अपना प्रश्न अलग तरीके से पूछने का प्रयास करें। ",
-            },
-            welcome: "स्वागत है",
-            devices: "उपकरण",
-            addDevice: "+ उपकरण जोड़ें",
-            heroTitleBadge: "अखिल भारतीय",
-            heroTitleMain: "जलजनित रोग निगरानी",
-            allIndiaMapTitle: "अखिल भारतीय रोग प्रकोप निगरानी",
-            nearbyMapTitle: "निकटवर्ती रोग प्रकोप",
-            heroPill1: "एआई-संचालित जांच",
-            heroPill2: "वास्तविक समय अलर्ट",
-            heroPill3: "अखिल भारतीय फोकस",
-            statisticsInfo: "यूपी और बिहार में सबसे अधिक मामले दर्ज",
-            trendsInfo: "जुलाई-अगस्त में चरम संचरण देखा गया",
-            waterFormTitle: "जल गुणवत्ता पैरामीटर",
-            waterFormSubtitle: "अपने जल स्रोत के विस्तृत विश्लेषण के लिए निम्नलिखित पैरामीटर सबमिट करें।",
-            basicWaterInfo: "बुनियादी जल जानकारी",
-            physicalParams: "भौतिक पैरामीटर",
-            chemicalParams: "रासायनिक पैरामीटर",
-            sensorReadings: "सेंसर रीडिंग",
-            rgbSensor: "आरजीबी सेंसर",
-            uvSensor: "यूवी सेंसर",
-            initialPrediction: "प्रारंभिक भविष्यवाणी",
-            fetchFromDevice: "डिवाइस से प्राप्त करें",
-            fetching: "प्राप्त कर रहा है...",
-            joinCause: "हमारे मकसद में शामिल हों",
-            joinCauseText: "जल-रक्षक में योगदान करने के इच्छुक हैं? हम हमेशा स्वयंसेवकों और भागीदारों की तलाश में रहते हैं।",
-            contactUs: "संपर्क करें",
-            deviceName: "डिवाइस का नाम",
-            deviceId: "डिवाइस आईडी",
-            addNewDevice: "नया डिवाइस जोड़ें",
-            adding: "जोड़ा जा रहा है...",
-            deviceAdded: "डिवाइस सफलतापूर्वक जोड़ा गया!",
-            deviceAddError: "डिवाइस जोड़ने में त्रुटि: ",
-            selectSource: "स्रोत का चयन करें",
-            selectColor: "रंग चुनें",
-            selectGender: "लिंग चुनें",
-        },
-        as: {
-            home: " ঘৰ ",
-            submitWaterData: " তথ্য জমা দিয়ক ",
-            diseasePrediction: " ৰোগৰ ভৱিষ্যদ্বাণী ",
-            community: " সামাজিক প্ৰসাৰণ ",
-            aiAssistant: " এআই সহায়ক ",
-            about: " আমাৰ বিষয়ে ",
-            language: " ভাষা ",
-            english: " ইংৰাজী ",
-            hindi: " হিন্দী ",
-            assamese: " অসমীয়া ",
-            bengali: " বাংলা ",
-            heroTitle: " সৰ্বভাৰতীয় জলবাহিত ৰোগ নিৰীক্ষণ ",
-            heroSubtitle: " জল-বাহিত ৰোগৰ বাবে বাস্তৱ-সময়ৰ নিৰীক্ষণ আৰু সঁহাৰি প্ৰণালী ",
-            outbreakTitle: " ডায়েৰিয়াৰ প্ৰাদুৰ্ভাৱ ",
-            statisticsTitle: " সৰ্বভাৰতীয় ৰাজ্যসমূহৰ তুলনা ",
-            trendsTitle: " ৰোগৰ প্ৰৱণতা (মাহেকীয়া )",
-            emergencyTitle: " জৰুৰীকালীন সঁহাৰি স্থিতি ",
-            disease: " ৰোগ ",
-            state: " ৰাজ্য ",
-            severity: " গুৰুত্বৰ স্তৰ ",
-            responseTeam: " সঁহাৰি দল ",
-            lastUpdate: " শেষ আপডেট ",
-            predictionTitle: " এআই ৰোগৰ ভৱিষ্যদ্বাণীৰ বাবে স্বাস্থ্য তথ্য জমা দিয়ক ",
-            predictionSubtitle: " লক্ষণ আৰু ৰোগীৰ তথ্য বাছনি কৰক, আৰু আমাৰ এআই-এ সম্ভাৱ্য পানীজনিত ৰোগৰ প্ৰাৰম্ভিক বিশ্লেষণ প্ৰদান কৰিব। ",
-            patientInfo: " ৰোগীৰ তথ্য ",
-            fullName: " সম্পূৰ্ণ নাম ",
-            age: " বয়স ",
-            gender: " লিঙ্গ ",
-            location: " স্থান ",
-            symptoms: " পৰ্যবেক্ষণ কৰা লক্ষণসমূহ ",
-            waterQuality: " পানীৰ গুণগত মানৰ মাপকাঠী ",
-            waterSourceType: " পানীৰ উৎসৰ প্ৰকাৰ ",
-            pH: " পিএইচ স্তৰ ",
-            turbidity: " ঘোলাपन (NTU)",
-            contaminantLevelPpm: " দূষক স্তৰ (ppm)",
-            waterTemperatureC: " পানীৰ উষ্ণতা (°C)",
-            upload: " ফাইল আপলোড কৰক ",
-            submitButton: " তথ্য জমা দিয়ক আৰু বিশ্লেষণ লাভ কৰক ",
-            analysisTitle: " এআই বিশ্লেষণৰ ফলাফল ",
-            analysisPlaceholder: " আপোনাৰ বিশ্লেষণ দাখিলৰ পিছত ইয়াত দেখা যাব। ",
-            analyzingPlaceholder: " আমাৰ এআই-এ তথ্য বিশ্লেষণ কৰি আছে... অনুগ্ৰহ কৰি অপেক্ষা কৰক। ",
-            communityTitle: " সামাজিক প্ৰসাৰণ কাৰ্যসূচী ",
-            communitySubtitle: " পানীৰ সুৰক্ষা আৰু ৰোগ প্ৰতিৰোধৰ বিষয়ে জানিবলৈ সৰ্বভাৰতত আমাৰ স্বাস্থ্য শিক্ষাৰ পদক্ষেপ আৰু সামাজিক কাৰ্যসূচীত যোগদান কৰক। ",
-            eventsTitle: " আগন্তুক কাৰ্যসূচী ",
-            programHighlights: " কাৰ্যসূচীৰ মুখ্য অংশ ",
-            onlinePrograms: " অনলাইন কাৰ্যসূচী ",
-            offlineEvents: " অফলাইন কাৰ্যসূচী ",
-            waterTesting: " পানী পৰীক্ষা ",
-            chatTitle: " জল-ৰক্ষক এআই সহায়ক ",
-            chatPlaceholder: " জলবাহিত ৰোগৰ বিষয়ে সোধক ...",
-            chatFeatures: " এআই সহায়কৰ বৈশিষ্ট্য ",
-            quickHelp: " দ্ৰুত সহায় ",
-            diseaseSymptoms: " ৰোগৰ লক্ষণ ",
-            preventionTips: " প্ৰতিৰোধৰ উপায় ",
-            waterTesting2: " পানী পৰীক্ষা ",
-            aboutTitle: " জল-ৰক্ষকৰ বিষয়ে ",
-            missionTitle: " আমাৰ উদ্দেশ্য ",
-            missionText: " জল-ৰক্ষক উন্নত এআই আৰু মেচিন লাৰ্নিং প্ৰযুক্তিৰ জৰিয়তে জনস্বাস্থ্য নিৰীক্ষণত বৈপ্লৱিক পৰিৱৰ্তন আনিবলৈ সমৰ্পিত। আমাৰ উদ্দেশ্য হৈছে গ্ৰাম্য সৰ্বভাৰতত দুৰ্বল সম্প্ৰদায়সমূহত জলবাহিত ৰোগৰ প্ৰাদুৰ্ভাৱ চিনাক্ত, নিৰীক্ষণ আৰু প্ৰতিৰোধ কৰা এক স্মাৰ্ট স্বাস্থ্য নিৰীক্ষণ প্ৰণালী সৃষ্টি কৰা। ",
-            visionTitle: " আমাৰ দৃষ্টিভংগী ",
-            visionText: " এক ব্যাপক আগতীয়া সতৰ্কবাণী প্ৰণালী স্থাপন কৰা যি সম্প্ৰদায়, স্বাস্থ্য কৰ্মী আৰু চৰকাৰী বিষয়াসকলক জলবাহিত ৰোগৰ সৈতে ফলপ্ৰসূভাৱে মোকাবিলা কৰিবলৈ বাস্তৱ-সময়ৰ জ্ঞান আৰু কাৰ্যকৰী বুদ্ধিমত্তাৰে সজ্জিত কৰে। ",
-            techStack: " প্ৰযুক্তিৰ ষ্টেক ",
-            teamTitle: " আমাৰ দল ",
-            critical: " সংকটজনক ",
-            high: " উচ্চ ",
-            medium: " মাধ্যম ",
-            low: " নিম্ন ",
-            upcoming: " আগন্তুক ",
-            registered: " পঞ্জীভুক্ত ",
-            registerNow: " এতিয়া পঞ্জীয়ন কৰক ",
-            description: " বিৱৰণ ",
-            prevention: " প্ৰতিৰোধ পদ্ধতি ",
-            reportedCases: " ৰিপোৰ্ট কৰা ঘটনা ",
-            rate: " হাৰ ",
-            cases: " ঘটনা ",
-            location2: " স্থান ",
-            send: " প্ৰেৰণ কৰক ",
-            aboutAI: " জল-ৰক্ষক এআইৰ বিষয়ে ",
-            aboutAIText: " আমাৰ এআই সহায়কে বহু ভাষাত জলবাহিত ৰোগ, প্ৰতিৰোধ পদ্ধতি আৰু স্বাস্থ্য সম্পদৰ বিষয়ে আপোনাৰ প্ৰশ্নৰ তৎকালীন উত্তৰ দিয়ে। ",
-            symptomsTitle: " লক্ষণসমূহ :",
-            preventionTitle: " প্ৰতিৰোধ পদ্ধতি :",
-            remediesTitle: " নিৰাময় আৰু প্ৰতিকাৰ ",
-            statistics: " প্ৰাদুৰ্ভাৱৰ পৰিসংখ্যা ",
-            probability: " মিল স্কোৰ ",
-            noDiseaseDetectedTitle: " কোনো নিৰ্দিষ্ট ৰোগ ধৰা পৰা নাই ",
-            noDiseaseDetectedDescription: " লক্ষণসমূহৰ সংমিশ্ৰণে আমাৰ ডাটাবেছত কোনো এটা জলবাহিত ৰোগৰ সৈতে শক্তিশালীভাৱে মিল নাখায়। ই কোনো ৰোগ নুই নকৰে। ",
-            noDiseaseDetectedRemedy: " অনুগ্ৰহ কৰি সঠিক ৰোগ নিৰ্ণয়ৰ বাবে এজন স্বাস্থ্যসেৱা পেছাদাৰীৰ সৈতে পৰামৰ্শ কৰক। আপুনি হাইড্ৰেটেড থকাটো নিশ্চিত কৰক আৰু আপোনাৰ লক্ষণসমূহ নিৰীক্ষণ কৰক। ",
-            genderOptions: { male: " পুৰুষ ", female: " মহিলা ", other: " অন্য " },
-            symptomsList: [" জ্বৰ ", " ডায়েৰিয়া ", " বমি ", " পেটৰ বিষ ", " ডিহাইড্ৰেচন ", " মূৰৰ বিষ ", " ভাগৰ ", " বমি ভাব ", " জণ্ডিচ ", " গাঢ় ৰঙৰ প্ৰস্ৰাৱ ", " গোলাপী দাগ ", " পেট ফুলা ", " ওজন হ্ৰাস "],
-            diseases: {
-                hepatitisA: { name: " হেপাটাইটিছ এ ", description: " হেপাটাইটিছ এ ভাইৰাছ (HAV) ৰ ফলত হোৱা যকৃতৰ সংক্ৰমণ, যি অতি সংক্ৰামক আৰু দূষিত খাদ্য বা পানীৰ জৰিয়তে বিয়পে। ", remedies: [" কোনো নিৰ্দিষ্ট চিকিৎসা নথকাৰ বাবে জিৰণি লোৱাটো গুৰুত্বপূৰ্ণ। ", " যথেষ্ট তৰল পদাৰ্থ পান কৰি হাইড্ৰেটেড থাকক। ", " মদ আৰু যকৃতৰ ক্ষতি কৰিব পৰা ঔষধ পৰিহাৰ কৰক। "] },
-                cholera: { name: " কলেৰা ", description: " ভিব্রিঅ' কলেৰি বেক্টেৰিয়াৰ দ্বাৰা অন্ত্ৰৰ সংক্ৰমণৰ ফলত হোৱা এক তীব্ৰ ডায়েৰিয়া ৰোগ, যি গুৰুতৰ হ'ব পাৰে। ", remedies: [" ওৰেল ৰিহাইড্ৰেচন চলিউচন (ORS) ৰ সৈতে তৎকালীনভাৱে পুনৰজলীকৰণ কৰাটো মূল কথা। ", " গুৰুতৰ ক্ষেত্ৰত তৎকালীন চিকিৎসাৰ সহায় লওক। ", " জিংক পৰিপূৰকে ডায়েৰিয়াৰ সময়সীমা হ্ৰাস কৰাত সহায় কৰিব পাৰে। "] },
-                gastroenteritis: { name: " গেষ্ট্ৰ'এণ্টেৰাইটিছ (ডায়েৰিয়া )", description: " পনীয়া ডায়েৰিয়া, পেটৰ বিষ, বমি ভাব বা বমি, আৰু কেতিয়াবা জ্বৰৰ দ্বাৰা চিহ্নিত এক অন্ত্ৰৰ সংক্ৰমণ। ", remedies: [" ডিহাইড্ৰেচন প্ৰতিৰোধ কৰিবলৈ যথেষ্ট তৰল পদাৰ্থ পান কৰক (ORS শ্ৰেষ্ঠ ) । ", " কল, ভাত আৰু টোষ্ট (BRAT diet) ৰ দৰে পাতল খাদ্য খাওক। ", " গাখীৰ, চৰ্বিযুক্ত বা মচলাযুক্ত খাদ্য পৰিহাৰ কৰক। "] },
-                typhoid: { name: " টাইফয়েড জ্বৰ ", description: " চালমোনেলা টাইফিৰ ফলত হোৱা এক গুৰুতৰ বেক্টেৰিয়া সংক্ৰমণ, যাৰ বৈশিষ্ট্য হৈছে এক দীৰ্ঘস্থায়ী উচ্চ জ্বৰ। ", remedies: [" তৎকালীন চিকিৎসাৰ প্ৰয়োজন আৰু ইয়াক এন্টিবায়োটিকৰ দ্বাৰা চিকিৎসা কৰা হয়। ", " ডিহাইড্ৰেচন প্ৰতিৰোধ কৰিবলৈ যথেষ্ট তৰল পদাৰ্থ পান কৰক। ", " উচ্চ কেলৰিযুক্ত, পুষ্টিকৰ আহাৰ খাওক। "] },
-                giardiasis: { name: " গিয়াৰ্ডিয়াচিছ ", description: " গিয়াৰ্ডিয়া লেম্বলিয়া নামৰ এক অণুবীক্ষণিক পৰজীৱীৰ ফলত হোৱা এক অন্ত্ৰৰ সংক্ৰমণ, যিয়ে প্ৰায়ে জ্বৰ অবিহনে পেট ফুলা আৰু বিষৰ সৃষ্টি কৰে। ", remedies: [" সাধাৰণতে চিকিৎসকৰ পৰামৰ্শ মতে ঔষধৰ সৈতে চিকিৎসাৰ প্ৰয়োজন হয়। ", " ভালদৰে হাইড্ৰেটেড থাকক। ", " কেফেইন আৰু গাখীৰৰ সামগ্ৰী পৰিহাৰ কৰক, যিয়ে ডায়েৰিয়া বঢ়াব পাৰে। "] },
-                crypto: { name: " ক্ৰিপ্টোস্প'ৰিডিওচিছ ", description: " অণুবীক্ষণিক পৰজীৱী ক্ৰিপ্টোস্প'ৰিডিয়ামৰ ফলত হোৱা এক ডায়েৰিয়া ৰোগ। ই পনীয়া ডায়েৰিয়াৰ সৃষ্টি কৰিব পাৰে আৰু ই জলবাহিত ৰোগৰ এক সাধাৰণ কাৰণ। ", remedies: [" বেছিভাগ লোক চিকিৎসা অবিহনে আৰোগ্য হয়। ", " ডিহাইড্ৰেচন প্ৰতিৰোধ কৰিবলৈ যথেষ্ট তৰল পদাৰ্থ পান কৰক। ", " ডায়েৰিয়া-প্ৰতিৰোধী ঔষধে সহায় কৰিব পাৰে, কিন্তু প্ৰথমে চিকিৎসকৰ পৰামৰ୍শ লওক। "] }
-            },
-            ai: {
-                initialGreeting: " নমস্কাৰ ! মই জল-ৰক্ষক এআই। মই আজি আপোনাক জলবাহিত ৰোগৰ বিষয়ে কেনেদৰে সহায় কৰিব পাৰোঁ ? আপুনি মোক ' কলেৰাৰ কাৰণ কি ?' বা ' টাইফয়েড কেনেকৈ প্ৰতিৰোধ কৰিব ?' আদি প্ৰশ্ন সুধিব পাৰে। ",
-                fallback: " মই দুঃখিত, মোৰ ওচৰত সেই বিষয়ে তথ্য নাই। মই কলেৰা, টাইফয়েড, হেপাটাইটিছ এ, গিয়াৰ্ডিয়াচিছ, আৰু গেষ্ট্ৰ'এণ্টেৰাইটিছৰ দৰে ৰোগৰ কাৰণ, লক্ষণ, চিকিৎসা, আৰু প্ৰতিৰোধৰ বিষয়ে প্ৰশ্নৰ উত্তৰ দিব পাৰোঁ। অনুগ্ৰহ কৰি আপোনাৰ প্ৰশ্নটো বেলেগ ধৰণে সুধিবলৈ চেষ্টা কৰক। ",
-            },
-            welcome: "স্বাগতম",
-            devices: "ডিভাইচ",
-            addDevice: "+ ডিভাইচ যোগ কৰক",
-            heroTitleBadge: "সৰ্বভাৰতীয়",
-            heroTitleMain: "জলবাহিত ৰোগ নিৰীক্ষণ",
-            allIndiaMapTitle: "সৰ্বভাৰতীয় ৰোগৰ প্ৰাদুৰ্ভাৱ মনিটৰ",
-            nearbyMapTitle: "ওচৰৰ ৰোগৰ প্ৰাদুৰ্ভাৱ",
-            heroPill1: "এআই-চালিত চিনাক্তকৰণ",
-            heroPill2: "বাস্তৱ-সময়ৰ সতৰ্কবাণী",
-            heroPill3: "সৰ্বভাৰতীয় ফোকাচ",
-            statisticsInfo: "উত্তৰ প্ৰদেশ আৰু বিহাৰত সৰ্বাধিক ৰিপ'ৰ্ট কৰা ঘটনা",
-            trendsInfo: "জুলাই-আগষ্টত সৰ্বাধিক সংক্ৰমণ পৰিলক্ষিত হৈছে",
-            waterFormTitle: "পানীৰ গুণগত মানৰ পৰিমাণ",
-            waterFormSubtitle: "আপোনাৰ পানীৰ উৎসৰ বিশদ বিশ্লেষণৰ বাবে তলত দিয়া পৰিমাণসমূহ জমা দিয়ক।",
-            basicWaterInfo: "পানীৰ মূল তথ্য",
-            physicalParams: "ভৌতিক পৰিমাপসমূহ",
-            chemicalParams: "ৰাসায়নিক পৰিমাপসমূহ",
-            sensorReadings: "চেন্সৰ ৰিডিং",
-            rgbSensor: "আৰজিবি চেন্সৰ",
-            uvSensor: "ইউভি চেন্সৰ",
-            initialPrediction: "প্ৰাৰম্ভিক ভৱিষ্যদ্বাণী",
-            fetchFromDevice: "ডিভাইচৰ পৰা আনক",
-            fetching: "অনা হৈ আছে...",
-            joinCause: "আমাৰ উদ্দেশ্যত যোগদান কৰক",
-            joinCauseText: "জল-ৰক্ষকত অৱদান আগবঢ়াবলৈ আগ্ৰহী নেকি? আমি সদায় স্বেচ্ছাসেৱক আৰু অংশীদাৰ বিচাৰি থাকোঁ।",
-            contactUs: "যোগাযোগ কৰক",
-            deviceName: "ডিভাইচৰ নাম",
-            deviceId: "ডিভাইচ আইডি",
-            addNewDevice: "নতুন ডিভাইচ যোগ কৰক",
-            adding: "যোগ কৰা হৈছে...",
-            deviceAdded: "ডিভাইচ সফলভাৱে যোগ কৰা হ'ল!",
-            deviceAddError: "ডিভাইচ যোগ কৰাত ত্ৰুটি: ",
-            selectSource: "উৎস বাছনি কৰক",
-            selectColor: "ৰং বাছনি কৰক",
-            selectGender: "লিঙ্গ বাছনি কৰক",
-        },
-        bn: {
-            home: " হোম ",
-            submitWaterData: " ডেটা জমা দিন ",
-            diseasePrediction: " রোগের পূর্বাভাস ",
-            community: " সম্প্রদায় আউটরিচ ",
-            aiAssistant: " এআই সহকারী ",
-            about: " আমাদের সম্পর্কে ",
-            language: " ভাষা ",
-            english: " ইংরেজি ",
-            hindi: " হিন্দি ",
-            assamese: " অসমিয়া ",
-            bengali: " বাংলা ",
-            heroTitle: " সর্ব-ভারত জলবাহিত রোগ মনিটর ",
-            heroSubtitle: " জল-বাহিত রোগের জন্য রিয়েল-টাইম নজরদারি এবং প্রতিক্রিয়া ব্যবস্থা ",
-            outbreakTitle: " ডায়রিয়ার প্রাদুর্ভাব ",
-            statisticsTitle: " সর্ব-ভারত রাজ্যগুলির তুলনা ",
-            trendsTitle: " রোগের প্রবণতা (মাসিক )",
-            emergencyTitle: " জরুরী প্রতিক্রিয়া স্থিতি ",
-            disease: " রোগ ",
-            state: " রাজ্য ",
-            severity: " গুরুতরতার স্তর ",
-            responseTeam: " প্রতিক্রিয়া দল ",
-            lastUpdate: " শেষ আপডেট ",
-            predictionTitle: " এআই রোগ পূর্বাভাসের জন্য স্বাস্থ্য ডেটা জমা দিন ",
-            predictionSubtitle: " লক্ষণ এবং রোগীর ডেটা নির্বাচন করুন, এবং আমাদের এআই সম্ভাব্য জলবাহিত অসুস্থতার একটি প্রাথমিক বিশ্লেষণ প্রদান করবে। ",
-            patientInfo: " রোগীর তথ্য ",
-            fullName: " পুরো নাম ",
-            age: " বয়স ",
-            gender: " লিঙ্গ ",
-            location: " অবস্থান ",
-            symptoms: " পর্যবেক্ষণ করা লক্ষণ ",
-            waterQuality: " জলের গুণমান পরামিতি ",
-            waterSourceType: " জলের উৎসের প্রকার ",
-            pH: " পিএইচ স্তর ",
-            turbidity: " ঘোলাত্ব (NTU)",
-            contaminantLevelPpm: " দূষক স্তর (ppm)",
-            waterTemperatureC: " জলের তাপমাত্রা (°C)",
-            upload: " ফাইল আপলোড করুন ",
-            submitButton: " ডেটা জমা দিন এবং বিশ্লেষণ পান ",
-            analysisTitle: " এআই বিশ্লেষণ ফলাফল ",
-            analysisPlaceholder: " আপনার বিশ্লেষণ জমা দেওয়ার পরে এখানে উপস্থিত হবে। ",
-            analyzingPlaceholder: " আমাদের এআই ডেটা বিশ্লেষণ করছে... অনুগ্রহ করে অপেক্ষা করুন। ",
-            communityTitle: " সম্প্রদায় আউটরিচ প্রোগ্রাম ",
-            communitySubtitle: " জল নিরাপত্তা এবং রোগ প্রতিরোধ সম্পর্কে জানতে সর্ব-ভারত জুড়ে আমাদের স্বাস্থ্য শিক্ষা উদ্যোগ এবং সম্প্রদায় ইভেন্টগুলিতে যোগ দিন। ",
-            eventsTitle: " আসন্ন ঘটনাবলী ",
-            programHighlights: " প্রোগ্রামের হাইলাইটস ",
-            onlinePrograms: " অনলাইন প্রোগ্রাম ",
-            offlineEvents: " অফলাইন ইভেন্টস ",
-            waterTesting: " জল পরীক্ষা ",
-            chatTitle: " জল-রक्षक এআই সহকারী ",
-            chatPlaceholder: " জলবাহিত রোগ সম্পর্কে জিজ্ঞাসা করুন ...",
-            chatFeatures: " এআই সহকারীর বৈশিষ্ট্য ",
-            quickHelp: " দ্রুত সাহায্য ",
-            diseaseSymptoms: " রোগের লক্ষণ ",
-            preventionTips: " প্রতিরোধ টিপস ",
-            waterTesting2: " জল পরীক্ষা ",
-            aboutTitle: " জল-রक्षक সম্পর্কে ",
-            missionTitle: " আমাদের লক্ষ্য ",
-            missionText: " জল-রक्षक উন্নত এআই এবং মেশিন লার্নিং প্রযুক্তির মাধ্যমে জনস্বাস্থ্য পর্যবেক্ষণে বিপ্লব ঘটাতে নিবেদিত। আমাদের লক্ষ্য হল একটি স্মার্ট স্বাস্থ্য নজরদারি ব্যবস্থা তৈরি করা যা গ্রামীণ সর্ব-ভারতে দুর্বল সম্প্রদায়গুলিতে জলবাহিত রোগের প্রাদুর্ভাব সনাক্ত, পর্যবেক্ষণ এবং প্রতিরোধ করে। ",
-            visionTitle: " আমাদের দৃষ্টি ",
-            visionText: " একটি ব্যাপক প্রারম্ভিক সতর্কতা ব্যবস্থা প্রতিষ্ঠা করা যা সম্প্রদায়, স্বাস্থ্যকর্মী এবং সরকারী কর্মকর্তাদেরকে জলবাহিত রোগের বিরুদ্ধে কার্যকরভাবে লড়াই করার জন্য রিয়েল-টাইম অন্তর্দৃষ্টি এবং কার্যকরী বুদ্ধিমত্তা দিয়ে শক্তিশালী করে। ",
-            techStack: " প্রযুক্তি স্ট্যাক ",
-            teamTitle: " আমাদের দল ",
-            critical: " সংকটজনক ",
-            high: " উচ্চ ",
-            medium: " মাঝারি ",
-            low: " নিম্ন ",
-            upcoming: " আসন্ন ",
-            registered: " নিবন্ধিত ",
-            registerNow: " এখন নিবন্ধন করুন ",
-            description: " বিবরণ ",
-            prevention: " প্রতিরোধ পদ্ধতি ",
-            reportedCases: " রিপোর্ট করা কেস ",
-            rate: " হার ",
-            cases: " কেস ",
-            location2: " অবস্থান ",
-            send: " প্রেরণ ",
-            aboutAI: " জল-রक्षक এআই সম্পর্কে ",
-            aboutAIText: " আমাদের এআই সহকারী একাধিক ভাষায় জলবাহিত রোগ, প্রতিরোধ পদ্ধতি এবং স্বাস্থ্য সম্পদ সম্পর্কে আপনার প্রশ্নের তাত্ক্ষণিক উত্তর প্রদান করে। ",
-            symptomsTitle: " লক্ষণ :",
-            preventionTitle: " প্রতিরোধ পদ্ধতি :",
-            remediesTitle: " নিরাময় ও প্রতিকার ",
-            statistics: " প্রাদুর্ভাবের পরিসংখ্যান ",
-            probability: " ম্যাচ স্কোর ",
-            noDiseaseDetectedTitle: " কোনো নির্দিষ্ট রোগ সনাক্ত করা যায়নি ",
-            noDiseaseDetectedDescription: " লক্ষণগুলির সংমিশ্রণ আমাদের ডাটাবেসের কোনো একক জলবাহিত রোগের সাথে দৃঢ়ভাবে মেলে না। এটি কোনো অসুস্থতা বাতিল করে না। ",
-            noDiseaseDetectedRemedy: " সঠিক নির্ণয়ের জন্য অনুগ্রহ করে একজন স্বাস্থ্যসেবা পেশাদারের সাথে পরামর্শ করুন। আপনি হাইড্রেটেড আছেন তা নিশ্চিত করুন এবং আপনার লক্ষণগুলি পর্যবেক্ষণ করুন। ",
-            genderOptions: { male: " পুরুষ ", female: " মহিলা ", other: " অন্যান্য " },
-            symptomsList: [" জ্বর ", " ডায়রিয়া ", " বমি ", " পেটে ব্যথা ", " ডিহাইড্রেশন ", " মাথাব্যথা ", " ক্লান্তি ", " বমি বমি ভাব ", " জন্ডিস ", " গাঢ় রঙের প্রস্রাব ", " গোলাপী দাগ ", " পেট ফাঁপা ", " ওজন হ্রাস "],
-            diseases: {
-                hepatitisA: { name: " হেপাটাইটিস এ ", description: " হেপাটাইটিস এ ভাইরাস (HAV) দ্বারা সৃষ্ট একটি লিভারের সংক্রমণ, যা অত্যন্ত সংক্রাকক এবং দূষিত খাবার বা জলের মাধ্যমে ছড়ায়। ", remedies: [" বিশ্রাম অপরিহার্য কারণ কোনো নির্দিষ্ট চিকিৎসা নেই। ", " প্রচুর পরিমাণে তরল পান করে হাইড্রেটেড থাকুন। ", " অ্যালকোহল এবং লিভারের ক্ষতি করতে পারে এমন ওষুধ এড়িয়ে চলুন। "] },
-                cholera: { name: " কলেরা ", description: " ভিব্রিও কলেরি ব্যাকটেরিয়া দ্বারা অন্ত্রের সংক্রমণের কারণে সৃষ্ট একটি তীব্র ডায়রিয়ার অসুস্থতা, যা গুরুতর হতে পারে। ", remedies: [" ওরাল রিহাইড্রেশন সলিউশন (ORS) দিয়ে অবিলম্বে পুনরুদ দরকার। ", " গুরুতর ক্ষেত্রে জরুরি চিকিৎসার সহায়তা নিন। ", " জিঙ্ক সাপ্লিমেন্ট ডায়রিয়ার সময়কাল কমাতে সাহায্য করতে পারে। "] },
-                gastroenteritis: { name: " গ্যাস্ট্রোএন্টারাইটিস (ডায়রিয়া )", description: " একটি অন্ত্রের সংক্রমণ যা জলীয় ডায়রিয়া, পেটে ব্যথা, বমি বমি ভাব বা বমি এবং কখনও কখনও জ্বর দ্বারা চিহ্নিত করা হয়। ", remedies: [" ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন (ORS সেরা ) । ", " কলা, ভাত এবং টোস্টের মতো নরম খাবার খান (BRAT ডায়েট ) । ", " দুগ্ধজাত, চর্বিযুক্ত বা মশলাদার খাবার এড়িয়ে চলুন। "] },
-                typhoid: { name: " টাইফয়েড জ্বর ", description: " সালমোনেলা টাইফি দ্বারা সৃষ্ট একটি গুরুতর ব্যাকটেরিয়া সংক্রমণ, যা একটি স্থায়ী উচ্চ জ্বর দ্বারা চিহ্নিত করা হয়। ", remedies: [" অবিলম্বে চিকিৎসার প্রয়োজন এবং এটি অ্যান্টিবায়োটিক দিয়ে চিকিৎসা করা হয়। ", " ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন। ", " একটি উচ্চ-ক্যালোরি, পুষ্টিকর খাদ্য গ্রহণ করুন। "] },
-                giardiasis: { name: " জিয়ার্ডিয়াসিস ", description: " জিয়ার্ডিয়া ল্যাম্বলিয়া নামক একটি আণুবীক্ষণিক পরজীবী দ্বারা সৃষ্ট একটি অন্ত্রের সংক্রমণ, যা প্রায়শই জ্বর ছাড়াই পেট ফাঁপা এবং ব্যথার কারণ হয়। ", remedies: [" সাধারণত প্রেসক্রিপশন ওষুধের সাথে চিকিৎসা প্রয়োজন। ", " ভালভাবে হাইড্রেটেড থাকুন। ", " ক্যাফিন এবং দুগ্ধজাত পণ্য এড়িয়ে চলুন, যা ডায়রিয়াকে আরও খারাপ করতে পারে। "] },
-                crypto: { name: " ক্রিপ্টোস্পোরিডিওসিস ", description: " আণুবীক্ষণিক পরজীবী ক্রিপ্টোস্পোরিডিয়াম দ্বারা সৃষ্ট একটি ডায়রিয়ার রোগ। এটি জলীয় ডায়রিয়ার কারণ হতে পারে এবং এটি জলবাহিত রোগের একটি সাধারণ কারণ। ", remedies: [" বেশিরভাগ লোক চিকিৎসা ছাড়াই সুস্থ হয়ে ওঠে। ", " ডিহাইড্রেশন প্রতিরোধ করতে প্রচুর পরিমাণে তরল পান করুন। ", " অ্যান্টি-ডায়রিয়াল ওষুধ সাহায্য করতে পারে, তবে প্রথমে একজন ডাক্তারের সাথে পরামর্শ করুন। "] }
-            },
-            ai: {
-                initialGreeting: " নমস্কার ! আমি জল-রक्षक এআই। আমি আজ আপনাকে জলবাহিত রোগ সম্পর্কে কীভাবে সহায়তা করতে পারি ? আপনি আমাকে জিজ্ঞাসা করতে পারেন ' কলেরার কারণ কী ?' বা ' টাইফয়েড কীভাবে প্রতিরোধ করা যায় ?'",
-                fallback: " আমি দুঃখিত, আমার কাছে সেই বিষয়ে তথ্য নেই। আমি কলেরা, টাইফয়েড, হেপাটাইটিস এ, জিয়ার্ডিয়াসিস এবং গ্যাস্ট্রোএন্টারাইটিসের মতো রোগের কারণ, লক্ষণ, চিকিৎসা এবং প্রতিরোধ সম্পর্কে প্রশ্নের উত্তর দিতে পারি। অনুগ্রহ করে আপনার প্রশ্নটি ভিন্নভাবে জিজ্ঞাসা করার চেষ্টা করুন। ",
-            },
-            welcome: "স্বাগতম",
-            devices: "ডিভাইস",
-            addDevice: "+ ডিভাইস যোগ করুন",
-            heroTitleBadge: "সর্ব-ভারত",
-            heroTitleMain: "জলবাহিত রোগ মনিটর",
-            allIndiaMapTitle: "সর্বভারতীয় রোগ প্রাদুর্ভাব মনিটর",
-            nearbyMapTitle: "কাছাকাছি রোগ প্রাদুর্ভাব",
-            heroPill1: "এআই-চালিত সনাক্তকরণ",
-            heroPill2: "রিয়েল-টাইম সতর্কতা",
-            heroPill3: "সর্ব-ভারত ফোকাস",
-            statisticsInfo: "ইউপি এবং বিহারে সর্বোচ্চ রিপোর্ট করা ঘটনা",
-            trendsInfo: "জুলাই-আগস্টে সর্বোচ্চ সংক্রমণ পরিলক্ষিত হয়েছে",
-            waterFormTitle: "জলের গুণমান পরিমাপ",
-            waterFormSubtitle: "আপনার জলের উৎসের বিস্তারিত বিশ্লেষণের জন্য নিম্নলিখিত পরিমাপগুলি জমা দিন।",
-            basicWaterInfo: "জলের মৌলিক তথ্য",
-            physicalParams: "ভৌত পরামিতি",
-            chemicalParams: "রাসায়নিক পরামিতি",
-            sensorReadings: "সেন্সর রিডিং",
-            rgbSensor: "আরজিবি সেন্সর",
-            uvSensor: "ইউভি সেন্সর",
-            initialPrediction: "প্রাথমিক পূর্বাভাস",
-            fetchFromDevice: "ডিভাইস থেকে আনুন",
-            fetching: "আনা হচ্ছে...",
-            joinCause: "আমাদের উদ্দেশ্যে যোগ দিন",
-            joinCauseText: "জল-রক্ষকে অবদান রাখতে আগ্রহী? আমরা সর্বদা স্বেচ্ছাসেবক এবং অংশীদারদের খুঁজছি।",
-            contactUs: "যোগাযোগ করুন",
-            deviceName: "ডিভাইসের নাম",
-            deviceId: "ডিভাইস আইডি",
-            addNewDevice: "নতুন ডিভাইস যোগ করুন",
-            adding: "যোগ করা হচ্ছে...",
-            deviceAdded: "ডিভাইস সফলভাবে যোগ করা হয়েছে!",
-            deviceAddError: "ডিভাইস যোগ করতে ত্রুটি: ",
-            selectSource: "উৎস নির্বাচন করুন",
-            selectColor: "রঙ নির্বাচন করুন",
-            selectGender: "লিঙ্গ নির্বাচন করুন",
-        }
-    };
-
-    const t = (key) => {
-        const keys = key.split('.');
-        const resolve = (languageObject, keyParts) => {
-            let current = languageObject;
-            for (const part of keyParts) {
-                if (current === undefined || typeof current !== 'object' || current === null) {
-                    return undefined;
-                }
-                current = current[part];
-            }
-            return current;
-        };
-        let result = resolve(translations[language], keys);
-        if (result === undefined && language !== 'en') {
-            result = resolve(translations['en'], keys);
-        }
-        return result !== undefined ? result : key;
-    };
 
     useEffect(() => {
         setMessages([
@@ -900,70 +407,9 @@ const App = () => {
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
         ]);
-    }, [language]);
+    }, [i18n.language, t]);
 
-    const diseaseInfoDatabase = {
-        hepatitisA: {
-            name: "Hepatitis A",
-            keywords: ["hepatitis", "jaundice", "hav"],
-            info: {
-                causes: "Hepatitis A is caused by the Hepatitis A virus (HAV). It's typically transmitted through consuming food or water contaminated with fecal matter from an infected person.",
-                symptoms: "Key symptoms are fever, fatigue, loss of appetite, nausea, abdominal pain, dark urine, and jaundice (yellowing of the skin and eyes).",
-                treatment: "There is no specific treatment for Hepatitis A. The body usually clears the virus on its own. Doctors recommend rest, adequate nutrition, and plenty of fluids. It's vital to avoid alcohol.",
-                prevention: "The best prevention is the Hepatitis A vaccine. Also, always wash your hands with soap and water after using the bathroom and before preparing food. Drink only purified or boiled water."
-            }
-        },
-        cholera: {
-            name: "Cholera",
-            keywords: ["cholera"],
-            info: {
-                causes: "Cholera is caused by the bacterium Vibrio cholerae, which is found in water or food sources contaminated by feces from an infected person.",
-                symptoms: "The hallmark symptom is profuse watery diarrhea, often described as 'rice-water stools'. Other symptoms include vomiting and leg cramps. It leads to rapid dehydration.",
-                treatment: "Immediate rehydration is critical. This is done using Oral Rehydration Solution (ORS). In severe cases, intravenous fluids and antibiotics are required. See a doctor immediately.",
-                prevention: "Prevention relies on ensuring access to clean, safe drinking water and proper sanitation. Boiling or treating water before use is essential in high-risk areas."
-            }
-        },
-        gastroenteritis: {
-            name: "Gastroenteritis",
-            keywords: ["gastroenteritis", "diarrhea", "stomach flu", "loose motion"],
-            info: {
-                causes: "Gastroenteritis, or infectious diarrhea, can be caused by various viruses (like rotavirus and norovirus), bacteria, or parasites. It spreads through contaminated food or water, or contact with an infected person.",
-                symptoms: "Common symptoms include watery diarrhea, abdominal cramps, nausea, vomiting, and sometimes fever. Dehydration is a major concern.",
-                treatment: "Treatment focuses on preventing dehydration by drinking plenty of fluids, especially ORS. Eat bland foods (like bananas, rice, toast). Most cases resolve on their own.",
-                prevention: "Frequent and thorough handwashing is the best way to prevent it. Also, ensure food is cooked properly and avoid consuming untreated water."
-            }
-        },
-        typhoid: {
-            name: "Typhoid Fever",
-            keywords: ["typhoid", "enteric fever"],
-            info: {
-                causes: "Typhoid fever is caused by the bacterium Salmonella Typhi. It is spread through contaminated food and water, and by close contact with an infected person.",
-                symptoms: "It is characterized by a sustained high fever that can reach 104°F (40°C). Other symptoms include headache, weakness, stomach pain, and sometimes a rash of flat, rose-colored spots.",
-                treatment: "Typhoid requires prompt treatment with antibiotics prescribed by a doctor. Without treatment, it can be fatal.",
-                prevention: "Vaccination is available and recommended for people in high-risk areas. Always drink safe water, avoid raw food from street vendors, and practice good hand hygiene."
-            }
-        },
-        giardiasis: {
-            name: "Giardiasis",
-            keywords: ["giardiasis", "giardia"],
-            info: {
-                causes: "This intestinal infection is caused by a microscopic parasite called Giardia lamblia. It is found in contaminated water, food, or soil and can be transmitted from person to person.",
-                symptoms: "Symptoms can include watery diarrhea, gas, greasy stools that tend to float, stomach cramps, and dehydration. Some people have no symptoms.",
-                treatment: "A doctor will prescribe specific anti-parasitic medications to treat Giardiasis.",
-                prevention: "Avoid swallowing water from pools, lakes, or streams. Practice good hygiene, especially handwashing. Peel or wash raw fruits and vegetables before eating."
-            }
-        },
-        crypto: {
-            name: "Cryptosporidiosis",
-            keywords: ["cryptosporidiosis", "crypto"],
-            info: {
-                causes: "Cryptosporidiosis is caused by the microscopic parasite Cryptosporidium. It is a common cause of waterborne disease and can be found in water, food, soil, or on surfaces contaminated with the feces of an infected human or animal.",
-                symptoms: "The primary symptom is watery diarrhea. Other symptoms include stomach cramps, dehydration, nausea, vomiting, fever, and weight loss.",
-                treatment: "Most people with a healthy immune system recover without treatment. The focus is on drinking plenty of fluids to prevent dehydration. A doctor may prescribe anti-diarrheal medicine.",
-                prevention: "Good hygiene, including thorough handwashing, is key. Do not swallow water when swimming in public pools or natural bodies of water."
-            }
-        }
-    };
+
 
     const handleSendMessage = async () => {
         if (!userMessage.trim()) return;
@@ -1007,7 +453,7 @@ const App = () => {
             // Display an error message in the chat if the call fails
             const errorResponse = {
                 id: Date.now() + 1,
-                text: "I'm having trouble connecting to my brain right now. Please try again in a moment.",
+                text: t('chatConnectionError'),
                 sender: 'ai',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
@@ -1036,10 +482,11 @@ const App = () => {
     };
 
     const runAIAnalysis = (selectedSymptoms) => {
-        const translatedSymptomsList = t('symptomsList');
+        const translatedSymptomsList = t('symptomsList', { returnObjects: true });
         const englishSelectedSymptoms = selectedSymptoms.map(symptom => {
             const index = translatedSymptomsList.indexOf(symptom);
-            return translations['en'].symptomsList[index];
+            const enBundle = i18n.getResourceBundle('en', 'translation');
+            return enBundle ? enBundle.symptomsList[index] : symptom;
         });
         let scores = [];
         for (const diseaseKey in diseaseDatabase) {
@@ -1049,7 +496,7 @@ const App = () => {
                 const score = Math.round((matchingSymptoms.length / disease.keywords.length) * 100);
                 if (score > 20) {
                     scores.push({
-                        ...t(`diseases.${diseaseKey}`),
+                        ...t(`diseases.${diseaseKey}`, { returnObjects: true }),
                         probability: score,
                     });
                 }
@@ -1062,7 +509,7 @@ const App = () => {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         if (formData.symptoms.length === 0) {
-            alert('Please select at least one symptom for analysis.');
+            alert(t('alertSelectSymptom'));
             return;
         }
         setIsAnalyzing(true);
@@ -1150,15 +597,15 @@ const App = () => {
                 }));
 
                 // Set a success message instead of an alert
-                setFetchMessage('Successfully fetched the latest sensor data!');
+                setFetchMessage(t('fetchSuccess'));
             } else {
                 // Set an error message
-                setFetchMessage('Could not find any sensor data in the database.');
+                setFetchMessage(t('fetchEmpty'));
             }
         } catch (error) {
             console.error("Error fetching data from Firebase:", error);
             // Set an error message
-            setFetchMessage('An error occurred while fetching data.');
+            setFetchMessage(t('fetchError'));
         } finally {
             setIsFetching(false);
         }
@@ -1185,7 +632,7 @@ const App = () => {
     };
 
     const toggleChat = () => setChatOpen(!chatOpen);
-    const toggleDarkMode = () => setDarkMode(!darkMode);
+
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     useEffect(() => {
@@ -1198,30 +645,45 @@ const App = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Close Sidebar
             if (sidebarOpen && !event.target.closest('.sidebar') && !event.target.closest('.hamburger-btn')) {
                 setSidebarOpen(false);
+            }
+
+            // Close Profile Menu
+            if (showProfileMenu && profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+                setShowProfileMenu(false);
+            }
+
+            // Close Chatbot
+            // Check if click is outside chat window AND outside the toggle button
+            if (chatOpen &&
+                chatbotRef.current && !chatbotRef.current.contains(event.target) &&
+                chatbotToggleRef.current && !chatbotToggleRef.current.contains(event.target)
+            ) {
+                setChatOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [sidebarOpen]);
+    }, [sidebarOpen, showProfileMenu, chatOpen]);
 
     const diseaseOutbreaks = [
-        { id: 1, name: 'Diarrhea Outbreak', state: 'Uttar Pradesh', cases: 95000, rate: 25.5, severity: 'critical', position: [26.8467, 80.9462], healthContact: "104", nearbyHospitals: 25, latestNews: "Govt. launches new initiative for clean drinking water in rural UP." },
-        { id: 2, name: 'Cholera Outbreak', state: 'West Bengal', cases: 88000, rate: 22.1, severity: 'high', position: [22.5726, 88.3639], healthContact: "108", nearbyHospitals: 18, latestNews: "Health department issues high alert following monsoon flooding in Kolkata." },
-        { id: 3, name: 'Typhoid Outbreak', state: 'Maharashtra', cases: 75000, rate: 20.8, severity: 'medium', position: [19.0760, 72.8777], healthContact: "102", nearbyHospitals: 14, latestNews: "Vaccination drive for Typhoid begins in Mumbai and surrounding areas." },
-        { id: 4, name: 'Hepatitis Outbreak', state: 'Bihar', cases: 62000, rate: 18.2, severity: 'low', position: [25.0961, 85.3131], healthContact: "103", nearbyHospitals: 10, latestNews: "Awareness campaigns about contaminated water sources are underway." },
-        { id: 5, name: 'Gastroenteritis', state: 'Gujarat', cases: 55000, rate: 16.5, severity: 'medium', position: [23.0225, 72.5714], healthContact: "108", nearbyHospitals: 12, latestNews: "Mobile medical units dispatched to rural districts of Gujarat." },
-        { id: 6, name: 'Typhoid Fever', state: 'Punjab', cases: 48000, rate: 15.3, severity: 'low', position: [30.7333, 76.7794], healthContact: "101", nearbyHospitals: 9, latestNews: "Community health camps are being organized in key villages." },
+        { id: 1, name: t('outbreaks.diarrhea.name'), diseaseKey: 'gastroenteritis', state: t('states.UP'), cases: 95000, rate: 25.5, severity: 'critical', position: [26.8467, 80.9462], healthContact: "104", nearbyHospitals: 25, latestNews: t('outbreaks.diarrhea.news') },
+        { id: 2, name: t('outbreaks.cholera.name'), diseaseKey: 'cholera', state: t('states.WB'), cases: 88000, rate: 22.1, severity: 'high', position: [22.5726, 88.3639], healthContact: "108", nearbyHospitals: 18, latestNews: t('outbreaks.cholera.news') },
+        { id: 3, name: t('outbreaks.typhoid.name'), diseaseKey: 'typhoid', state: t('states.MH'), cases: 75000, rate: 20.8, severity: 'medium', position: [19.0760, 72.8777], healthContact: "102", nearbyHospitals: 14, latestNews: t('outbreaks.typhoid.news') },
+        { id: 4, name: t('outbreaks.hepatitis.name'), diseaseKey: 'hepatitisA', state: t('states.BR'), cases: 62000, rate: 18.2, severity: 'low', position: [25.0961, 85.3131], healthContact: "103", nearbyHospitals: 10, latestNews: t('outbreaks.hepatitis.news') },
+        { id: 5, name: t('outbreaks.gastroenteritis.name'), diseaseKey: 'gastroenteritis', state: t('states.GJ'), cases: 55000, rate: 16.5, severity: 'medium', position: [23.0225, 72.5714], healthContact: "108", nearbyHospitals: 12, latestNews: t('outbreaks.gastroenteritis.news') },
+        { id: 6, name: t('outbreaks.typhoidFever.name'), diseaseKey: 'typhoid', state: t('states.PB'), cases: 48000, rate: 15.3, severity: 'low', position: [30.7333, 76.7794], healthContact: "101", nearbyHospitals: 9, latestNews: t('outbreaks.typhoidFever.news') },
     ];
 
     const communityEvents = [
-        { id: 1, title: 'Online Health Webinar', type: 'online', platform: 'Zoom', date: 'October 20, 2025', time: '3:00 PM - 5:00 PM', description: 'Join our health education initiatives and community events across India to learn about water safety and disease prevention.', attendees: 250, status: 'upcoming' },
-        { id: 2, title: 'Rural Health Camp', type: 'offline', venue: 'Tura Community Center, Meghalaya', date: 'November 5, 2025', time: '9:00 AM - 3:00 PM', description: 'Free health checkups and water quality testing.', attendees: 85, status: 'upcoming' },
-        { id: 3, title: 'Water Quality Workshop', type: 'online', platform: 'Microsoft Teams', date: 'November 15, 2025', time: '11:00 AM - 1:00 PM', description: 'Virtual training session on water purification.', attendees: 180, status: 'upcoming' },
-        { id: 4, title: 'Village Health Screening', type: 'offline', venue: 'Kohima School Complex, Nagaland', date: 'December 2, 2025', time: '8:00 AM - 2:00 PM', description: 'Special health camp focusing on pediatric waterborne diseases.', attendees: 200, status: 'upcoming' },
-        { id: 5, title: 'Water Safety Training', type: 'offline', venue: 'Public Hall, Patna, Bihar', date: 'December 15, 2025', time: '10:00 AM - 1:00 PM', description: 'Hands-on training for community leaders on water safety.', attendees: 120, status: 'upcoming' },
-        { id: 6, title: 'AI for Public Health Seminar', type: 'online', platform: 'Google Meet', date: 'January 10, 2026', time: '2:00 PM - 4:00 PM', description: 'Discussing the future of AI in public health.', attendees: 300, status: 'upcoming' },
+        { id: 1, title: t('events.webinar.title'), type: 'online', platform: 'Zoom', date: 'October 20, 2025', time: '3:00 PM - 5:00 PM', description: t('events.webinar.desc'), attendees: 250, status: 'upcoming' },
+        { id: 2, title: t('events.camp.title'), type: 'offline', venue: 'Tura Community Center, Meghalaya', date: 'November 5, 2025', time: '9:00 AM - 3:00 PM', description: t('events.camp.desc'), attendees: 85, status: 'upcoming' },
+        { id: 3, title: t('events.workshop.title'), type: 'online', platform: 'Microsoft Teams', date: 'November 15, 2025', time: '11:00 AM - 1:00 PM', description: t('events.workshop.desc'), attendees: 180, status: 'upcoming' },
+        { id: 4, title: t('events.screening.title'), type: 'offline', venue: 'Kohima School Complex, Nagaland', date: 'December 2, 2025', time: '8:00 AM - 2:00 PM', description: t('events.screening.desc'), attendees: 200, status: 'upcoming' },
+        { id: 5, title: t('events.training.title'), type: 'offline', venue: 'Public Hall, Patna, Bihar', date: 'December 15, 2025', time: '10:00 AM - 1:00 PM', description: t('events.training.desc'), attendees: 120, status: 'upcoming' },
+        { id: 6, title: t('events.seminar.title'), type: 'online', platform: 'Google Meet', date: 'January 10, 2026', time: '2:00 PM - 4:00 PM', description: t('events.seminar.desc'), attendees: 300, status: 'upcoming' },
     ];
 
     const allIndiaStats = [
@@ -1273,11 +735,35 @@ const App = () => {
                             <h1 className="h4 fw-bold mb-0">JAL-RAKSHAK</h1>
                         </div>
 
-                        <div className="d-flex align-items-center">
-                            <span className="text-white me-3 d-none d-md-block">Welcome, <span className="fw-bold text-info">{userName || 'User'}</span></span>
-                            <div className="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold" style={{ width: '40px', height: '40px', fontSize: '1.2rem' }}>
-                                {userName ? userName.charAt(0).toUpperCase() : 'U'}
+                        <div className="d-flex align-items-center position-relative" ref={profileDropdownRef}>
+                            <div
+                                className="d-flex align-items-center cursor-pointer"
+                                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <span className="text-white me-3 d-none d-md-block">{t('welcomeUser')} <span className="fw-bold text-info">{userName || 'User'}</span></span>
+                                <div className="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold" style={{ width: '40px', height: '40px', fontSize: '1.2rem' }}>
+                                    {userName ? userName.charAt(0).toUpperCase() : 'U'}
+                                </div>
                             </div>
+
+                            <AnimatePresence>
+                                {showProfileMenu && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="jr-profile-dropdown"
+                                    >
+                                        <button onClick={handleLogout} className="jr-dropdown-item w-100 text-start">
+                                            <FaExchangeAlt className="me-2 text-warning" /> Switch Account
+                                        </button>
+                                        <button onClick={handleLogout} className="jr-dropdown-item w-100 text-start border-top border-secondary pt-2 mt-1">
+                                            <FaSignOutAlt className="me-2 text-danger" /> Logout
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
@@ -1358,6 +844,15 @@ const App = () => {
                                 </button>
                             </li>
 
+                            <li>
+                                <button
+                                    onClick={() => { setActiveTab('readings'); setSidebarOpen(false); }}
+                                    className={`sidebar-link ${activeTab === 'readings' ? 'active' : ''}`}
+                                >
+                                    <div className="sidebar-icon"><FaClipboardList /></div> {t('readings') || 'Readings'}
+                                </button>
+                            </li>
+
                             {/* Devices Dropdown */}
                             <li>
                                 <button
@@ -1420,17 +915,31 @@ const App = () => {
                                 <small className="text-uppercase text-muted fw-bold mb-3 d-block px-2" style={{ fontSize: '0.7rem', letterSpacing: '0.1em' }}>{t('language')}</small>
                                 <div className="d-grid gap-2 px-2">
                                     <div className="row g-2">
-                                        {['en', 'hi', 'as', 'bn'].map(lang => (
-                                            <div className="col-6" key={lang}>
-                                                <button
-                                                    onClick={() => setLanguage(lang)}
-                                                    className={`btn btn-sm w-100 ${language === lang ? 'btn-info text-dark fw-bold' : 'btn-outline-secondary text-light'}`}
-                                                    style={{ borderRadius: '8px', fontSize: '0.8rem', borderColor: language === lang ? 'transparent' : 'rgba(255,255,255,0.1)' }}
-                                                >
-                                                    {t(lang === 'en' ? 'english' : lang === 'hi' ? 'hindi' : lang === 'as' ? 'assamese' : 'bengali')}
-                                                </button>
-                                            </div>
-                                        ))}
+                                        {['en', 'hi', 'as', 'bn', 'mr', 'te', 'ta', 'gu', 'ur', 'kn'].map(lang => {
+                                            const langKeys = {
+                                                en: 'english',
+                                                hi: 'hindi',
+                                                as: 'assamese',
+                                                bn: 'bengali',
+                                                mr: 'marathi',
+                                                te: 'telugu',
+                                                ta: 'tamil',
+                                                gu: 'gujarati',
+                                                ur: 'urdu',
+                                                kn: 'kannada'
+                                            };
+                                            return (
+                                                <div className="col-6" key={lang}>
+                                                    <button
+                                                        onClick={() => i18n.changeLanguage(lang)}
+                                                        className={`btn btn-sm w-100 ${i18n.language === lang ? 'btn-info text-dark fw-bold' : 'btn-outline-secondary text-light'}`}
+                                                        style={{ borderRadius: '8px', fontSize: '0.8rem', borderColor: i18n.language === lang ? 'transparent' : 'rgba(255,255,255,0.1)' }}
+                                                    >
+                                                        {t(langKeys[lang])}
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </li>
@@ -1439,21 +948,18 @@ const App = () => {
                 </aside>
 
                 <main
+                    className="jr-main-content"
                     style={{
                         marginLeft: sidebarOpen ? '280px' : '0',
-                        padding: '24px',
-                        width: '100%',
-                        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        background: 'transparent'
                     }}
                 >
                     {activeTab === 'home' && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            <div className="jr-hero-container mb-4 d-flex flex-column justify-content-center text-center p-5" style={{ minHeight: '300px' }}>
+                            <div className="jr-hero-container mb-4 d-flex flex-column justify-content-center text-center p-3 p-md-5" style={{ minHeight: '300px' }}>
                                 <div style={{ zIndex: 2 }}>
                                     <div className="jr-hero-sub-badge">{t('heroTitleBadge')}</div>
                                     <h1 className="jr-hero-title">{t('heroTitleMain')}</h1>
-                                    <p className="jr-hero-subtitle">Real-time Surveillance and Response System for Water-Borne Diseases</p>
+                                    <p className="jr-hero-subtitle">{t('heroSubtitle')}</p>
 
                                     <div className="d-flex justify-content-center gap-3 mt-4 flex-wrap">
                                         <span className="jr-hero-pill">{t('heroPill1')}</span>
@@ -1573,7 +1079,7 @@ const App = () => {
                                             <tr>
                                                 <th scope="col">{t('disease')}</th>
                                                 <th scope="col">{t('state')}</th>
-                                                <th scope="col">{t('severity')}</th>
+                                                <th scope="col">{t('severityLabel')}</th>
                                                 <th scope="col">{t('responseTeam')}</th>
                                                 <th scope="col">{t('lastUpdate')}</th>
                                             </tr>
@@ -1585,7 +1091,7 @@ const App = () => {
                                                     <td className="text-white-50">{outbreak.state}</td>
                                                     <td>
                                                         <span className={`jr-badge-cell ${outbreak.severity === 'critical' ? 'jr-badge-critical' : outbreak.severity === 'high' ? 'jr-badge-high' : 'jr-badge-medium'}`}>
-                                                            {outbreak.severity.toUpperCase()}
+                                                            {t(`severity.${outbreak.severity}`).toUpperCase()}
                                                         </span>
                                                     </td>
                                                     <td className="text-cyan"><span className="d-flex align-items-center gap-2"><div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }}></div> Deployed</span></td>
@@ -1622,7 +1128,10 @@ const App = () => {
                                                         name="water_source_type"
                                                         value={waterFormData.water_source_type}
                                                         onChange={handleWaterInputChange}
-                                                        options={['River', 'Well', 'Lake', 'Pond', 'Tap Water', 'Borewell', 'Rainwater']}
+                                                        options={['River', 'Well', 'Lake', 'Pond', 'Tap Water', 'Borewell', 'Rainwater'].map(opt => ({
+                                                            value: opt,
+                                                            label: t(`waterSources.${opt === 'Tap Water' ? 'tap' : opt.toLowerCase()}`)
+                                                        }))}
                                                         placeholder={t('selectSource')}
                                                     />
                                                 </div>
@@ -1665,7 +1174,10 @@ const App = () => {
                                                         name="uv_sensor"
                                                         value={waterFormData.uv_sensor}
                                                         onChange={handleWaterInputChange}
-                                                        options={['Blue', 'Green', 'Red']}
+                                                        options={['Blue', 'Green', 'Red'].map(opt => ({
+                                                            value: opt,
+                                                            label: t(`colors.${opt.toLowerCase()}`)
+                                                        }))}
                                                         placeholder={t('selectColor')}
                                                     />
                                                 </div>
@@ -1760,6 +1272,19 @@ const App = () => {
                                                 {waterAnalysisError && (
                                                     <div className="text-center small mt-2 text-danger bg-danger bg-opacity-10 p-2 rounded">{waterAnalysisError}</div>
                                                 )}
+
+                                                {waterAnalysisResult && (
+                                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-3 text-center">
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleSaveReading}
+                                                            className="jr-btn-fetch w-100"
+                                                            style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)' }}
+                                                        >
+                                                            <FaClipboardList className="me-2" /> {t('saveReading') || 'Save Readings'}
+                                                        </button>
+                                                    </motion.div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1811,9 +1336,9 @@ const App = () => {
                                                             onChange={handleInputChange}
                                                             placeholder={t('gender')}
                                                             options={[
-                                                                { value: 'male', label: t('genderOptions').male },
-                                                                { value: 'female', label: t('genderOptions').female },
-                                                                { value: 'other', label: t('genderOptions').other }
+                                                                { value: 'male', label: t('genderOptions.male') },
+                                                                { value: 'female', label: t('genderOptions.female') },
+                                                                { value: 'other', label: t('genderOptions.other') }
                                                             ]}
                                                         />
                                                     </div>
@@ -1834,7 +1359,7 @@ const App = () => {
                                                     <label className="jr-label">{t('symptoms')}</label>
                                                     <div className="p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                         <div className="row">
-                                                            {t('symptomsList').map((symptom, index) => (
+                                                            {t('symptomsList', { returnObjects: true }).map((symptom, index) => (
                                                                 <div key={index} className="col-md-6 mb-2">
                                                                     <div className="form-check">
                                                                         <input
@@ -1876,11 +1401,11 @@ const App = () => {
                                                                     <div key={idx} className="p-3 rounded text-start" style={{ background: 'rgba(59, 130, 246, 0.1)', borderLeft: '4px solid #3b82f6' }}>
                                                                         <div className="d-flex justify-content-between mb-1">
                                                                             <strong className="text-white">{result.name}</strong>
-                                                                            <span className="badge bg-primary">{result.probability}% Match</span>
+                                                                            <span className="badge bg-primary">{result.probability}% {t('match')}</span>
                                                                         </div>
                                                                         <p className="small text-muted mb-2">{result.description}</p>
                                                                         <div className="small">
-                                                                            <strong className="text-white-50">Remedies:</strong>
+                                                                            <strong className="text-white-50">{t('remedies')}</strong>
                                                                             <ul className="mb-0 ps-3">
                                                                                 {result.remedies.map((remedy, rIdx) => (
                                                                                     <li key={rIdx} className="text-muted">{remedy}</li>
@@ -1906,8 +1431,9 @@ const App = () => {
                         )
                     }
 
-                    {
 
+
+                    {
                         activeTab === 'community' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                 <div className="jr-card" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -1956,17 +1482,17 @@ const App = () => {
                                                 <motion.div whileHover={{ scale: 1.02 }} className="jr-card p-3 d-flex align-items-center text-center">
                                                     <div className="jr-icon-wrapper mb-2"><FaVideo /></div>
                                                     <h5 className="h6 fw-bold text-white">{t('onlinePrograms')}</h5>
-                                                    <p className="small mb-0 text-muted">Webinars and virtual workshops</p>
+                                                    <p className="small mb-0 text-muted">{t('highlights.online')}</p>
                                                 </motion.div>
                                                 <motion.div whileHover={{ scale: 1.02 }} className="jr-card p-3 d-flex align-items-center text-center">
                                                     <div className="jr-icon-wrapper mb-2"><FaUsers /></div>
                                                     <h5 className="h6 fw-bold text-white">{t('offlineEvents')}</h5>
-                                                    <p className="small mb-0 text-muted">Health camps and field visits</p>
+                                                    <p className="small mb-0 text-muted">{t('highlights.offline')}</p>
                                                 </motion.div>
                                                 <motion.div whileHover={{ scale: 1.02 }} className="jr-card p-3 d-flex align-items-center text-center">
                                                     <div className="jr-icon-wrapper mb-2"><FaFlask /></div>
                                                     <h5 className="h6 fw-bold text-white">{t('waterTesting')}</h5>
-                                                    <p className="small mb-0 text-muted">Quality assessment and purification</p>
+                                                    <p className="small mb-0 text-muted">{t('highlights.testing')}</p>
                                                 </motion.div>
                                             </div>
                                         </div>
@@ -1983,7 +1509,7 @@ const App = () => {
                                     {/* Main Chat Area */}
                                     <div className="jr-chat-main-area">
                                         {/* Header */}
-                                        <div className="jr-chat-header px-4 py-3">
+                                        <div className="jr-chat-header">
 
 
                                             <div className="d-flex align-items-center gap-3">
@@ -1992,7 +1518,7 @@ const App = () => {
                                                     <h2 className="h5 fw-bold text-white mb-0">{t('chatTitle')}</h2>
                                                     <div className="d-flex align-items-center gap-2">
                                                         <span className="bg-success rounded-circle" style={{ width: 8, height: 8 }}></span>
-                                                        <span className="text-white-50 small">Online • Jal-Rakshak AI</span>
+                                                        <span className="text-white-50 small">{t('onlineAI')}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2078,9 +1604,9 @@ const App = () => {
                                         <div className="jr-info-card">
                                             <h4 className="h6 fw-bold text-white mb-3">{t('chatFeatures')}</h4>
                                             <ul className="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
-                                                <li className="d-flex gap-2"><span className="text-success">✔</span> 24/7 AI Health Support</li>
-                                                <li className="d-flex gap-2"><span className="text-success">✔</span> Multi-language Support</li>
-                                                <li className="d-flex gap-2"><span className="text-success">✔</span> Symptom Analysis</li>
+                                                <li className="d-flex gap-2"><span className="text-success">✔</span> {t('chatFeaturesList.aiSupport')}</li>
+                                                <li className="d-flex gap-2"><span className="text-success">✔</span> {t('chatFeaturesList.multiLang')}</li>
+                                                <li className="d-flex gap-2"><span className="text-success">✔</span> {t('chatFeaturesList.symptomAnalysis')}</li>
                                             </ul>
                                         </div>
 
@@ -2090,7 +1616,7 @@ const App = () => {
                                                 <span className="fw-bold text-white">Jal-Rakshak</span>
                                             </div>
                                             <p className="small text-white-50 mb-0">
-                                                Empowering communities with real-time water safety intelligence.
+                                                {t('footerSlogan')}
                                             </p>
                                         </div>
                                     </div>
@@ -2117,9 +1643,9 @@ const App = () => {
 
                                             <h3 className="h5 fw-bold mb-3 text-white">{t('techStack')}</h3>
                                             <ul className="list-group list-group-flush bg-transparent">
-                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaRobot className="me-2 text-primary" /> AI/ML Models</li>
-                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaMicrochip className="me-2 text-success" /> IoT Sensors</li>
-                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaBolt className="me-2 text-warning" /> Real-time Alert System</li>
+                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaRobot className="me-2 text-primary" /> {t('techStackItems.aiModels')}</li>
+                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaMicrochip className="me-2 text-success" /> {t('techStackItems.iotSensors')}</li>
+                                                <li className="list-group-item bg-transparent text-white-50 border-secondary"><FaBolt className="me-2 text-warning" /> {t('techStackItems.alertSystem')}</li>
                                             </ul>
                                         </div>
                                         <div className="col-lg-6 mt-4 mt-lg-0">
@@ -2136,8 +1662,8 @@ const App = () => {
                                                             />
                                                             <div className="position-absolute bottom-0 end-0 bg-success rounded-circle" style={{ width: '15px', height: '15px', border: '2px solid #0f172a' }}></div>
                                                         </div>
-                                                        <div className="fw-bold small text-white">{member.name}</div>
-                                                        <div className="small text-muted" style={{ fontSize: '0.75rem' }}>Core Member</div>
+                                                        <div className="fw-bold small text-white">{t(`team.${member.name.toLowerCase()}`)}</div>
+                                                        <div className="small text-muted" style={{ fontSize: '0.75rem' }}>{t('coreMember')}</div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -2170,7 +1696,7 @@ const App = () => {
                                             <p><strong>{t('state')}:</strong> {selectedOutbreak.state}</p>
                                             <p><strong>{t('cases')}:</strong> {selectedOutbreak.cases.toLocaleString()}</p>
                                             <p><strong>{t('rate')}:</strong> {selectedOutbreak.rate}/1000</p>
-                                            <p><strong>{t('description')}:</strong> {t(`diseases.${selectedOutbreak.name.split(' ')[0].toLowerCase()}`).description}</p>
+                                            <p><strong>{t('description')}:</strong> {t(`diseases.${selectedOutbreak.diseaseKey || 'gastroenteritis'}.description`)}</p>
                                         </div>
                                         <div className="col-md-4">
                                             <div className={`p-3 rounded ${darkMode ? 'bg-secondary' : 'bg-light'}`}>
@@ -2195,7 +1721,197 @@ const App = () => {
                     </div>
                 )
             }
+
+            {
+                activeTab === 'readings' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="jr-card" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                            <div className="jr-card-header mb-4 d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="jr-icon-wrapper"><FaClipboardList /></div>
+                                    {t('savedReadings') || 'Saved Readings'}
+                                </div>
+                                <button className="jr-btn-fetch" style={{ width: 'auto' }} onClick={fetchReadings}>Refresh</button>
+                            </div>
+
+                            {savedReadings.length === 0 ? (
+                                <div className="text-center py-5">
+                                    <div className="text-white-50 mb-3" style={{ fontSize: '3rem' }}>
+                                        <FaClipboardList />
+                                    </div>
+                                    <h5 className="text-white">No saved readings yet</h5>
+                                    <p className="text-white-50 small">Submit water data to generate and save reports.</p>
+                                </div>
+                            ) : (
+                                <div className="jr-readings-grid">
+                                    {savedReadings.map((reading) => (
+                                        <div key={reading.id} className="jr-reading-card">
+                                            <div className="jr-reading-card-header" onClick={() => setSelectedReading(reading)}>
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <div className="jr-source-icon">
+                                                        {reading.water_source === 'River' || reading.water_source === 'Lake' ? <FaTint /> : <FaFaucet />}
+                                                    </div>
+                                                    <div>
+                                                        <h6 className="mb-0 text-white fw-bold">{reading.device_name || 'Manual Entry'}</h6>
+                                                        <small className="text-white-50" style={{ fontSize: '0.75rem' }}>
+                                                            {new Date(reading.timestamp).toLocaleDateString()}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <span className={`jr-reading-badge ${reading.risk_level === 'Safe' ? 'safe' : reading.risk_level === 'Unsafe' ? 'unsafe' : 'moderate'}`}>
+                                                    {reading.risk_level}
+                                                </span>
+                                            </div>
+
+                                            <div className="jr-reading-card-body" onClick={() => setSelectedReading(reading)}>
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                    <span className="text-white-50 small">Source</span>
+                                                    <span className="text-white small">{reading.water_source}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="jr-reading-card-footer" style={{ position: 'relative', zIndex: 2 }}>
+                                                <button
+                                                    className="btn btn-sm btn-link text-white-50 p-0 text-decoration-none"
+                                                    onClick={() => setSelectedReading(reading)}
+                                                    style={{ position: 'relative', zIndex: 3 }}
+                                                >
+                                                    View Details
+                                                </button>
+                                                <button
+                                                    className="btn btn-sm btn-icon text-danger"
+                                                    onClick={async () => {
+                                                        if (window.confirm('Delete this reading?')) {
+                                                            const { error } = await supabase.from('user_readings').delete().eq('id', reading.id);
+                                                            if (error) {
+                                                                alert('Error deleting: ' + error.message);
+                                                            } else {
+                                                                fetchReadings();
+                                                            }
+                                                        }
+                                                    }}
+                                                    style={{ position: 'relative', zIndex: 3 }}
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )
+            }
+
+            {/* Selected Reading Details Modal */}
+            {selectedReading && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1055, backdropFilter: 'blur(5px)' }}>
+                    <div className="modal-dialog modal-lg modal-dialog-centered">
+                        <div className="jr-modal-glass">
+                            <div className="jr-modal-header">
+                                <h5 className="modal-title d-flex align-items-center gap-2 text-white">
+                                    <FaClipboardList className="text-primary" />
+                                    Reading Details
+                                </h5>
+                                <button type="button" className="jr-btn-close-glass" onClick={() => setSelectedReading(null)}>
+                                    <FaTimes />
+                                </button>
+                            </div>
+                            <div className="jr-modal-body">
+                                <div className="row g-4">
+                                    {/* General Info Section */}
+                                    <div className="col-md-6">
+                                        <div className="jr-info-section">
+                                            <h6 className="jr-section-title">General Info</h6>
+                                            <div className="d-flex flex-column gap-3">
+                                                <div>
+                                                    <div className="jr-modal-label">Device Name</div>
+                                                    <div className="jr-modal-value">{selectedReading.device_name || 'Manual Entry'}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="jr-modal-label">Timestamp</div>
+                                                    <div className="jr-modal-value fs-6">{new Date(selectedReading.timestamp).toLocaleString()}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="jr-modal-label">Source</div>
+                                                    <div className="d-flex align-items-center gap-2 mt-1">
+                                                        <span className="text-white fs-5">{selectedReading.water_source}</span>
+                                                        <span className="jr-source-icon-small">
+                                                            {selectedReading.water_source === 'River' || selectedReading.water_source === 'Lake' ? <FaTint /> : <FaFaucet />}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Analysis Section */}
+                                    <div className="col-md-6">
+                                        <div className="jr-info-section h-100">
+                                            <h6 className="jr-section-title">Analysis Results</h6>
+                                            <div className="d-flex flex-column gap-4">
+                                                <div>
+                                                    <div className="jr-modal-label mb-2">Overall Status</div>
+                                                    <span className={`jr-reading-badge ${selectedReading.risk_level === 'Safe' ? 'safe' : selectedReading.risk_level === 'Unsafe' ? 'unsafe' : 'moderate'} fs-6 px-3 py-2`}>
+                                                        {selectedReading.risk_level}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <div className="jr-modal-label mb-2">Prediction Model</div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <span className={`jr-reading-badge ${selectedReading.analysis_result?.risk_level === 'Safe' ? 'safe' : 'unsafe'} opacity-75`}>
+                                                            {selectedReading.analysis_result?.risk_level || selectedReading.risk_level}
+                                                        </span>
+                                                        <div>
+                                                            <div className="jr-modal-label">Confidence</div>
+                                                            <div className="text-white fw-bold">{(selectedReading.confidence * 100).toFixed(1)}%</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Water Parameters Grid */}
+                                    <div className="col-12">
+                                        <div className="jr-info-section">
+                                            <h6 className="jr-section-title mb-4">Water Parameters</h6>
+                                            <div className="jr-parameters-grid">
+                                                <div className="jr-parameter-item">
+                                                    <div className="jr-modal-label">pH Level</div>
+                                                    <div className="jr-modal-large-value text-info">{selectedReading.ph}</div>
+                                                </div>
+                                                <div className="jr-parameter-item">
+                                                    <div className="jr-modal-label">Turbidity</div>
+                                                    <div className="jr-modal-large-value text-warning">{selectedReading.turbidity} <span className="fs-6 text-muted">NTU</span></div>
+                                                </div>
+                                                <div className="jr-parameter-item">
+                                                    <div className="jr-modal-label">Contaminants</div>
+                                                    <div className="jr-modal-large-value text-danger">{selectedReading.contaminant_level} <span className="fs-6 text-muted">ppm</span></div>
+                                                </div>
+                                                <div className="jr-parameter-item">
+                                                    <div className="jr-modal-label">Temperature</div>
+                                                    <div className="jr-modal-large-value text-primary">{selectedReading.temperature}<span className="fs-6 text-muted">°C</span></div>
+                                                </div>
+                                                <div className="jr-parameter-item">
+                                                    <div className="jr-modal-label">Conductivity</div>
+                                                    <div className="jr-modal-large-value text-success">{selectedReading.conductivity} <span className="fs-6 text-muted">µS/cm</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="jr-modal-footer">
+                                <button type="button" className="jr-btn-glass" onClick={() => setSelectedReading(null)}>Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             <button
+                ref={chatbotToggleRef}
                 onClick={toggleChat}
                 aria-label="Open Jal-Rakshak AI chat window"
                 className="jr-chat-toggle"
@@ -2206,6 +1922,7 @@ const App = () => {
             <AnimatePresence>
                 {chatOpen && (
                     <motion.div
+                        ref={chatbotRef}
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -2220,7 +1937,7 @@ const App = () => {
                                 </div>
                                 <div>
                                     <div className="fw-bold text-white" style={{ fontSize: '0.95rem' }}>{t('chatTitle')}</div>
-                                    <div className="text-white-50" style={{ fontSize: '0.75rem' }}>Online • AI Assistant</div>
+                                    <div className="text-white-50" style={{ fontSize: '0.75rem' }}>{t('onlineAssistant')}</div>
                                 </div>
                             </div>
                             <button onClick={toggleChat} className="btn-close btn-close-white opacity-75 hover-opacity-100"></button>
@@ -2275,93 +1992,97 @@ const App = () => {
                 )}
             </AnimatePresence>
             {/* Add Device Modal - Global */}
-            {showAddDeviceModal && (
-                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content text-white" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="modal-header border-secondary">
-                                <h5 className="modal-title">{t('addNewDevice')}</h5>
-                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowAddDeviceModal(false)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <form onSubmit={handleAddDevice}>
-                                    <div className="mb-3">
-                                        <label className="form-label text-muted">{t('deviceName')}</label>
-                                        <input
-                                            type="text"
-                                            className="form-control bg-dark text-white border-secondary"
-                                            value={newDeviceData.name}
-                                            onChange={e => setNewDeviceData({ ...newDeviceData, name: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label text-muted">{t('deviceId')}</label>
-                                        <input
-                                            type="text"
-                                            className="form-control bg-dark text-white border-secondary"
-                                            value={newDeviceData.id}
-                                            onChange={e => setNewDeviceData({ ...newDeviceData, id: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="d-grid">
-                                        <button type="submit" className="btn btn-primary" disabled={deviceLoading}>
-                                            {deviceLoading ? t('adding') : t('addNewDevice')}
-                                        </button>
-                                    </div>
-                                </form>
+            {
+                showAddDeviceModal && (
+                    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content text-white" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div className="modal-header border-secondary">
+                                    <h5 className="modal-title">{t('addNewDevice')}</h5>
+                                    <button type="button" className="btn-close btn-close-white" onClick={() => setShowAddDeviceModal(false)}></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={handleAddDevice}>
+                                        <div className="mb-3">
+                                            <label className="form-label text-muted">{t('deviceName')}</label>
+                                            <input
+                                                type="text"
+                                                className="form-control bg-dark text-white border-secondary"
+                                                value={newDeviceData.name}
+                                                onChange={e => setNewDeviceData({ ...newDeviceData, name: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label text-muted">{t('deviceId')}</label>
+                                            <input
+                                                type="text"
+                                                className="form-control bg-dark text-white border-secondary"
+                                                value={newDeviceData.id}
+                                                onChange={e => setNewDeviceData({ ...newDeviceData, id: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="d-grid">
+                                            <button type="submit" className="btn btn-primary" disabled={deviceLoading}>
+                                                {deviceLoading ? t('adding') : t('addNewDevice')}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Contact Us Modal */}
-            {showContactModal && (
-                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }} onClick={() => setShowContactModal(false)}>
-                    <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
-                        <div className="modal-content text-white" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="modal-header border-secondary">
-                                <h5 className="modal-title">{t('contactUs')}</h5>
-                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowContactModal(false)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <div className="d-flex flex-column gap-3">
-                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
-                                        <div className="d-flex align-items-center mb-1">
-                                            <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
-                                                <span className="fw-bold text-white">A</span>
+            {
+                showContactModal && (
+                    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }} onClick={() => setShowContactModal(false)}>
+                        <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
+                            <div className="modal-content text-white" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div className="modal-header border-secondary">
+                                    <h5 className="modal-title">{t('contactUs')}</h5>
+                                    <button type="button" className="btn-close btn-close-white" onClick={() => setShowContactModal(false)}></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="d-flex flex-column gap-3">
+                                        <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                            <div className="d-flex align-items-center mb-1">
+                                                <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                    <span className="fw-bold text-white">A</span>
+                                                </div>
+                                                <h6 className="fw-bold mb-0 text-white">Abhimanyu</h6>
                                             </div>
-                                            <h6 className="fw-bold mb-0 text-white">Abhimanyu</h6>
+                                            <a href="mailto:abhimanyusharma.xi@gmail.com" className="text-decoration-none ms-5 d-block text-info small">abhimanyusharma.xi@gmail.com</a>
                                         </div>
-                                        <a href="mailto:abhimanyusharma.xi@gmail.com" className="text-decoration-none ms-5 d-block text-info small">abhimanyusharma.xi@gmail.com</a>
-                                    </div>
-                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
-                                        <div className="d-flex align-items-center mb-1">
-                                            <div className="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
-                                                <span className="fw-bold text-white">R</span>
+                                        <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                            <div className="d-flex align-items-center mb-1">
+                                                <div className="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                    <span className="fw-bold text-white">R</span>
+                                                </div>
+                                                <h6 className="fw-bold mb-0 text-white">Rudra</h6>
                                             </div>
-                                            <h6 className="fw-bold mb-0 text-white">Rudra</h6>
+                                            <a href="mailto:rudrarana02006@gmail.com" className="text-decoration-none ms-5 d-block text-info small">rudrarana02006@gmail.com</a>
                                         </div>
-                                        <a href="mailto:rudrarana02006@gmail.com" className="text-decoration-none ms-5 d-block text-info small">rudrarana02006@gmail.com</a>
-                                    </div>
-                                    <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
-                                        <div className="d-flex align-items-center mb-1">
-                                            <div className="bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
-                                                <span className="fw-bold text-white">S</span>
+                                        <div className="p-3 rounded bg-dark bg-opacity-50 border border-secondary">
+                                            <div className="d-flex align-items-center mb-1">
+                                                <div className="bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
+                                                    <span className="fw-bold text-white">S</span>
+                                                </div>
+                                                <h6 className="fw-bold mb-0 text-white">Siddharth</h6>
                                             </div>
-                                            <h6 className="fw-bold mb-0 text-white">Siddharth</h6>
+                                            <a href="mailto:siddharthjaspal@gmail.com" className="text-decoration-none ms-5 d-block text-info small">siddharthjaspal@gmail.com</a>
                                         </div>
-                                        <a href="mailto:siddharthjaspal@gmail.com" className="text-decoration-none ms-5 d-block text-info small">siddharthjaspal@gmail.com</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

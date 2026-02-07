@@ -1,0 +1,350 @@
+{
+    "saveReading": "Save Readings",
+    "home": "Home",
+    "submitWaterData": "Submit Data",
+    "diseasePrediction": "Disease Prediction",
+    "community": "Community Outreach",
+    "aiAssistant": "AI Assistant",
+    "about": "About Us",
+    "language": "Language",
+    "english": "English",
+    "hindi": "Hindi",
+    "assamese": "Assamese",
+    "bengali": "Bengali",
+    "marathi": "Marathi",
+    "telugu": "Telugu",
+    "tamil": "Tamil",
+    "gujarati": "Gujarati",
+    "urdu": "Urdu",
+    "kannada": "Kannada",
+    "heroTitle": "All-India Waterborne Disease Monitor",
+    "heroSubtitle": "Real-time Surveillance and Response System for Water-Borne Diseases",
+    "outbreakTitle": "Diarrhea Outbreak",
+    "statisticsTitle": "All-India State Comparison",
+    "trendsTitle": "Disease Trends (Monthly)",
+    "emergencyTitle": "Emergency Response Status",
+    "disease": "Disease",
+    "state": "State",
+    "severityLabel": "Severity Level",
+    "responseTeam": "Response Team",
+    "lastUpdate": "Last Update",
+    "predictionTitle": "Submit Health Data for AI Disease Prediction",
+    "predictionSubtitle": "Select symptoms and patient data, and our AI will provide a preliminary analysis of potential waterborne illnesses.",
+    "patientInfo": "Patient Information",
+    "fullName": "Full Name",
+    "age": "Age",
+    "gender": "Gender",
+    "location": "Location",
+    "symptoms": "Symptoms Observed",
+    "waterQuality": "Water Quality Parameters",
+    "waterSourceType": "Water Source Type",
+    "pH": "pH Level",
+    "turbidity": "Turbidity (NTU)",
+    "contaminantLevelPpm": "Contaminant Level (ppm)",
+    "waterTemperatureC": "Water Temperature (°C)",
+    "conductivity": "Conductivity (µS/cm)",
+    "upload": "Upload File",
+    "submitButton": "Submit Data & Get Analysis",
+    "analysisTitle": "AI Analysis Results",
+    "analysisPlaceholder": "Select symptoms and click Submit to get an AI-powered disease prediction.",
+    "analyzingPlaceholder": "Our AI is analyzing the data... Please wait.",
+    "communityTitle": "Community Outreach Programs",
+    "communitySubtitle": "Join our health education initiatives and community events across India to learn about water safety and disease prevention.",
+    "eventsTitle": "Upcoming Events",
+    "programHighlights": "Program Highlights",
+    "onlinePrograms": "Online Programs",
+    "offlineEvents": "Offline Events",
+    "waterTesting": "Water Testing",
+    "chatTitle": "Jal-Rakshak AI Assistant",
+    "chatPlaceholder": "Ask about waterborne diseases...",
+    "chatFeatures": "AI Assistant Features",
+    "quickHelp": "Quick Help",
+    "diseaseSymptoms": "Disease symptoms",
+    "preventionTips": "Prevention tips",
+    "waterTesting2": "Water testing",
+    "aboutTitle": "About Jal-Rakshak",
+    "missionTitle": "Our Mission",
+    "missionText": "Jal-Rakshak is dedicated to revolutionizing public health monitoring through advanced AI and machine learning technologies. Our mission is to create a smart health surveillance system that detects, monitors, and prevents outbreaks of waterborne diseases in vulnerable communities across rural India.",
+    "visionTitle": "Our Vision",
+    "visionText": "To establish a comprehensive early warning system that empowers communities, health workers, and government officials with real-time insights and actionable intelligence to combat waterborne diseases effectively.",
+    "techStack": "Technology Stack",
+    "teamTitle": "Our Team",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "upcoming": "Upcoming",
+    "registered": "registered",
+    "registerNow": "Register Now",
+    "description": "Description",
+    "prevention": "Prevention Methods",
+    "reportedCases": "Reported Cases",
+    "rate": "Rate",
+    "cases": "Cases",
+    "location2": "Location",
+    "send": "Send",
+    "aboutAI": "About Jal-Rakshak AI",
+    "aboutAIText": "Our AI assistant provides instant answers to your questions about waterborne diseases, prevention methods, and health resources in multiple languages.",
+    "symptomsTitle": "Symptoms:",
+    "preventionTitle": "Prevention Methods:",
+    "remediesTitle": "Cure and Remedies",
+    "statistics": "Outbreak Statistics",
+    "probability": "Match Score",
+    "noDiseaseDetectedTitle": "No Specific Disease Detected",
+    "noDiseaseDetectedDescription": "The combination of symptoms does not strongly match a single waterborne disease in our database. This does not rule out an illness.",
+    "noDiseaseDetectedRemedy": "Please consult a healthcare professional for an accurate diagnosis. Ensure you stay hydrated and monitor your symptoms.",
+    "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+    },
+    "symptomsList": [
+        "Fever",
+        "Diarrhea",
+        "Vomiting",
+        "Abdominal Pain",
+        "Dehydration",
+        "Headache",
+        "Fatigue",
+        "Nausea",
+        "Jaundice",
+        "Dark colored urine",
+        "Rose spots",
+        "Bloating",
+        "Weight loss"
+    ],
+    "diseases": {
+        "hepatitisA": {
+            "name": "Hepatitis A",
+            "description": "A liver infection caused by the Hepatitis A virus (HAV), highly contagious and spread through contaminated food or water.",
+            "remedies": [
+                "Rest is crucial as there's no specific treatment.",
+                "Stay hydrated by drinking plenty of fluids.",
+                "Avoid alcohol and medications that can harm the liver."
+            ]
+        },
+        "cholera": {
+            "name": "Cholera",
+            "description": "An acute diarrheal illness caused by infection of the intestine with Vibrio cholerae bacteria, which can be severe.",
+            "remedies": [
+                "Immediate rehydration with Oral Rehydration Solution (ORS) is key.",
+                "Seek urgent medical attention for severe cases.",
+                "Zinc supplements can help reduce the duration of diarrhea."
+            ]
+        },
+        "gastroenteritis": {
+            "name": "Gastroenteritis (Diarrhea)",
+            "description": "An intestinal infection marked by watery diarrhea, abdominal cramps, nausea or vomiting, and sometimes fever.",
+            "remedies": [
+                "Drink plenty of liquids to prevent dehydration (ORS is best).",
+                "Eat bland foods like bananas, rice, and toast (BRAT diet).",
+                "Avoid dairy, fatty, or spicy foods."
+            ]
+        },
+        "typhoid": {
+            "name": "Typhoid Fever",
+            "description": "A serious bacterial infection caused by Salmonella Typhi, characterized by a sustained high fever.",
+            "remedies": [
+                "Requires immediate medical attention and is treated with antibiotics.",
+                "Drink plenty of fluids to prevent dehydration.",
+                "Eat a high-calorie, nutritious diet."
+            ]
+        },
+        "giardiasis": {
+            "name": "Giardiasis",
+            "description": "An intestinal infection caused by a microscopic parasite called Giardia lamblia, often causing bloating and cramps without fever.",
+            "remedies": [
+                "Medical treatment with prescription drugs is usually required.",
+                "Stay well-hydrated.",
+                "Avoid caffeine and dairy products, which can worsen diarrhea."
+            ]
+        },
+        "crypto": {
+            "name": "Cryptosporidiosis",
+            "description": "A diarrheal disease caused by the microscopic parasite Cryptosporidium. It can cause watery diarrhea and is a common cause of waterborne disease.",
+            "remedies": [
+                "Most people with a healthy immune system recover without treatment.",
+                "Drink plenty of fluids to prevent dehydration.",
+                "Anti-diarrheal medicine may help, but consult a doctor first."
+            ]
+        }
+    },
+    "ai": {
+        "initialGreeting": "Hello! I'm Jal-Rakshak AI. How can I assist you with waterborne diseases today? You can ask me things like 'What causes cholera?' or 'How to prevent typhoid?'",
+        "fallback": "I'm sorry, I don't have information on that. I can answer questions about the causes, symptoms, treatment, and prevention of diseases like Cholera, Typhoid, Hepatitis A, Giardiasis, and Gastroenteritis. Please try asking your question differently."
+    },
+    "welcome": "Welcome",
+    "devices": "Devices",
+    "addDevice": "+ Add Device",
+    "heroTitleBadge": "ALL-INDIA",
+    "heroTitleMain": "Waterborne Disease Monitor",
+    "allIndiaMapTitle": "All India Disease Outbreak Monitor",
+    "nearbyMapTitle": "Nearby Disease Outbreak",
+    "heroPill1": "AI-Powered Detection",
+    "heroPill2": "Real-Time Alerts",
+    "heroPill3": "All-India Focus",
+    "statisticsInfo": "Highest reported cases in UP & Bihar",
+    "trendsInfo": "Peak transmission observed in July-Aug",
+    "waterFormTitle": "Water Quality Parameters",
+    "waterFormSubtitle": "Submit the following parameters for a detailed analysis of your water source.",
+    "basicWaterInfo": "Basic Water Info",
+    "physicalParams": "Physical Parameters",
+    "chemicalParams": "Chemical Parameters",
+    "sensorReadings": "Sensor Readings",
+    "rgbSensor": "RGB Sensor",
+    "uvSensor": "UV Sensor",
+    "initialPrediction": "Initial Prediction",
+    "fetchFromDevice": "Fetch From Device",
+    "fetching": "Fetching...",
+    "joinCause": "Join Our Cause",
+    "joinCauseText": "Interested in contributing to Jal-Rakshak? We are always looking for volunteers and partners.",
+    "clickToInteract": "Click map to interact",
+    "welcomeUser": "Welcome,",
+    "fetchSuccess": "Successfully fetched the latest sensor data!",
+    "fetchEmpty": "Could not find any sensor data in the database.",
+    "fetchError": "An error occurred while fetching data.",
+    "alertSelectSymptom": "Please select at least one symptom for analysis.",
+    "alertDeviceAdded": "Device added successfully!",
+    "alertDeviceError": "Error adding device: ",
+    "chatConnectionError": "I'm having trouble connecting to my brain right now. Please try again in a moment.",
+    "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+    },
+    "statusLabel": "Status",
+    "battery": "Battery",
+    "chatFeaturesList": {
+        "aiSupport": "24/7 AI Health Support",
+        "multiLang": "Multi-language Support",
+        "symptomAnalysis": "Symptom Analysis"
+    },
+    "team": {
+        "abhimanyu": "Abhimanyu",
+        "rudra": "Rudra",
+        "siddharth": "Siddharth"
+    },
+    "waterSources": {
+        "river": "River",
+        "well": "Well",
+        "lake": "Lake",
+        "pond": "Pond",
+        "tap": "Tap Water",
+        "borewell": "Borewell",
+        "rainwater": "Rainwater"
+    },
+    "colors": {
+        "blue": "Blue",
+        "green": "Green",
+        "red": "Red"
+    },
+    "addNewDevice": "Add New Device",
+    "deviceName": "Device Name",
+    "deviceId": "Device ID",
+    "adding": "Adding...",
+    "contactUs": "Contact Us",
+    "selectSource": "Select Source",
+    "selectColor": "Select Color",
+    "selectGender": "Select Gender",
+    "outbreaks": {
+        "diarrhea": {
+            "name": "Diarrhea Outbreak",
+            "news": "Govt. launches new initiative for clean drinking water in rural UP."
+        },
+        "cholera": {
+            "name": "Cholera Outbreak",
+            "news": "Health department issues high alert following monsoon flooding in Kolkata."
+        },
+        "typhoid": {
+            "name": "Typhoid Outbreak",
+            "news": "Vaccination drive for Typhoid begins in Mumbai and surrounding areas."
+        },
+        "hepatitis": {
+            "name": "Hepatitis Outbreak",
+            "news": "Awareness campaigns about contaminated water sources are underway."
+        },
+        "gastroenteritis": {
+            "name": "Gastroenteritis",
+            "news": "Mobile medical units dispatched to rural districts of Gujarat."
+        },
+        "typhoidFever": {
+            "name": "Typhoid Fever",
+            "news": "Community health camps are being organized in key villages."
+        },
+        "contamination": {
+            "name": "Potential Contamination",
+            "news": "High coliform levels detected"
+        },
+        "safeZone": {
+            "name": "Safe Zone",
+            "news": "Water quality normal"
+        }
+    },
+    "states": {
+        "UP": "Uttar Pradesh",
+        "WB": "West Bengal",
+        "MH": "Maharashtra",
+        "BR": "Bihar",
+        "GJ": "Gujarat",
+        "PB": "Punjab",
+        "sector4": "Sector 4, Rohini",
+        "connaughtPlace": "Connaught Place"
+    },
+    "deviceTypes": {
+        "sensorBuoy": "Sensor Buoy",
+        "pipelineMonitor": "Pipeline Monitor"
+    },
+    "status": {
+        "active": "Active",
+        "alert": "Alert"
+    },
+    "events": {
+        "webinar": {
+            "title": "Online Health Webinar",
+            "desc": "Join our health education initiatives and community events across India to learn about water safety and disease prevention."
+        },
+        "camp": {
+            "title": "Rural Health Camp",
+            "desc": "Free health checkups and water quality testing."
+        },
+        "workshop": {
+            "title": "Water Quality Workshop",
+            "desc": "Virtual training session on water purification."
+        },
+        "screening": {
+            "title": "Village Health Screening",
+            "desc": "Special health camp focusing on pediatric waterborne diseases."
+        },
+        "training": {
+            "title": "Water Safety Training",
+            "desc": "Hands-on training for community leaders on water safety."
+        },
+        "seminar": {
+            "title": "AI for Public Health Seminar",
+            "desc": "Discussing the future of AI in public health."
+        }
+    },
+    "highlights": {
+        "online": "Webinars and virtual workshops",
+        "offline": "Health camps and field visits",
+        "testing": "Quality assessment and purification"
+    },
+    "footerSlogan": "Empowering communities with real-time water safety intelligence.",
+    "techStackItems": {
+        "aiModels": "AI/ML Models",
+        "iotSensors": "IoT Sensors",
+        "alertSystem": "Real-time Alert System"
+    },
+    "coreMember": "Core Member",
+    "onlineAI": "Online • Jal-Rakshak AI",
+    "onlineAssistant": "Online • AI Assistant",
+    "match": "Match",
+    "remedies": "Remedies:",
+    "aria": {
+        "openSidebar": "Open sidebar menu",
+        "closeSidebar": "Close sidebar menu",
+        "openChat": "Open Jal-Rakshak AI chat window"
+    },
+    "defaultUser": "User"
+}
