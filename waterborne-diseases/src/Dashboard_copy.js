@@ -16,6 +16,7 @@ import SafetyScale from './Components/SafetyScale';
 import PredictionGauge from './Components/PredictionGauge';
 import CustomDropdown from './Components/CustomDropdown';
 import './Dashboard.css'; // MUST be last to override Bootstrap
+import './MobileWaterData.css'; // New mobile styles
 
 const CustomChartTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -258,6 +259,7 @@ const App = () => {
     const [deviceLoading, setDeviceLoading] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
     const [savedReadings, setSavedReadings] = useState([]);
     const [selectedReading, setSelectedReading] = useState(null);
     const navigate = useNavigate();
@@ -296,7 +298,7 @@ const App = () => {
 
         const readingData = {
             user_id: user.id,
-            device_name: selectedDevice?.device_name || 'Manual Entry',
+            device_name: selectedDevice?.device_name || t('manualEntry'),
             device_id: selectedDevice?.device_id || null,
             ph: waterFormData.ph || null,
             turbidity: waterFormData.turbidity || null,
@@ -554,7 +556,7 @@ const App = () => {
             // Normalize Result because APIs are inconsistent
             const normalizedResult = {
                 ...result,
-                risk_level: result.risk_level || result.prediction || result.label || result.result || "Unknown",
+                risk_level: result.risk_level || result.prediction || result.label || result.result || t('unknown'),
                 confidence: result.confidence || result.score || result.probability || 0
             };
 
@@ -587,29 +589,30 @@ const App = () => {
 
                 setWaterFormData(prevData => ({
                     ...prevData,
-                    ph: Number(sensorValues.ph).toFixed(2) ?? '',
-                    turbidity: Number(sensorValues.turbidity).toFixed(2) ?? '',
-                    temperature: Number(sensorValues.temperature).toFixed(2) ?? '',
-                    conductivity: Number(sensorValues.conductivity).toFixed(2) ?? '',
-                    contaminantLevel: Number(sensorValues.tds).toFixed(2) ?? '', // Map 'tds' from Firebase
-                    uv_sensor: sensorValues.color ?? 'Green',                   // Map 'color' from Firebase
-                    guva_sensor: Number(sensorValues.uv).toFixed(2) ?? ''
+                    ph: sensorValues.ph ? Number(sensorValues.ph).toFixed(2) : prevData.ph,
+                    turbidity: sensorValues.turbidity ? Number(sensorValues.turbidity).toFixed(2) : prevData.turbidity,
+                    temperature: sensorValues.temperature ? Number(sensorValues.temperature).toFixed(2) : prevData.temperature,
+                    conductivity: sensorValues.conductivity ? Number(sensorValues.conductivity).toFixed(2) : prevData.conductivity,
+                    contaminantLevel: sensorValues.tds ? Number(sensorValues.tds).toFixed(2) : prevData.contaminantLevel, // Map 'tds' from Firebase
+                    uv_sensor: sensorValues.color || 'Green',                   // Map 'color' from Firebase
+                    guva_sensor: sensorValues.uv ? Number(sensorValues.uv).toFixed(2) : prevData.guva_sensor
                 }));
 
                 // Set a success message instead of an alert
                 setFetchMessage(t('fetchSuccess'));
             } else {
-                // Set an error message
-                setFetchMessage(t('fetchEmpty'));
+                setFetchMessage(t('fetchError') || 'No data found');
+                alert(t('fetchError') || 'No device data found in cloud.');
             }
         } catch (error) {
-            console.error("Error fetching data from Firebase:", error);
-            // Set an error message
-            setFetchMessage(t('fetchError'));
+            console.error("Error fetching data:", error);
+            setFetchMessage(t('fetchError') || 'Connection failed');
+            alert(`Failed to fetch from device: ${error.message}`);
         } finally {
             setIsFetching(false);
         }
     };
+
 
 
     const handleWaterInputChange = (e) => {
@@ -756,10 +759,10 @@ const App = () => {
                                         className="jr-profile-dropdown"
                                     >
                                         <button onClick={handleLogout} className="jr-dropdown-item w-100 text-start">
-                                            <FaExchangeAlt className="me-2 text-warning" /> Switch Account
+                                            <FaExchangeAlt className="me-2 text-warning" /> {t('switchAccount')}
                                         </button>
                                         <button onClick={handleLogout} className="jr-dropdown-item w-100 text-start border-top border-secondary pt-2 mt-1">
-                                            <FaSignOutAlt className="me-2 text-danger" /> Logout
+                                            <FaSignOutAlt className="me-2 text-danger" /> {t('logout')}
                                         </button>
                                     </motion.div>
                                 )}
@@ -780,10 +783,13 @@ const App = () => {
                         background: 'linear-gradient(180deg, #011C40 0%, #023859 100%)', // LUNA Gradient
                         borderRight: '1px solid rgba(167, 235, 242, 0.1)',
                         transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        zIndex: 1000,
+                        zIndex: 2000,
                         paddingTop: '20px',
                         color: 'white',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        overflowY: 'auto',
+                        scrollbarWidth: 'thin',
+                        paddingBottom: '200px'
                     }}
                 >
                     <div className="p-4 border-bottom border-secondary mb-3">
@@ -913,34 +919,74 @@ const App = () => {
 
                             <li className="mt-4 pt-3 border-top border-secondary">
                                 <small className="text-uppercase text-muted fw-bold mb-3 d-block px-2" style={{ fontSize: '0.7rem', letterSpacing: '0.1em' }}>{t('language')}</small>
-                                <div className="d-grid gap-2 px-2">
-                                    <div className="row g-2">
-                                        {['en', 'hi', 'as', 'bn', 'mr', 'te', 'ta', 'gu', 'ur', 'kn'].map(lang => {
-                                            const langKeys = {
-                                                en: 'english',
-                                                hi: 'hindi',
-                                                as: 'assamese',
-                                                bn: 'bengali',
-                                                mr: 'marathi',
-                                                te: 'telugu',
-                                                ta: 'tamil',
-                                                gu: 'gujarati',
-                                                ur: 'urdu',
-                                                kn: 'kannada'
-                                            };
-                                            return (
-                                                <div className="col-6" key={lang}>
-                                                    <button
-                                                        onClick={() => i18n.changeLanguage(lang)}
-                                                        className={`btn btn-sm w-100 ${i18n.language === lang ? 'btn-info text-dark fw-bold' : 'btn-outline-secondary text-light'}`}
-                                                        style={{ borderRadius: '8px', fontSize: '0.8rem', borderColor: i18n.language === lang ? 'transparent' : 'rgba(255,255,255,0.1)' }}
-                                                    >
-                                                        {t(langKeys[lang])}
-                                                    </button>
+                                <div className="px-0">
+                                    <button
+                                        onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                                        className="sidebar-link d-flex justify-content-between align-items-center w-100"
+                                        style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                                    >
+                                        <div className="d-flex align-items-center">
+                                            <div className="sidebar-icon"><FaExchangeAlt /></div>
+                                            {
+                                                {
+                                                    en: 'English',
+                                                    hi: 'हिंदी (Hindi)',
+                                                    as: 'অসমীয়া (Assamese)',
+                                                    bn: 'বাংলা (Bengali)',
+                                                    mr: 'मराठी (Marathi)',
+                                                    te: 'తెలుగు (Telugu)',
+                                                    ta: 'தமிழ் (Tamil)',
+                                                    gu: ' ગુજરાતી (Gujarati)',
+                                                    ur: 'اردو (Urdu)',
+                                                    kn: 'ಕನ್ನಡ (Kannada)'
+                                                }[i18n.language] || 'Language'
+                                            }
+                                        </div>
+                                        <FaChevronDown style={{ transform: showLanguageDropdown ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s' }} size={12} />
+                                    </button>
+                                    <AnimatePresence>
+                                        {showLanguageDropdown && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden mt-1"
+                                                style={{ background: 'rgba(0, 0, 0, 0.6)', borderRadius: '8px' }}
+                                            >
+                                                <div className="py-2 d-grid gap-1 px-2">
+                                                    {[
+                                                        { code: 'en', label: 'English' },
+                                                        { code: 'hi', label: 'हिंदी (Hindi)' },
+                                                        { code: 'as', label: 'অসমীয়া (Assamese)' },
+                                                        { code: 'bn', label: 'বাংলা (Bengali)' },
+                                                        { code: 'mr', label: 'मराठी (Marathi)' },
+                                                        { code: 'te', label: 'తెలుగు (Telugu)' },
+                                                        { code: 'ta', label: 'தமிழ் (Tamil)' },
+                                                        { code: 'gu', label: 'ગુજરાતી (Gujarati)' },
+                                                        { code: 'ur', label: 'اردو (Urdu)' },
+                                                        { code: 'kn', label: 'ಕನ್ನಡ (Kannada)' }
+                                                    ].map(lang => (
+                                                        <button
+                                                            key={lang.code}
+                                                            onClick={() => {
+                                                                i18n.changeLanguage(lang.code);
+                                                                setShowLanguageDropdown(false);
+                                                            }}
+                                                            className={`btn btn-sm text-start w-100 ${i18n.language === lang.code ? 'text-info fw-bold' : 'text-white'}`}
+                                                            style={{
+                                                                padding: '8px 12px',
+                                                                background: i18n.language === lang.code ? 'rgba(84, 172, 191, 0.1)' : 'transparent',
+                                                                borderRadius: '6px',
+                                                                fontSize: '0.9rem'
+                                                            }}
+                                                        >
+                                                            {lang.label}
+                                                        </button>
+                                                    ))}
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </li>
                         </ul>
@@ -1106,147 +1152,114 @@ const App = () => {
                     )}
                     {
                         activeTab === 'waterData' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container-fluid p-4">
-                                <h2 className="fs-3 fw-bold mb-1 text-white">{t('waterFormTitle')}</h2>
-                                <p className="text-muted mb-4 small">
-                                    {t('waterFormSubtitle')}
-                                </p>
-
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="container-fluid p-0">
                                 <form onSubmit={handleWaterFormSubmit}>
-                                    <div className="row g-4">
-                                        {/* --- COLUMN 1 --- */}
-                                        <div className="col-lg-4">
-                                            <div className="d-flex flex-column gap-4">
-                                                {/* Basic Water Info */}
-                                                <div className="jr-card">
-                                                    <div className="jr-card-header">
-                                                        <div className="jr-icon-wrapper"><i className="bi bi-droplet-fill"></i></div>
-                                                        {t('basicWaterInfo')}
-                                                    </div>
-                                                    <label className="jr-label">{t('waterSourceType')}</label>
-                                                    <CustomDropdown
-                                                        name="water_source_type"
-                                                        value={waterFormData.water_source_type}
-                                                        onChange={handleWaterInputChange}
-                                                        options={['River', 'Well', 'Lake', 'Pond', 'Tap Water', 'Borewell', 'Rainwater'].map(opt => ({
-                                                            value: opt,
-                                                            label: t(`waterSources.${opt === 'Tap Water' ? 'tap' : opt.toLowerCase()}`)
-                                                        }))}
-                                                        placeholder={t('selectSource')}
-                                                    />
-                                                </div>
-
-                                                {/* Physical Parameters */}
-                                                <div className="jr-card">
-                                                    <div className="jr-card-header">
-                                                        <div className="jr-icon-wrapper"><i className="bi bi-thermometer-half"></i></div>
-                                                        {t('physicalParams')}
-                                                    </div>
-
-                                                    <SafetyScale
-                                                        label="PH Level"
-                                                        name="ph"
-                                                        value={waterFormData.ph}
-                                                        min={0} max={14}
-                                                        trackType="ph"
-                                                        unit=""
-                                                        onChange={handleWaterInputChange}
-                                                    />
-
-                                                    <SafetyScale
-                                                        label="Contaminant Level (ppm)"
-                                                        name="contaminantLevel"
-                                                        value={waterFormData.contaminantLevel}
-                                                        min={0} max={1000}
-                                                        unit="ppm"
-                                                        onChange={handleWaterInputChange}
-                                                    />
-                                                </div>
-
-                                                {/* Sensor Readings Part 1 */}
-                                                <div className="jr-card">
-                                                    <div className="jr-card-header">
-                                                        <div className="jr-icon-wrapper"><i className="bi bi-cpu"></i></div>
-                                                        {t('sensorReadings')}
-                                                    </div>
-                                                    <label className="jr-label">{t('rgbSensor')}</label>
-                                                    <CustomDropdown
-                                                        name="uv_sensor"
-                                                        value={waterFormData.uv_sensor}
-                                                        onChange={handleWaterInputChange}
-                                                        options={['Blue', 'Green', 'Red'].map(opt => ({
-                                                            value: opt,
-                                                            label: t(`colors.${opt.toLowerCase()}`)
-                                                        }))}
-                                                        placeholder={t('selectColor')}
-                                                    />
-                                                </div>
-                                            </div>
+                                    <div className="water-grid-container">
+                                        {/* Card 1: Water Source */}
+                                        <div className="water-card">
+                                            <div className="water-card-title">{t('waterSourceType')}</div>
+                                            <CustomDropdown
+                                                name="water_source_type"
+                                                value={waterFormData.water_source_type}
+                                                onChange={handleWaterInputChange}
+                                                options={['River', 'Well', 'Lake', 'Pond', 'Tap Water', 'Borewell', 'Rainwater'].map(opt => ({
+                                                    value: opt,
+                                                    label: t(`waterSources.${opt === 'Tap Water' ? 'tap' : opt.toLowerCase()}`)
+                                                }))}
+                                                placeholder={t('selectSource')}
+                                            />
                                         </div>
 
-                                        {/* --- COLUMN 2 --- */}
-                                        <div className="col-lg-4">
-                                            <div className="d-flex flex-column gap-4">
-                                                {/* Chemical Parameters */}
-                                                <div className="jr-card">
-                                                    <div className="jr-card-header">
-                                                        <div className="jr-icon-wrapper"><i className="bi bi-flask"></i></div>
-                                                        {t('chemicalParams')}
-                                                    </div>
-
-                                                    <SafetyScale
-                                                        label="Turbidity (NTU)"
-                                                        name="turbidity"
-                                                        value={waterFormData.turbidity}
-                                                        min={0} max={10}
-                                                        unit="NTU"
-                                                        onChange={handleWaterInputChange}
-                                                    />
-
-                                                    <SafetyScale
-                                                        label="Temp Level (°C)"
-                                                        name="temperature"
-                                                        value={waterFormData.temperature}
-                                                        min={0} max={50}
-                                                        unit="°C"
-                                                        onChange={handleWaterInputChange}
-                                                    />
-                                                </div>
-
-                                                {/* Sensor Readings Part 2 */}
-                                                <div className="jr-card">
-                                                    <div className="jr-card-header">
-                                                        <div className="jr-icon-wrapper"><i className="bi bi-sun"></i></div>
-                                                        {t('sensorReadings')}
-                                                    </div>
-
-                                                    <SafetyScale
-                                                        label="UV Sensor"
-                                                        name="guva_sensor"
-                                                        value={waterFormData.guva_sensor}
-                                                        min={0} max={15}
-                                                        unit="Index"
-                                                        onChange={handleWaterInputChange}
-                                                    />
-
-                                                    <SafetyScale
-                                                        label={`${t('conductivity')} (µS/cm)`}
-                                                        name="conductivity"
-                                                        value={waterFormData.conductivity}
-                                                        min={0} max={1000}
-                                                        unit="µS/cm"
-                                                        onChange={handleWaterInputChange}
-                                                    />
-                                                </div>
-                                            </div>
+                                        {/* Card 2: pH Level */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label="PH Level"
+                                                name="ph"
+                                                value={waterFormData.ph}
+                                                min={0} max={14}
+                                                trackType="ph"
+                                                onChange={handleWaterInputChange}
+                                            />
                                         </div>
 
-                                        {/* --- COLUMN 3: PREDICTION --- */}
-                                        <div className="col-lg-4">
-                                            <div className="d-flex flex-column gap-3 h-100">
-                                                <h3 className="h5 text-white mb-0">{t('initialPrediction')}</h3>
+                                        {/* Card 3: Contaminant */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label={`${t('contaminant')} (ppm)`}
+                                                name="contaminantLevel"
+                                                value={waterFormData.contaminantLevel}
+                                                min={0} max={1000}
+                                                unit="ppm"
+                                                onChange={handleWaterInputChange}
+                                            />
+                                        </div>
 
-                                                <div className="jr-card d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                                        {/* Card 4: Turbidity */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label="Turbidity (NTU)"
+                                                name="turbidity"
+                                                value={waterFormData.turbidity}
+                                                min={0} max={10}
+                                                unit="NTU"
+                                                onChange={handleWaterInputChange}
+                                            />
+                                        </div>
+
+                                        {/* Card 5: Temperature */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label="Temp Level (°C)"
+                                                name="temperature"
+                                                value={waterFormData.temperature}
+                                                min={0} max={50}
+                                                unit="°C"
+                                                onChange={handleWaterInputChange}
+                                            />
+                                        </div>
+
+                                        {/* Card 6: RGB Sensor */}
+                                        <div className="water-card">
+                                            <div className="water-card-title">RGB Sensor</div>
+                                            <CustomDropdown
+                                                name="uv_sensor"
+                                                value={waterFormData.uv_sensor}
+                                                onChange={handleWaterInputChange}
+                                                options={['Red', 'Green', 'Blue']}
+                                                placeholder="Select Color"
+                                            />
+                                        </div>
+
+                                        {/* Card 7: UV Sensor */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label="UV Sensor"
+                                                name="guva_sensor"
+                                                value={waterFormData.guva_sensor}
+                                                min={0} max={15}
+                                                unit="Index"
+                                                onChange={handleWaterInputChange}
+                                            />
+                                        </div>
+
+                                        {/* Card 8: Conductivity */}
+                                        <div className="water-card">
+                                            <SafetyScale
+                                                label={`${t('conductivity')} (µS/cm)`}
+                                                name="conductivity"
+                                                value={waterFormData.conductivity}
+                                                min={0} max={1000}
+                                                unit="µS/cm"
+                                                onChange={handleWaterInputChange}
+                                            />
+                                        </div>
+
+                                        {/* Prediction & Actions Card (Sidebar) */}
+                                        <div className="water-card prediction-card">
+                                            <div className="d-flex flex-column align-items-center justify-content-center h-100">
+                                                <h3 className="h6 text-white mb-4 opacity-100 fw-bold">{t('initialPrediction')}</h3>
+
+                                                <div style={{ transform: 'scale(1.1)', marginBottom: 'auto' }}>
                                                     <PredictionGauge
                                                         isAnalyzing={isWaterAnalyzing}
                                                         prediction={waterAnalysisResult?.risk_level}
@@ -1254,37 +1267,41 @@ const App = () => {
                                                     />
                                                 </div>
 
-                                                <button type="submit" className="jr-btn-submit" disabled={isWaterAnalyzing}>
-                                                    {isWaterAnalyzing ? 'Analyzing...' : t('submitButton')}
-                                                </button>
+                                                <div className="d-flex flex-column gap-4 w-100 mt-4">
+                                                    <div className="prediction-actions d-flex flex-column gap-3">
+                                                        <button type="submit" className="btn-grid-submit" disabled={isWaterAnalyzing}>
+                                                            {isWaterAnalyzing ? 'Analyzing...' : t('submitButton')}
+                                                        </button>
 
-                                                <button
-                                                    type="button"
-                                                    className="jr-btn-fetch"
-                                                    onClick={handleFetchFromDevice}
-                                                    disabled={isFetching}
-                                                >
-                                                    {isFetching ? t('fetching') : t('fetchFromDevice')}
-                                                </button>
-                                                {fetchMessage && (
-                                                    <div className="text-center small mt-2 text-info">{fetchMessage}</div>
-                                                )}
-                                                {waterAnalysisError && (
-                                                    <div className="text-center small mt-2 text-danger bg-danger bg-opacity-10 p-2 rounded">{waterAnalysisError}</div>
-                                                )}
-
-                                                {waterAnalysisResult && (
-                                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-3 text-center">
                                                         <button
                                                             type="button"
-                                                            onClick={handleSaveReading}
-                                                            className="jr-btn-fetch w-100"
-                                                            style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)' }}
+                                                            className="btn-grid-fetch"
+                                                            onClick={handleFetchFromDevice}
+                                                            disabled={isFetching}
                                                         >
-                                                            <FaClipboardList className="me-2" /> {t('saveReading') || 'Save Readings'}
+                                                            <FaDatabase size={14} /> {isFetching ? t('fetching') : t('fetchFromDevice')}
                                                         </button>
-                                                    </motion.div>
-                                                )}
+                                                    </div>
+
+                                                    {fetchMessage && (
+                                                        <div className="text-center small text-info">{fetchMessage}</div>
+                                                    )}
+                                                    {waterAnalysisError && (
+                                                        <div className="text-center small text-danger bg-danger bg-opacity-10 p-2 rounded">{waterAnalysisError}</div>
+                                                    )}
+
+                                                    {waterAnalysisResult && (
+                                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleSaveReading}
+                                                                className="btn-grid-save"
+                                                            >
+                                                                <FaClipboardList className="me-2" /> {t('saveReading') || 'Save Readings'}
+                                                            </button>
+                                                        </motion.div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1296,7 +1313,7 @@ const App = () => {
                     {
                         activeTab === 'prediction' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <div className="jr-card" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                                <div className="jr-card" style={{ width: '100%', margin: '0 auto' }}>
                                     <h2 className="card-title h3 fw-bold mb-4">{t('predictionTitle')}</h2>
                                     <p className="mb-4 text-muted">{t('predictionSubtitle')}</p>
                                     <div className="row">
@@ -1752,7 +1769,7 @@ const App = () => {
                                                         {reading.water_source === 'River' || reading.water_source === 'Lake' ? <FaTint /> : <FaFaucet />}
                                                     </div>
                                                     <div>
-                                                        <h6 className="mb-0 text-white fw-bold">{reading.device_name || 'Manual Entry'}</h6>
+                                                        <h6 className="mb-0 text-white fw-bold">{reading.device_name || t('manualEntry')}</h6>
                                                         <small className="text-white-50" style={{ fontSize: '0.75rem' }}>
                                                             {new Date(reading.timestamp).toLocaleDateString()}
                                                         </small>
@@ -1765,7 +1782,7 @@ const App = () => {
 
                                             <div className="jr-reading-card-body" onClick={() => setSelectedReading(reading)}>
                                                 <div className="d-flex justify-content-between align-items-center mb-2">
-                                                    <span className="text-white-50 small">Source</span>
+                                                    <span className="text-white-50 small">{t('source')}</span>
                                                     <span className="text-white small">{reading.water_source}</span>
                                                 </div>
                                             </div>
@@ -1780,13 +1797,27 @@ const App = () => {
                                                 </button>
                                                 <button
                                                     className="btn btn-sm btn-icon text-danger"
-                                                    onClick={async () => {
-                                                        if (window.confirm('Delete this reading?')) {
-                                                            const { error } = await supabase.from('user_readings').delete().eq('id', reading.id);
-                                                            if (error) {
-                                                                alert('Error deleting: ' + error.message);
-                                                            } else {
-                                                                fetchReadings();
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        console.log("Attempting to delete reading:", reading.id);
+                                                        if (window.confirm(t('deleteReadingConfirm') || 'Delete this reading?')) {
+                                                            try {
+                                                                const { error } = await supabase.from('user_readings').delete().eq('id', reading.id);
+
+                                                                if (error) {
+                                                                    console.error("Delete error:", error);
+                                                                    alert((t('deleteReadingError') || 'Error deleting: ') + error.message);
+                                                                } else {
+                                                                    console.log("Delete successful for ID:", reading.id);
+                                                                    // Update local state immediately for better UI response
+                                                                    setSavedReadings(prev => prev.filter(r => r.id !== reading.id));
+                                                                    // Optional: still fetch to sync, but local update is crucial
+                                                                    // fetchReadings(); 
+                                                                }
+                                                            } catch (err) {
+                                                                console.error("Unexpected error deleting:", err);
+                                                                alert("An unexpected error occurred while deleting.");
                                                             }
                                                         }
                                                     }}
@@ -1812,7 +1843,7 @@ const App = () => {
                             <div className="jr-modal-header">
                                 <h5 className="modal-title d-flex align-items-center gap-2 text-white">
                                     <FaClipboardList className="text-primary" />
-                                    Reading Details
+                                    {t('readingDetails')}
                                 </h5>
                                 <button type="button" className="jr-btn-close-glass" onClick={() => setSelectedReading(null)}>
                                     <FaTimes />
@@ -1823,18 +1854,18 @@ const App = () => {
                                     {/* General Info Section */}
                                     <div className="col-md-6">
                                         <div className="jr-info-section">
-                                            <h6 className="jr-section-title">General Info</h6>
+                                            <h6 className="jr-section-title">{t('generalInfo')}</h6>
                                             <div className="d-flex flex-column gap-3">
                                                 <div>
-                                                    <div className="jr-modal-label">Device Name</div>
-                                                    <div className="jr-modal-value">{selectedReading.device_name || 'Manual Entry'}</div>
+                                                    <div className="jr-modal-label">{t('deviceName')}</div>
+                                                    <div className="jr-modal-value">{selectedReading.device_name || t('manualEntry')}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="jr-modal-label">Timestamp</div>
+                                                    <div className="jr-modal-label">{t('timestamp')}</div>
                                                     <div className="jr-modal-value fs-6">{new Date(selectedReading.timestamp).toLocaleString()}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="jr-modal-label">Source</div>
+                                                    <div className="jr-modal-label">{t('source')}</div>
                                                     <div className="d-flex align-items-center gap-2 mt-1">
                                                         <span className="text-white fs-5">{selectedReading.water_source}</span>
                                                         <span className="jr-source-icon-small">
@@ -1849,22 +1880,22 @@ const App = () => {
                                     {/* Analysis Section */}
                                     <div className="col-md-6">
                                         <div className="jr-info-section h-100">
-                                            <h6 className="jr-section-title">Analysis Results</h6>
+                                            <h6 className="jr-section-title">{t('analysisResults')}</h6>
                                             <div className="d-flex flex-column gap-4">
                                                 <div>
-                                                    <div className="jr-modal-label mb-2">Overall Status</div>
+                                                    <div className="jr-modal-label mb-2">{t('overallStatus')}</div>
                                                     <span className={`jr-reading-badge ${selectedReading.risk_level === 'Safe' ? 'safe' : selectedReading.risk_level === 'Unsafe' ? 'unsafe' : 'moderate'} fs-6 px-3 py-2`}>
                                                         {selectedReading.risk_level}
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <div className="jr-modal-label mb-2">Prediction Model</div>
+                                                    <div className="jr-modal-label mb-2">{t('predictionModel')}</div>
                                                     <div className="d-flex align-items-center gap-3">
                                                         <span className={`jr-reading-badge ${selectedReading.analysis_result?.risk_level === 'Safe' ? 'safe' : 'unsafe'} opacity-75`}>
                                                             {selectedReading.analysis_result?.risk_level || selectedReading.risk_level}
                                                         </span>
                                                         <div>
-                                                            <div className="jr-modal-label">Confidence</div>
+                                                            <div className="jr-modal-label">{t('confidence')}</div>
                                                             <div className="text-white fw-bold">{(selectedReading.confidence * 100).toFixed(1)}%</div>
                                                         </div>
                                                     </div>
@@ -1876,26 +1907,26 @@ const App = () => {
                                     {/* Water Parameters Grid */}
                                     <div className="col-12">
                                         <div className="jr-info-section">
-                                            <h6 className="jr-section-title mb-4">Water Parameters</h6>
+                                            <h6 className="jr-section-title mb-4">{t('waterParameters')}</h6>
                                             <div className="jr-parameters-grid">
                                                 <div className="jr-parameter-item">
-                                                    <div className="jr-modal-label">pH Level</div>
+                                                    <div className="jr-modal-label">{t('phLevel')}</div>
                                                     <div className="jr-modal-large-value text-info">{selectedReading.ph}</div>
                                                 </div>
                                                 <div className="jr-parameter-item">
-                                                    <div className="jr-modal-label">Turbidity</div>
+                                                    <div className="jr-modal-label">{t('turbidity')}</div>
                                                     <div className="jr-modal-large-value text-warning">{selectedReading.turbidity} <span className="fs-6 text-muted">NTU</span></div>
                                                 </div>
                                                 <div className="jr-parameter-item">
-                                                    <div className="jr-modal-label">Contaminants</div>
+                                                    <div className="jr-modal-label">{t('contaminants')}</div>
                                                     <div className="jr-modal-large-value text-danger">{selectedReading.contaminant_level} <span className="fs-6 text-muted">ppm</span></div>
                                                 </div>
                                                 <div className="jr-parameter-item">
-                                                    <div className="jr-modal-label">Temperature</div>
+                                                    <div className="jr-modal-label">{t('temperature')}</div>
                                                     <div className="jr-modal-large-value text-primary">{selectedReading.temperature}<span className="fs-6 text-muted">°C</span></div>
                                                 </div>
                                                 <div className="jr-parameter-item">
-                                                    <div className="jr-modal-label">Conductivity</div>
+                                                    <div className="jr-modal-label">{t('conductivity')}</div>
                                                     <div className="jr-modal-large-value text-success">{selectedReading.conductivity} <span className="fs-6 text-muted">µS/cm</span></div>
                                                 </div>
                                             </div>
@@ -1904,7 +1935,7 @@ const App = () => {
                                 </div>
                             </div>
                             <div className="jr-modal-footer">
-                                <button type="button" className="jr-btn-glass" onClick={() => setSelectedReading(null)}>Close</button>
+                                <button type="button" className="jr-btn-glass" onClick={() => setSelectedReading(null)}>{t('close')}</button>
                             </div>
                         </div>
                     </div>

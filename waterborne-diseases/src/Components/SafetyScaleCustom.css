@@ -1,0 +1,168 @@
+/* Custom styling for the range input to match the design */
+
+/* Custom Text Input Wrapper (The "Glass" Box) */
+.safety-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(167, 235, 242, 0.15);
+    /* Soft cyan border */
+    border-radius: 8px;
+    padding: 2px 8px;
+    transition: all 0.2s ease;
+}
+
+.safety-input-wrapper:focus-within {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: #54ACBF;
+    /* Accent blue */
+    box-shadow: 0 0 0 2px rgba(84, 172, 191, 0.2);
+}
+
+/* The actual number input field */
+.safety-input-field {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    width: 60px;
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    outline: none;
+    font-size: 0.9rem;
+    padding: 2px 0;
+    appearance: textfield;
+    /* Standard property */
+    -moz-appearance: textfield;
+    /* Remove arrows in Firefox */
+}
+
+/* Remove arrows within the input for Chrome/Safari */
+.safety-input-field::-webkit-outer-spin-button,
+.safety-input-field::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* The unit text next to the input */
+.safety-input-unit {
+    color: rgba(255, 255, 255, 0.5);
+    /* Muted text */
+    font-size: 0.75rem;
+    margin-left: 6px;
+    font-weight: 500;
+    user-select: none;
+}
+
+/* SLIDER STYLES */
+
+/* SLIDER STYLES - NEON GLASS TUBE */
+
+.custom-safety-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    /* Slightly thicker for tube effect */
+    outline: none;
+    border-radius: 50rem;
+    margin: 0;
+    transition: opacity 0.2s;
+    /* Glass Tube Effect: Inner shadow for depth + slight border */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Webkit Track */
+.custom-safety-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: transparent;
+    /* Background comes from inline gradient */
+    border-radius: 50rem;
+    border: none;
+}
+
+/* Webkit Thumb - Neon Bloom */
+.custom-safety-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    /* pure white core */
+    cursor: pointer;
+    margin-top: -7px;
+    /* center vertically (8px track height / 2 - 20px thumb height / 2) */
+
+    /* Neon Glow Effect */
+    box-shadow: 0 0 15px 2px rgba(255, 255, 255, 0.8), 0 0 5px rgba(255, 255, 255, 1);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+.custom-safety-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.9), 0 0 10px rgba(255, 255, 255, 1);
+}
+
+/* Firefox Track */
+.custom-safety-slider::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 50rem;
+    border: none;
+}
+
+/* Firefox Thumb */
+.custom-safety-slider::-moz-range-thumb {
+    height: 18px;
+    width: 18px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6);
+}
+
+.custom-safety-slider:focus {
+    outline: none;
+}
+
+/* Glassy Status Badges */
+.glass-badge {
+    padding: 0.4em 0.8em;
+    letter-spacing: 0.05em;
+    min-width: 60px;
+    border-radius: 50rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glass-badge-safe {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.glass-badge-moderate {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
+
+.glass-badge-unsafe {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}

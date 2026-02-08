@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next'; // Imported useTranslation
 
 const LoginPage = ({ darkMode }) => {
+    const { t } = useTranslation(); // Initialize hook
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
@@ -15,11 +17,41 @@ const LoginPage = ({ darkMode }) => {
     const [detectingLocation, setDetectingLocation] = useState(false); // State for location loading
     const navigate = useNavigate();
 
-    const handleRegister = async () => {
+    const handleLogin = async (e) => {
+        e.preventDefault();
         setLoading(true);
         setError('');
         setMessage('');
+
         try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) throw error;
+
+            setMessage(t('loginSuccess')); // Translated message
+            // Wait for 1 second to show success message before navigating
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1000);
+
+        } catch (error) {
+            setError(error.message || t('loginFail')); // Translated error fallback
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        setMessage('');
+
+        try {
+            // 1. Sign up the user
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -33,62 +65,24 @@ const LoginPage = ({ darkMode }) => {
 
             if (error) throw error;
 
-            if (data.user) {
-                // Assuming "Confirm Email" is disabled, we can just say success
-                // OR if session exists, redirect.
-                if (data.session) {
-                    alert('Registration successful!');
-                    navigate('/dashboard');
-                } else {
-                    // Even if confirm email is disabled, sometimes session isn't immediate if auto-confirm is off?
-                    // But user said they will remove confirm email option.
-                    alert('Registration successful!');
-                    navigate('/dashboard');
-                }
-            }
+            setMessage(t('registerSuccess')); // Translated message
+            // Ideally output instructions to check email if email confirmation is on.
 
-        } catch (err) {
-            setError(err.message);
+
+        } catch (error) {
+            setError(error.message || t('registerFail')); // Translated error fallback
         } finally {
             setLoading(false);
         }
     };
 
-    const handleLogin = async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) throw error;
-
-            console.log('Logged in user:', data.user);
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.message || 'Failed to log in.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (isRegistering) {
-            handleRegister();
-        } else {
-            handleLogin();
-        }
-    };
-
+    // Function to get current location
     const detectLocation = () => {
         setDetectingLocation(true);
         setError('');
 
         if (!navigator.geolocation) {
-            setError("Geolocation is not supported by your browser.");
+            setError(t('locationError')); // Translated
             setDetectingLocation(false);
             return;
         }
@@ -96,117 +90,145 @@ const LoginPage = ({ darkMode }) => {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
+
                 try {
-                    const response = await fetch(
-                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-                    );
+                    // Use a reverse geocoding API to get the city/address
+                    // Using a free API for demonstration (replace with Google Maps API or similar in production)
+                    const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
                     const data = await response.json();
 
-                    // Construct location string
-                    const parts = [];
-                    if (data.city) parts.push(data.city);
-                    else if (data.locality) parts.push(data.locality);
+                    if (data && (data.city || data.locality || data.principalSubdivision)) {
+                        const detectedLoc = data.city || data.locality || data.principalSubdivision;
+                        setLocation(detectedLoc);
+                        setMessage(t('locationDetected')); // Translated
+                    } else {
+                        setLocation(`${latitude}, ${longitude}`); // Fallback to coordinates
+                        setMessage(t('locationDetected')); // Translated
+                    }
 
-                    if (data.principalSubdivision) parts.push(data.principalSubdivision);
-                    if (data.countryName) parts.push(data.countryName);
-
-                    const locationString = parts.join(', ');
-                    setLocation(locationString);
                 } catch (err) {
-                    setError("Failed to fetch location details.");
+                    // Fallback if reverse geocoding fails
+                    setLocation(`${latitude}, ${longitude}`);
+                    console.error("Geocoding error:", err);
                 } finally {
                     setDetectingLocation(false);
                 }
             },
             (err) => {
-                setError("Unable to retrieve your location. Please allow location access.");
+                console.error("Geolocation error:", err);
+                setError(t('locationError')); // Translated
                 setDetectingLocation(false);
             }
         );
     };
 
     return (
-        <div className={`d-flex align-items-center justify-content-center vh-100 ${darkMode ? 'bg-dark text-light' : 'bg-light'}`}>
-            <div className={`card p-4 shadow-lg ${darkMode ? 'bg-dark border-secondary' : ''}`} style={{ width: '400px', borderRadius: '1rem', color: darkMode ? '#fff' : 'inherit' }}>
-                <div className="card-body">
-                    <h2 className="text-center mb-4">{isRegistering ? 'Create Account' : 'JAL-RAKSHAK Login'}</h2>
+        <div className={`d-flex align-items-center justify-content-center vh-100 ${darkMode ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
+            <div className={`card p-4 shadow-lg ${darkMode ? 'bg-secondary text-light' : 'bg-white text-dark'}`} style={{ maxWidth: '400px', width: '100%' }}>
+                <div className="text-center mb-4">
+                    <h2 className="fw-bold">{isRegistering ? t('createAccount') : t('login')}</h2>
+                </div>
 
-                    {message && <div className="alert alert-success">{message}</div>}
-                    {error && <div className="alert alert-danger">{error}</div>}
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                {message && <div className="alert alert-success" role="alert">{message}</div>}
 
-                    <form onSubmit={handleSubmit}>
-                        {isRegistering && (
-                            <>
-                                <div className="form-group mb-3">
-                                    <label>Full Name</label>
-                                    <input
-                                        type="text"
-                                        className={`form-control ${darkMode ? 'bg-secondary text-light border-secondary' : ''}`}
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group mb-3">
-                                    <label>Location</label>
-                                    <div className="input-group">
-                                        <input
-                                            type="text"
-                                            className={`form-control ${darkMode ? 'bg-secondary text-light border-secondary' : ''}`}
-                                            value={location}
-                                            readOnly
-                                            placeholder="Detecting..."
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            className={`btn ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`}
-                                            onClick={detectLocation}
-                                            disabled={detectingLocation}
-                                            title="Detect My Location"
-                                        >
-                                            {detectingLocation ? (
-                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            ) : (
-                                                <FaMapMarkerAlt />
-                                            )}
-                                        </button>
-                                    </div>
-                                    <small className="form-text text-muted">
-                                        Click the map icon to auto-detect your location.
-                                    </small>
-                                </div>
-                            </>
-                        )}
-                        <div className="form-group mb-3">
-                            <label>Email Address</label>
+                <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+                    {isRegistering && (
+                        <div className="mb-3">
+                            <label className="form-label">{t('name') || "Full Name"}</label>
                             <input
-                                type="email"
-                                className={`form-control ${darkMode ? 'bg-secondary text-light border-secondary' : ''}`}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                type="text"
+                                className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                placeholder={t('name') || "Full Name"}
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 required
                             />
                         </div>
-                        <div className="form-group mb-4">
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                className={`form-control ${darkMode ? 'bg-secondary text-light border-secondary' : ''}`}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
+                    )}
 
-                        <button type="submit" className="btn btn-primary w-100 mb-3" disabled={loading}>
-                            {loading ? 'Processing...' : (isRegistering ? 'Register' : 'Login')}
+                    <div className="mb-3">
+                        <label className="form-label">{t('email')}</label>
+                        <input
+                            type="email"
+                            className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                            placeholder="name@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">{t('password')}</label>
+                        <input
+                            type="password"
+                            className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                            placeholder="********"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {isRegistering && (
+                        <div className="mb-3">
+                            <label className="form-label">{t('location') || "Location"}</label>
+                            <div className="input-group">
+                                <input
+                                    type="text"
+                                    className={`form-control ${darkMode ? 'bg-dark text-light border-secondary' : ''}`}
+                                    placeholder={t('location') || "City, Country"}
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                />
+                                <button
+                                    className={`btn ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`}
+                                    type="button"
+                                    onClick={detectLocation}
+                                    disabled={detectingLocation}
+                                    title={t('detectingLocation')}
+                                >
+                                    {detectingLocation ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : <FaMapMarkerAlt />}
+                                </button>
+                            </div>
+                            {detectingLocation && <div className="form-text text-muted">{t('detectingLocation')}</div>}
+                        </div>
+                    )}
+
+                    {!isRegistering && (
+                        <div className="mb-3 text-end">
+                            <button type="button" className="btn btn-link p-0 text-decoration-none" style={{ fontSize: '0.9rem' }} onClick={() => alert(t('implementationPending'))}>{t('forgotPassword')}</button>
+                        </div>
+                    )}
+
+                    <div className="d-grid gap-2">
+                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    {isRegistering ? t('registering') : t('loggingIn')}
+                                </>
+                            ) : (
+                                isRegistering ? t('createAccount') : t('login')
+                            )}
                         </button>
-                    </form>
+                    </div>
+                </form>
 
-                    <button type="button" className="btn btn-link w-100 mt-2" onClick={() => setIsRegistering(!isRegistering)}>
-                        {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
-                    </button>
+                <div className="mt-4 text-center">
+                    <p className="mb-0">
+                        {isRegistering ? t('hasAccount') : t('noAccount')}
+                        <button
+                            className="btn btn-link text-decoration-none fw-bold"
+                            onClick={() => {
+                                setIsRegistering(!isRegistering);
+                                setError('');
+                                setMessage('');
+                            }}
+                        >
+                            {isRegistering ? t('login') : t('signup')}
+                        </button>
+                    </p>
                 </div>
             </div>
         </div>

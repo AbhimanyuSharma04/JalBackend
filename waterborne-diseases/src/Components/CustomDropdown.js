@@ -9,43 +9,33 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
     const dropdownRef = useRef(null);
 
     // Update coordinates when opening
-    useLayoutEffect(() => {
-        if (isOpen && dropdownRef.current) {
+    const updateCoords = () => {
+        if (dropdownRef.current) {
             const rect = dropdownRef.current.getBoundingClientRect();
             setCoords({
-                top: rect.bottom + window.scrollY + 8, // 8px gap
-                left: rect.left + window.scrollX,
+                top: rect.bottom + 8, // Fixed position relative to viewport
+                left: rect.left,
                 width: rect.width
             });
         }
-    }, [isOpen]);
+    };
 
-    // Handle Resize / Scroll to update or close
-    useEffect(() => {
-        const handleResize = () => setIsOpen(false); // Close on resize to avoid misalignment
-
-        // Optional: Close on scroll if sticky behavior is hard to track perfectly
-        const handleScroll = () => {
-            if (isOpen) setIsOpen(false);
-        };
-
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('scroll', handleScroll, { capture: true }); // Capture to catch container scrolls
-
+    useLayoutEffect(() => {
+        if (isOpen) {
+            updateCoords();
+            window.addEventListener('scroll', updateCoords, { capture: true });
+            window.addEventListener('resize', updateCoords);
+        }
         return () => {
-            window.removeEventListener('resize', handleResize);
-            window.removeEventListener('scroll', handleScroll, { capture: true });
+            window.removeEventListener('scroll', updateCoords, { capture: true });
+            window.removeEventListener('resize', updateCoords);
         };
     }, [isOpen]);
-
 
     // Click outside handler
     useEffect(() => {
         const handleClickOutside = (event) => {
-            // Check if click is on the trigger or the portal menu
-            // Note: Portal menu is separate, but we can check if target is inside .jr-dropdown-menu-portal
             const portalMenu = document.getElementById(`dropdown-portal-${name}`);
-
             if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target) &&
@@ -54,12 +44,15 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
                 setIsOpen(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [name]);
+    }, [isOpen, name]);
 
 
     const handleSelect = (optionValue) => {
+        // Ensure we send the correct event structure that parent expects
         onChange({ target: { name, value: optionValue } });
         setIsOpen(false);
     };
@@ -67,13 +60,15 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
     // Find display label
     const getDisplayLabel = () => {
         if (!value) return placeholder;
-        if (typeof options[0] === 'string') return value;
-        const selected = options.find(opt => opt.value === value || opt === value);
+        // Handle both simple string array and object array
+        const selected = options.find(opt =>
+            (opt.value === value) || (opt === value)
+        );
         if (selected) return selected.label || selected;
-        return value;
+        return value; // Fallback
     };
 
-    // Normalized options
+    // Normalized options for internal rendering
     const normalizedOptions = options.map(opt => {
         if (typeof opt === 'string') return { value: opt, label: opt };
         return opt;
@@ -84,6 +79,7 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
             <div
                 className={`jr-custom-select ${isOpen ? 'active' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
+                style={{ cursor: 'pointer' }}
             >
                 <div className="d-flex align-items-center justify-content-between w-100">
                     <span className={!value ? "text-muted" : "text-white fw-medium"}>
@@ -98,7 +94,7 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
                 </div>
             </div>
 
-            {/* Portal for the Menu */}
+            {/* Portal for the Menu - Renders outside of any overflow:hidden containers */}
             {createPortal(
                 <AnimatePresence>
                     {isOpen && (
@@ -110,11 +106,11 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
                             transition={{ duration: 0.15 }}
                             className="jr-dropdown-menu"
                             style={{
-                                position: 'absolute',
+                                position: 'fixed', // Fixed positioning is key here
                                 top: coords.top,
                                 left: coords.left,
                                 width: coords.width,
-                                zIndex: 9999, // Super high z-index
+                                zIndex: 9999,
                                 maxHeight: '300px',
                                 overflowY: 'auto'
                             }}
@@ -123,7 +119,10 @@ const CustomDropdown = ({ options, value, onChange, placeholder, name }) => {
                                 <div
                                     key={index}
                                     className={`jr-dropdown-item ${value === option.value ? 'selected' : ''}`}
-                                    onClick={() => handleSelect(option.value)}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent bubbling
+                                        handleSelect(option.value);
+                                    }}
                                 >
                                     {option.label}
                                     {value === option.value && <div className="jr-indicator" />}
